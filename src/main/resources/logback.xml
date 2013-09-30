@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<property name="DEFAULT_PATTERN" value="%d %-5level - %msg %n"
+		scope="CONTEXT" />
+	<appender name="INFO-FILE" class="ch.qos.logback.core.FileAppender">
+		<file>info.log</file>
+		<level>DEBUG</level>
+		<append>true</append>
+		<encoder>
+			<pattern>${DEFAULT_PATTERN}
+			</pattern>
+		</encoder>
+	</appender>
+	<appender name="ACCESS-FILE" class="ch.qos.logback.core.FileAppender">
+		<file>debug.log</file>
+		<level>INFO</level>
+		<append>true</append>
+		<encoder>
+			<pattern>${DEFAULT_PATTERN}
+			</pattern>
+		</encoder>
+	</appender>
+	<!-- additivity=false ensures analytics data only goes to the analytics 
+		log -->
+	<logger name="access.log">
+		<appender-ref ref="DEBUG-FILE" />
+	</logger>
+	<logger name="error.log">
+		<appender-ref ref="INFO-FILE" />
+	</logger>
+</configuration>
