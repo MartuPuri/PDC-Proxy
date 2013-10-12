@@ -1,6 +1,7 @@
 package itba.pdc.proxy;
 
 import itba.pdc.proxy.data.Attachment;
+import itba.pdc.proxy.data.PersistentConnection;
 import itba.pdc.proxy.data.ProcessType;
 
 import java.io.IOException;
@@ -12,9 +13,11 @@ import java.nio.channels.SocketChannel;
 
 public class HttpProtocol implements TCPProtocol {
 	private int bufSize; // Size of I/O buffer
+	private PersistentConnection connections;
 
 	public HttpProtocol(int bufSize) {
 		this.bufSize = bufSize;
+		this.connections = PersistentConnection.getInstance();
 	}
 
 	public void handleAccept(SelectionKey key) throws IOException {
@@ -24,14 +27,17 @@ public class HttpProtocol implements TCPProtocol {
 		// buffer
 		SelectionKey clientKey = clntChan.register(key.selector(),
 				SelectionKey.OP_READ);
-		SocketChannel serverChannel = SocketChannel.open(new InetSocketAddress("192.168.1.108", 8080));
-		serverChannel.configureBlocking(false);
-		SelectionKey serverKey = serverChannel.register(key.selector(), SelectionKey.OP_READ);
-		Attachment serverAtt = new Attachment(serverKey, ProcessType.SERVER, serverChannel,
-				this.bufSize, clientKey, clntChan);
-		serverKey.attach(serverAtt);
-		Attachment clientAtt = new Attachment(clientKey, ProcessType.CLIENT, clntChan,
-				this.bufSize, serverKey, serverChannel);
+		// SocketChannel serverChannel = SocketChannel.open(new
+		// InetSocketAddress("192.168.1.108", 8080));
+		// serverChannel.configureBlocking(false);
+		// SelectionKey serverKey = serverChannel.register(key.selector(),
+		// SelectionKey.OP_READ);
+		// Attachment serverAtt = new Attachment(serverKey, ProcessType.SERVER,
+		// serverChannel,
+		// this.bufSize, clientKey, clntChan);
+		// serverKey.attach(serverAtt);
+		Attachment clientAtt = new Attachment(clientKey, ProcessType.CLIENT,
+				clntChan, this.bufSize);
 		clientKey.attach(clientAtt);
 	}
 
@@ -40,18 +46,43 @@ public class HttpProtocol implements TCPProtocol {
 		Attachment att = (Attachment) key.attachment();
 		System.out.println("PROCESS: " + att.getProcessID());
 		SocketChannel channel = att.getChannel();
-		SocketChannel oppositeChannel = att.getOppositeChannel();
-		SelectionKey oppositeKey = att.getOppositeKey();
-		
+		// SocketChannel oppositeChannel = att.getOppositeChannel();
+		// SelectionKey oppositeKey = att.getOppositeKey();
+
 		ByteBuffer buf = att.getByteBuffer();
 		long bytesRead = channel.read(buf);
 		if (bytesRead == -1) { // Did the other end close?
 			channel.close();
 		} else if (bytesRead > 0) {
+			//TODO: Hardcoding persistent connections. Fix this when the http parser is complete
+			String port = new String(buf.array()).trim();
+			Attachment serverAtt = connections.getConnection(port);
+			SelectionKey oppositeKey;
+			SocketChannel oppositeChannel;
+			if (serverAtt != null) {
+				oppositeKey = serverAtt.getKey();
+				oppositeKey.attach(serverAtt);
+				oppositeChannel = serverAtt.getChannel();
+				System.out.println("User existing connections");
+			} else {
+				oppositeChannel = SocketChannel
+						.open(new InetSocketAddress("192.168.1.108", Integer
+								.parseInt(port)));
+				oppositeChannel.configureBlocking(false);
+				oppositeKey = oppositeChannel.register(
+						key.selector(), SelectionKey.OP_READ);
+				serverAtt = new Attachment(oppositeKey,
+						ProcessType.SERVER, oppositeChannel, this.bufSize,
+						att.getKey(), channel);
+				oppositeKey.attach(serverAtt);
+				connections.addConnection(port, serverAtt);
+				System.out.println("Use new connections");
+			}
+			att.setOppositeChannel(oppositeChannel);
+			att.setOppositeKey(oppositeKey);
 			// Indicate via key that reading/writing are both of interest now.
-			
-			Attachment oppositeAtt = (Attachment) oppositeKey.attachment();
-			oppositeAtt.setByteBuffer(buf);
+			// Attachment oppositeAtt = (Attachment) oppositeKey.attachment();
+			serverAtt.setByteBuffer(buf);
 			oppositeKey.interestOps(SelectionKey.OP_WRITE);
 			key.interestOps(SelectionKey.OP_READ);
 		}
@@ -68,7 +99,7 @@ public class HttpProtocol implements TCPProtocol {
 		SocketChannel channel = att.getChannel();
 		SocketChannel oppositeChannel = att.getOppositeChannel();
 		SelectionKey oppositeKey = att.getOppositeKey();
-		
+
 		ByteBuffer buf = att.getByteBuffer();
 		buf.flip(); // Prepare buffer for writing
 		channel.write(buf);
