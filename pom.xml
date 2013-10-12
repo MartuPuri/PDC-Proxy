@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>itba.pdc</groupId>
-	<artifactId>proxy</artifactId>
+	<artifactId>HTTP-Proxy</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>proxy</name>
+	<name>HTTP-Proxy</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>

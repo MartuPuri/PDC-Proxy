@@ -1,38 +1,20 @@
 package itba.pdc.proxy;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
+
 
 /**
- * Unit test for simple App.
+ * Hello world!
+ * 
  */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
-    }
-
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
-    }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
+public class AppTest {
+	public static void main(String[] args) {
+		Logger logger = (Logger) LoggerFactory.getLogger("error.log");
+		// Keep in mind that all of those classes are from SLF4J package!
+		logger.info("Here is my important-as-hell message!");
+		logger.debug("Debug");
+		logger.error("Error");
+	}
 }
