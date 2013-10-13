@@ -54,35 +54,41 @@ public class HttpProtocol implements TCPProtocol {
 		if (bytesRead == -1) { // Did the other end close?
 			channel.close();
 		} else if (bytesRead > 0) {
-			//TODO: Hardcoding persistent connections. Fix this when the http parser is complete
-			String port = new String(buf.array()).trim();
-			Attachment serverAtt = connections.getConnection(port);
+			// TODO: Hardcoding persistent connections. Fix this when the http
+			// parser is complete
 			SelectionKey oppositeKey;
 			SocketChannel oppositeChannel;
-			if (serverAtt != null) {
-				oppositeKey = serverAtt.getKey();
-				oppositeKey.attach(serverAtt);
-				oppositeChannel = serverAtt.getChannel();
-				System.out.println("User existing connections");
+			if (att.getProcessID().equals(ProcessType.CLIENT)) {
+				String port = new String(buf.array()).trim();
+				Attachment serverAtt = connections.getConnection(port);
+				if (serverAtt != null) {
+					oppositeKey = serverAtt.getKey();
+					oppositeKey.attach(serverAtt);
+					oppositeChannel = serverAtt.getChannel();
+					System.out.println("User existing connections");
+				} else {
+					oppositeChannel = SocketChannel.open(new InetSocketAddress(
+							"192.168.1.108", Integer.parseInt(port)));
+					oppositeChannel.configureBlocking(false);
+					oppositeKey = oppositeChannel.register(key.selector(),
+							SelectionKey.OP_READ);
+					serverAtt = new Attachment(oppositeKey, ProcessType.SERVER,
+							oppositeChannel, this.bufSize, att.getKey(),
+							channel);
+					oppositeKey.attach(serverAtt);
+					connections.addConnection(port, serverAtt);
+					System.out.println("Use new connections");
+				}
+				att.setOppositeChannel(oppositeChannel);
+				att.setOppositeKey(oppositeKey);
+				// Indicate via key that reading/writing are both of interest
+				// now.
+				// Attachment oppositeAtt = (Attachment)
+				// oppositeKey.attachment();
+				serverAtt.setByteBuffer(buf);
 			} else {
-				oppositeChannel = SocketChannel
-						.open(new InetSocketAddress("192.168.1.108", Integer
-								.parseInt(port)));
-				oppositeChannel.configureBlocking(false);
-				oppositeKey = oppositeChannel.register(
-						key.selector(), SelectionKey.OP_READ);
-				serverAtt = new Attachment(oppositeKey,
-						ProcessType.SERVER, oppositeChannel, this.bufSize,
-						att.getKey(), channel);
-				oppositeKey.attach(serverAtt);
-				connections.addConnection(port, serverAtt);
-				System.out.println("Use new connections");
+				oppositeKey = att.getOppositeKey();
 			}
-			att.setOppositeChannel(oppositeChannel);
-			att.setOppositeKey(oppositeKey);
-			// Indicate via key that reading/writing are both of interest now.
-			// Attachment oppositeAtt = (Attachment) oppositeKey.attachment();
-			serverAtt.setByteBuffer(buf);
 			oppositeKey.interestOps(SelectionKey.OP_WRITE);
 			key.interestOps(SelectionKey.OP_READ);
 		}

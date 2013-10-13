@@ -26,25 +26,36 @@ public class PersistentConnection {
 		if (_host == null || _att == null) {
 			return false;
 		}
-		if (this.connections.containsKey(_host)) {
+		if (connections.containsKey(_host)) {
 			return false;
 		}
-		this.connections.put(_host, _att);
+		connections.put(_host, _att);
 		return true;
 	}
 	
 	public void closeConnection(String _host) throws IOException {
 		if (_host != null) {
-			Attachment att = this.connections.get(_host);
+			Attachment att = connections.get(_host);
 			if (att != null) {
-				att.closeChannel();
+				att.getChannel().close();
 			}
 		}
 	}
 	
 	public Attachment getConnection(String _host) {
 		if (_host != null) {
-			return connections.get(_host);
+			Attachment att = connections.get(_host);
+			if (att == null) {
+				return null;
+			}
+			System.out.println("att.getChannel().isOpen(): " + att.getChannel().isOpen());
+			System.out.println("att.getChannel().isConnected(): " + att.getChannel().isConnected());
+			if (att.getChannel().isOpen() && att.getChannel().isConnected()) {
+				return att;
+			} else {
+				connections.remove(_host);
+				return null;
+			}
 		}
 		return null;
 	}

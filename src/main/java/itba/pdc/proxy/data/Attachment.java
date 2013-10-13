@@ -77,16 +77,4 @@ public class Attachment {
 	public void setByteBuffer(ByteBuffer _buff) {
 		this.buff = _buff;
 	}
-
-	public void closeChannel() throws IOException {
-		if (this.channel != null) {
-			this.channel.close();
-		}
-	}
-
-	public void closeOppositeChannel() throws IOException {
-		if (this.oppositeChannel != null) {
-			this.oppositeChannel.close();
-		}
-	}
 }
