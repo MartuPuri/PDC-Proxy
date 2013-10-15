@@ -1,6 +1,5 @@
 package itba.pdc.proxy.data;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -35,7 +34,7 @@ public class Attachment {
 		this.key = _key;
 		this.channel = _channel;
 		this.buffSize = _buffSize;
-		this.buff = ByteBuffer.allocate(_buffSize);
+		this.buff = ByteBuffer.allocateDirect(_buffSize);
 	}
 
 	public Attachment(ProcessType _processID) {
