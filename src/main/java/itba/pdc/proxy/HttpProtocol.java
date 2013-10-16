@@ -44,13 +44,15 @@ public class HttpProtocol implements TCPProtocol {
 	public void handleRead(SelectionKey key) throws IOException {
 		// Client socket channel has pending data
 		Attachment att = (Attachment) key.attachment();
-		System.out.println("PROCESS: " + att.getProcessID());
+//		System.out.println("PROCESS: " + att.getProcessID());
 		SocketChannel channel = att.getChannel();
 		// SocketChannel oppositeChannel = att.getOppositeChannel();
 		// SelectionKey oppositeKey = att.getOppositeKey();
 
 		ByteBuffer buf = att.getByteBuffer();
+		System.out.println("Total Buffer yes: " + new String(att.getTotalByteBuffer().array()));
 		long bytesRead = channel.read(buf);
+		att.setBuffer(buf);
 		if (bytesRead == -1) { // Did the other end close?
 			channel.close();
 		} else if (bytesRead > 0) {
@@ -59,38 +61,46 @@ public class HttpProtocol implements TCPProtocol {
 			SelectionKey oppositeKey;
 			SocketChannel oppositeChannel;
 			if (att.getProcessID().equals(ProcessType.CLIENT)) {
-				//String port = new String(buf.array()).trim();
-				Attachment serverAtt;// = connections.getConnection(port);
-				//if (serverAtt != null) {
-//					oppositeKey = serverAtt.getKey();
-//					oppositeKey.attach(serverAtt);
-//					oppositeChannel = serverAtt.getChannel();
-//					System.out.println("User existing connections");
-//				} else {
+				att.parseByteBuffer();
+				System.out.println("att.requestFinished(): " + att.requestFinished());
+				System.out.println("state: " + att.getState());
+				if (att.requestFinished()) {
+					String host = att.getHost();
+					Integer port = att.getPort();
 					oppositeChannel = SocketChannel.open(new InetSocketAddress(
-							"www.google.com", 80));
+							host, port));
 					oppositeChannel.configureBlocking(false);
 					oppositeKey = oppositeChannel.register(key.selector(),
 							SelectionKey.OP_READ);
-					serverAtt = new Attachment(oppositeKey, ProcessType.SERVER,
-							oppositeChannel, this.bufSize, att.getKey(),
-							channel);
+					Attachment serverAtt = new Attachment(oppositeKey,
+							ProcessType.SERVER, oppositeChannel, this.bufSize,
+							att.getKey(), channel);
 					oppositeKey.attach(serverAtt);
-					connections.addConnection("80", serverAtt);
-					System.out.println("Use new connections");
-				//}
-				att.setOppositeChannel(oppositeChannel);
-				att.setOppositeKey(oppositeKey);
+					att.setOppositeChannel(oppositeChannel);
+					att.setOppositeKey(oppositeKey);
+					serverAtt.setByteBuffer(att.getTotalByteBuffer());
+					System.out.println("TOTAL: " + new String(att.getTotalByteBuffer().array()));
+					oppositeKey.interestOps(SelectionKey.OP_WRITE);
+					key.interestOps(SelectionKey.OP_READ);
+				} else {
+					System.out.println("Entra aqui");
+					att.resetBuffer();
+					key.interestOps(SelectionKey.OP_READ);
+				}
+				// connections.addConnection("80", serverAtt);
+				// System.out.println("Use new connections");
+				// }
 				// Indicate via key that reading/writing are both of interest
 				// now.
 				// Attachment oppositeAtt = (Attachment)
 				// oppositeKey.attachment();
-				serverAtt.setByteBuffer(buf);
 			} else {
+				System.out.println("PORQUE ENTRAS");
 				oppositeKey = att.getOppositeKey();
+				oppositeKey.interestOps(SelectionKey.OP_WRITE);
+				key.interestOps(SelectionKey.OP_READ);
 			}
-			oppositeKey.interestOps(SelectionKey.OP_WRITE);
-			key.interestOps(SelectionKey.OP_READ);
+
 		}
 	}
 
@@ -101,12 +111,14 @@ public class HttpProtocol implements TCPProtocol {
 		 */
 		// Retrieve data read earlier
 		Attachment att = (Attachment) key.attachment();
-		System.out.println("PROCESS: " + att.getProcessID());
+//		System.out.println("PROCESS: " + att.getProcessID());
 		SocketChannel channel = att.getChannel();
 		SocketChannel oppositeChannel = att.getOppositeChannel();
 		SelectionKey oppositeKey = att.getOppositeKey();
 
 		ByteBuffer buf = att.getByteBuffer();
+		System.out.println("PROCESS: " + att.getProcessID());
+		System.out.println("WRITE: " + new String(buf.array()));
 		buf.flip(); // Prepare buffer for writing
 		channel.write(buf);
 		if (!buf.hasRemaining()) { // Buffer completely written?

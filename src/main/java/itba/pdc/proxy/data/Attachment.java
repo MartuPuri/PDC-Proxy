@@ -1,5 +1,8 @@
 package itba.pdc.proxy.data;
 
+import itba.pdc.httpparser.HttpParser;
+
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -16,8 +19,10 @@ public class Attachment {
 	private SelectionKey key;
 	private SelectionKey oppositeKey;
 	private ByteBuffer buff;
+	private ByteBuffer totalBuff;
 	private SocketChannel oppositeChannel;
 	private SocketChannel channel;
+	private HttpParser parser;
 	private int buffSize;
 
 	public Attachment(SelectionKey _key, ProcessType _processID,
@@ -38,6 +43,8 @@ public class Attachment {
 	}
 
 	public Attachment(ProcessType _processID) {
+		this.parser = new HttpParser();
+		this.totalBuff = ByteBuffer.allocate(0);
 		this.processID = _processID;
 	}
 
@@ -75,5 +82,62 @@ public class Attachment {
 
 	public void setByteBuffer(ByteBuffer _buff) {
 		this.buff = _buff;
+	}
+	
+	public boolean parseByteBuffer() {
+		this.buff.flip();
+		increaseTotalByteBuffer();
+		System.out.println("Total Buffer: " + new String(totalBuff.array()));
+//		System.out.println("Buff: " + this.buff.array());
+		this.buff.flip();
+		parser.pushByteBuffer(this.buff);
+		try {
+			parser.parse();
+		} catch (IOException e) {
+			return false;
+		}
+		return true;
+	}
+	
+	private void increaseTotalByteBuffer() {
+		ByteBuffer aux = ByteBuffer.allocate(this.totalBuff.capacity() + this.buff.capacity());
+		this.totalBuff.flip();
+		aux.put(this.totalBuff);
+		aux.put(this.buff);
+		System.out.println("Aux: " + new String(aux.array()));
+		this.totalBuff = aux;
+	}
+
+	public boolean requestFinished() {
+		return parser.requestFinish();
+	}
+	
+	public String getHost() {
+		return parser.getHeader("Host");
+	}
+
+	public Integer getPort() {
+		String port = parser.getHeader("Port");
+		if (port == null) {
+			return 80;
+		}
+		return Integer.parseInt(port);
+	}
+
+	public ByteBuffer getTotalByteBuffer() {
+		return this.totalBuff;
+	}
+
+	public void setBuffer(ByteBuffer _buff) {
+		this.buff = _buff;
+	}
+	
+	public void resetBuffer() {
+		this.buff = ByteBuffer.allocate(this.buffSize);
+	}
+
+	@Deprecated
+	public String getState() {
+		return parser.toString();
 	}
 }
