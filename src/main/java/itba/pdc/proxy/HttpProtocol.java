@@ -68,7 +68,7 @@ public class HttpProtocol implements TCPProtocol {
 //					System.out.println("User existing connections");
 //				} else {
 					oppositeChannel = SocketChannel.open(new InetSocketAddress(
-							"192.168.76.1", 80));
+							"www.google.com", 80));
 					oppositeChannel.configureBlocking(false);
 					oppositeKey = oppositeChannel.register(key.selector(),
 							SelectionKey.OP_READ);
@@ -76,7 +76,7 @@ public class HttpProtocol implements TCPProtocol {
 							oppositeChannel, this.bufSize, att.getKey(),
 							channel);
 					oppositeKey.attach(serverAtt);
-					connections.addConnection(port, serverAtt);
+					connections.addConnection("80", serverAtt);
 					System.out.println("Use new connections");
 				//}
 				att.setOppositeChannel(oppositeChannel);

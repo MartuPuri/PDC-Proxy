@@ -9,7 +9,7 @@ import ch.qos.logback.classic.Logger;
  * Hello world!
  * 
  */
-public class AppTest {
+public class LogTest {
 	public static void main(String[] args) {
 		Logger logger = (Logger) LoggerFactory.getLogger("error.log");
 		// Keep in mind that all of those classes are from SLF4J package!

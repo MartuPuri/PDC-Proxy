@@ -17,8 +17,6 @@ package itba.pdc.httpparser;
  */
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,7 +31,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 enum State {
-	INITIAL, HEADERS, BODY, END, ERROR;
+	INITIAL, HEADERS, DATA, END, ERROR;
 };
 
 public class HttpParser {
@@ -64,69 +62,89 @@ public class HttpParser {
 			{ "504", "Gateway Timeout" },
 			{ "505", "HTTP Version Not Supported" } };
 
+	@Deprecated
 	private BufferedReader reader;
 	private String method, url;
 	private Map<String, String> headers, params;
 	private int[] ver;
-	
+	private String data;
+
+	private ByteBuffer buff;
 	private State state;
+	@Deprecated
 	private InputStream input;
+	@Deprecated
 	private BufferedReader buffReader;
 
-	public static void main(String args[]) {
-		File file = new File("get.txt");
-		FileInputStream fis = null;
-		try {
-			fis = new FileInputStream(file);
-
-			System.out.println("Total file size to read (in bytes) : "
-					+ fis.available());
-			HttpParser parser = new HttpParser(fis);
-			parser.parseRequest();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (fis != null)
-					fis.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
+	// public static void main(String args[]) {
+	// File file = new File("get.txt");
+	// FileInputStream fis = null;
+	// try {
+	// fis = new FileInputStream(file);
+	//
+	// System.out.println("Total file size to read (in bytes) : "
+	// + fis.available());
+	// HttpParser parser = new HttpParser(fis);
+	// parser.parseRequest();
+	//
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// } finally {
+	// try {
+	// if (fis != null)
+	// fis.close();
+	// } catch (IOException ex) {
+	// ex.printStackTrace();
+	// }
+	// }
+	// }
 
 	public HttpParser() {
 		this.state = State.INITIAL;
 		this.method = "";
 		this.url = "";
-		headers = new HashMap<String, String>();
-		params = new HashMap<String, String>();
-		ver = new int[2];
+		this.headers = new HashMap<String, String>();
+		this.params = new HashMap<String, String>();
+		this.ver = new int[2];
 	}
-	
+
+	@Deprecated
+	public HttpParser(InputStream is) {
+		this();
+		this.reader = new BufferedReader(new InputStreamReader(is));
+	}
+
+	public HttpParser(ByteBuffer _buff) {
+		this();
+		this.buff = _buff;
+	}
+
 	/*
-	 *funcion que pushea al inputstream, un is entrante 
+	 * funcion que pushea al inputstream, un is entrante
 	 */
-	public void pushInputStream(InputStream is){
+	@Deprecated
+	public void pushInputStream(InputStream is) {
 		this.input = new SequenceInputStream(this.input, is);
 		this.buffReader = new BufferedReader(new InputStreamReader(this.input));
 	}
-	
+
 	/*
-	 * funcion que parsea en base a su estado actual, si cambia de estado intenta parsiar dnuevo.
+	 * funcion que parsea en base a su estado actual, si cambia de estado
+	 * intenta parsiar dnuevo.
 	 */
-	public void parse(){
+	public void parse() throws IOException {
 		switch (this.state) {
 		case INITIAL:
 			this.handleInitial();
 			this.state = State.HEADERS;
 			break;
 		case HEADERS:
-			this.state = State.BODY;
+			parseHeaders();
+//			this.state = State.DATA;
 			break;
-		case BODY:
-			this.state = State.END;
+		case DATA:
+			parseData();
+//			this.state = State.END;
 			break;
 		case END:
 			break;
@@ -134,13 +152,67 @@ public class HttpParser {
 			break;
 		}
 	}
-	
-	private int handleInitial(){
-		String initial, prms[], cmd[], temp[];
-		int ret, idx, i;
 
-		ret = 200; // default is OK now
-		initial = reader.readLine();
+	public void pushByteBuffer(ByteBuffer _buff) {
+		System.out.println("Buff: " + new String(this.buff.array()));
+		System.out.println("_Buff: " + new String(_buff.array()));
+		int capacity = this.buff.capacity();
+		int remaining = this.buff.remaining();
+		System.out
+				.println("capacity: " + capacity + " remaining: " + remaining);
+		System.out.println("_buff.capacity(): " + _buff.capacity());
+		ByteBuffer aux = ByteBuffer.allocate(remaining + _buff.capacity());
+		System.out.println("Aux capacity: " + aux.capacity());
+		System.out.println("position: " + this.buff.position());
+		aux.put(this.buff);
+		System.out.println("Aux text 1: " + new String(aux.array()));
+		aux.put(_buff);
+		System.out.println("Aux: position: " + aux.position());
+		System.out.println("Aux text 2: " + new String(aux.array()));
+		System.out.println("AUX IS: " + new String(aux.array()));
+		this.buff = aux;
+		this.buff.position(0);
+	}
+
+	public void print() {
+		System.out.println(new String(this.buff.array()));
+	}
+
+	private String readLine() {
+		String s = new String(this.buff.array());
+		int index = s.indexOf("\n");
+		if (index < 0) {
+			System.out.println("REMAINING:" + this.buff.remaining());
+			return null;
+		}
+		int length = s.length() - 1;
+		String line = s.substring(0, index);
+		if (index < length) {
+			this.buff = ByteBuffer.allocate(length - index);
+			String tail = s.substring(index + 1, length + 1);
+			System.out.println("tail: " + tail);
+			this.buff.put(tail.getBytes());
+			this.buff.position(0);
+		} else if (index == length) {
+			this.buff = ByteBuffer.allocate(length - index);
+			this.buff.position(0);
+		}
+		return line;
+
+	}
+
+	private int handleInitial() throws IOException {
+		String prms[], cmd[], temp[];
+		int idx, i;
+
+		System.out.println("Byte buffer 1: " + new String(this.buff.array()));
+		String initial = readLine();
+		if (initial == null) {
+			return -1;
+		}
+		// initial = reader.readLine();
+		System.out.println("Byte buffer 2: " + new String(this.buff.array()));
+		System.out.println("Initial = " + initial.contains("\n"));
 		if (initial == null || initial.length() == 0)
 			return 0;
 		if (Character.isWhitespace(initial.charAt(0))) {
@@ -150,6 +222,7 @@ public class HttpParser {
 		}
 
 		cmd = initial.split("\\s");
+
 		if (cmd.length != 3) {
 			System.out.println("BAD REQUEST");
 			return 400;
@@ -160,22 +233,26 @@ public class HttpParser {
 			try {
 				ver[0] = Integer.parseInt(temp[0]);
 				ver[1] = Integer.parseInt(temp[1]);
+				if (ver[0] != 1 || ver[1] != 1) {
+					return 505;
+				}
 			} catch (NumberFormatException nfe) {
-				ret = 400;
+				return 400;
 			}
-		} else
-			ret = 400;
+		} else {
+			return 400;
+		}
 
-		if (cmd[0].equals("GET") || cmd[0].equals("HEAD")) {
+		if (cmd[0].equals("GET") || cmd[0].equals("HEAD")
+				|| cmd[0].equals("POST")) {
 			method = cmd[0];
 			System.out.println(cmd);
 			idx = cmd[1].indexOf('?');
-			if (idx < 0)
+			if (idx < 0) {
 				url = cmd[1];
-			else {
+			} else {
 				url = URLDecoder.decode(cmd[1].substring(0, idx), "ISO-8859-1");
 				prms = cmd[1].substring(idx + 1).split("&");
-
 				params = new HashMap<String, String>();
 				for (i = 0; i < prms.length; i++) {
 					temp = prms[i].split("=");
@@ -191,16 +268,8 @@ public class HttpParser {
 					}
 				}
 			}
-	}
-	
-
-	public HttpParser(InputStream is) {
-		reader = new BufferedReader(new InputStreamReader(is));
-		method = "";
-		url = "";
-		headers = new HashMap<String, String>();
-		params = new HashMap<String, String>();
-		ver = new int[2];
+		}
+		return 200;
 	}
 
 	public int parseRequest() throws IOException {
@@ -283,11 +352,17 @@ public class HttpParser {
 	}
 
 	private void parseHeaders() throws IOException {
-		String line;
 		int idx;
 
 		// that fscking rfc822 allows multiple lines, we don't care now
-		line = reader.readLine();
+		String line = readLine();
+		System.out.println("line: " + line);
+		if (line == null) {
+			return;
+		}
+//		if (line.equals("")) {
+//			this.state = State.DATA;
+//		}
 		while (!line.equals("")) {
 			idx = line.indexOf(':');
 			if (idx < 0) {
@@ -297,9 +372,30 @@ public class HttpParser {
 				headers.put(line.substring(0, idx).toLowerCase(), line
 						.substring(idx + 1).trim());
 			}
-			line = reader.readLine();
+			line = readLine();
+			if (line == null) {
+				return;
+			}
+//			if (line.equals("")) {
+//				this.state = State.DATA;
+//			}
 		}
+		this.state = State.DATA;
 		headers.toString();
+	}
+	
+	public void parseData() {
+		String line = readLine();
+		if (line == null) {
+			return;
+		}
+		if (line.equals("")) {
+			this.state = State.END;
+		} else {
+			this.data = line;
+			parseData();
+			System.out.println("Data: " + data);
+		}
 	}
 
 	public String getMethod() {
@@ -371,5 +467,9 @@ public class HttpParser {
 		ret = "Date: " + format.format(new Date()) + " GMT";
 
 		return ret;
+	}
+
+	public State getState() {
+		return this.state;
 	}
 }
