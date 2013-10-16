@@ -183,6 +183,9 @@ public class HttpParser {
 	private String readLine() {
 		String s = new String(this.buff.array());
 		int index = s.indexOf("\r\n");
+		if(index < 0){
+			index = s.indexOf("\n");
+		}
 		if (index < 0) {
 //			System.out.println("REMAINING:" + this.buff.remaining());
 			return null;
