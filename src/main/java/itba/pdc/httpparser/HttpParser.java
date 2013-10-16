@@ -68,6 +68,7 @@ public class HttpParser {
 	private Map<String, String> headers, params;
 	private int[] ver;
 	private String data;
+	private String tail = "";
 
 	private ByteBuffer buff;
 	private State state;
@@ -106,6 +107,7 @@ public class HttpParser {
 		this.headers = new HashMap<String, String>();
 		this.params = new HashMap<String, String>();
 		this.ver = new int[2];
+		this.buff = ByteBuffer.allocate(0);
 	}
 
 	@Deprecated
@@ -114,6 +116,7 @@ public class HttpParser {
 		this.reader = new BufferedReader(new InputStreamReader(is));
 	}
 
+	@Deprecated
 	public HttpParser(ByteBuffer _buff) {
 		this();
 		this.buff = _buff;
@@ -154,24 +157,23 @@ public class HttpParser {
 	}
 
 	public void pushByteBuffer(ByteBuffer _buff) {
-		System.out.println("Buff: " + new String(this.buff.array()));
-		System.out.println("_Buff: " + new String(_buff.array()));
+//		System.out.println("Buff: " + new String(this.buff.array()));
+//		System.out.println("_Buff: " + new String(_buff.array()));
 		int capacity = this.buff.capacity();
 		int remaining = this.buff.remaining();
-		System.out
-				.println("capacity: " + capacity + " remaining: " + remaining);
-		System.out.println("_buff.capacity(): " + _buff.capacity());
+//		System.out.println("capacity: " + capacity + " remaining: " + remaining);
+//		System.out.println("_buff.capacity(): " + _buff.capacity());
 		ByteBuffer aux = ByteBuffer.allocate(remaining + _buff.capacity());
-		System.out.println("Aux capacity: " + aux.capacity());
-		System.out.println("position: " + this.buff.position());
+//		System.out.println("Aux capacity: " + aux.capacity());
+//		System.out.println("position: " + this.buff.position());
 		aux.put(this.buff);
 		System.out.println("Aux text 1: " + new String(aux.array()));
 		aux.put(_buff);
-		System.out.println("Aux: position: " + aux.position());
+//		System.out.println("Aux: position: " + aux.position());
 		System.out.println("Aux text 2: " + new String(aux.array()));
-		System.out.println("AUX IS: " + new String(aux.array()));
+//		System.out.println("AUX IS: " + new String(aux.array()));
 		this.buff = aux;
-		this.buff.position(0);
+		this.buff.flip();
 	}
 
 	public void print() {
@@ -180,23 +182,24 @@ public class HttpParser {
 
 	private String readLine() {
 		String s = new String(this.buff.array());
-		int index = s.indexOf("\n");
+		int index = s.indexOf("\r\n");
 		if (index < 0) {
-			System.out.println("REMAINING:" + this.buff.remaining());
+//			System.out.println("REMAINING:" + this.buff.remaining());
 			return null;
 		}
 		int length = s.length() - 1;
 		String line = s.substring(0, index);
 		if (index < length) {
 			this.buff = ByteBuffer.allocate(length - index);
-			String tail = s.substring(index + 1, length + 1);
+			this.tail = s.substring(index + 2, length + 1);
 			System.out.println("tail: " + tail);
 			this.buff.put(tail.getBytes());
-			this.buff.position(0);
+//			this.buff.position(0);
 		} else if (index == length) {
 			this.buff = ByteBuffer.allocate(length - index);
-			this.buff.position(0);
+//			this.buff.position(0);
 		}
+		this.buff.flip();
 		return line;
 
 	}
@@ -205,14 +208,14 @@ public class HttpParser {
 		String prms[], cmd[], temp[];
 		int idx, i;
 
-		System.out.println("Byte buffer 1: " + new String(this.buff.array()));
+//		System.out.println("Byte buffer 1: " + new String(this.buff.array()));
 		String initial = readLine();
 		if (initial == null) {
 			return -1;
 		}
 		// initial = reader.readLine();
-		System.out.println("Byte buffer 2: " + new String(this.buff.array()));
-		System.out.println("Initial = " + initial.contains("\n"));
+//		System.out.println("Byte buffer 2: " + new String(this.buff.array()));
+//		System.out.println("Initial = " + initial.contains("\n"));
 		if (initial == null || initial.length() == 0)
 			return 0;
 		if (Character.isWhitespace(initial.charAt(0))) {
@@ -381,6 +384,12 @@ public class HttpParser {
 //			}
 		}
 		this.state = State.DATA;
+		System.out.println("Tail 2: " + tail);
+		String s = new String(this.buff.array()).trim();
+		System.out.println(s.trim().equals(""));
+		if (s.equals("")) {
+			this.state = State.END;
+		}
 		headers.toString();
 	}
 	
@@ -471,5 +480,13 @@ public class HttpParser {
 
 	public State getState() {
 		return this.state;
+	}
+	
+	public String toString() {
+		return this.state.toString();
+	}
+	
+	public boolean requestFinish() {
+		return this.state == State.END;
 	}
 }

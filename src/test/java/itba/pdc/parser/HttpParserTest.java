@@ -17,14 +17,15 @@ public class HttpParserTest {
 	private static CharsetDecoder decoder = charset.newDecoder();
 
 	public static void main(String[] args) throws IOException {
-		String first = "GET / HTTP/1.1\nHos";
-		String second = "t: www.google.com\nPort: 80";
-		String third = "80\n\nEsto es todo el dato que puedo enviar";
+		String first = "GET / HTTP/1.1\r\nHos";
+		String second = "t: www.google.com\r\nPort: 80";
+		String third = "80\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.46.3 (KHTML, like Gecko) Version/6.1 Safari/537.46.3\r\n\nEsto es todo el dato que puedo enviar";
 		String fourth = " siempre y cuando no sea nada";
-		String fifth = " malo. Muchas gracias\n\n";
+		String fifth = " malo. Muchas gracias\r\n\n";
 		ByteBuffer buf = str_to_bb(first);
 		System.out.println("STRING:" + buf.capacity());
-		HttpParser parser = new HttpParser(buf);
+		HttpParser parser = new HttpParser();
+		parser.pushByteBuffer(str_to_bb(first));
 		parser.parse();
 		parser.pushByteBuffer(str_to_bb(second));
 		parser.parse();
@@ -37,7 +38,7 @@ public class HttpParserTest {
 		System.out.println(parser.getState());
 		for (Entry<String, String> entry : parser.getHeaders().entrySet()) {
 			System.out.println("key: " + entry.getKey());
-			System.out.println("key: " + entry.getValue());
+			System.out.println("value: " + entry.getValue());
 		};
 	}
 
