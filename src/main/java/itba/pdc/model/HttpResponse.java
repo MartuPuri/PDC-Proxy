@@ -63,7 +63,6 @@ public class HttpResponse {
 	private static Map<Integer, String> createHttpReplies() {
         Map<Integer, String> result = new HashMap<Integer, String>();
         result.put(100, "Continue");
-        result.put(101, "Switching Protocols");
         result.put(200, "OK");
         result.put(201, "Created");
         result.put(202, "Accepted");
@@ -150,5 +149,19 @@ public class HttpResponse {
 		this.addDefaultHeaders();
 	}
 
+	private void lengthRequired(){
+		this.status = 411;
+		this.addDefaultHeaders();
+	}
+	
+	private void unsopportedMediaType(){
+		this.status = 415;
+		this.addDefaultHeaders();
+	}
+	
+	private void httpVersionNotSupported(){
+		this.status = 505;
+		this.addDefaultHeaders();
+	}
 
 }

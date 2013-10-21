@@ -18,37 +18,37 @@ public class HttpRequest {
 	private static Set<String> createHeaders() {
 		Set<String> headers = new HashSet<String>();
 		headers.add("Accept");
-		headers.add("Accept-Charset");
-		headers.add("Accept-Encoding");
-		headers.add("Accept-Language");
-		headers.add("Accept-Datetime");
-		headers.add("Authorization");
-		headers.add("Cache-Control");
+//		headers.add("Accept-Charset");
+//		headers.add("Accept-Encoding");
+//		headers.add("Accept-Language");
+//		headers.add("Accept-Datetime");
+//		headers.add("Authorization");
+//		headers.add("Cache-Control");
 		headers.add("Connection");
-		headers.add("Cookie");
+//		headers.add("Cookie");
 		headers.add("Content-Length");
-		headers.add("Content-MD5");
-		headers.add("Content-Type");
+//		headers.add("Content-MD5");
+//		headers.add("Content-Type");
 		headers.add("Date");
 		headers.add("Expect");
 		headers.add("From");
 		headers.add("Host");
-		headers.add("If-Match");
-		headers.add("If-None-Match");
-		headers.add("If-Modified-Since");
-		headers.add("If-Range");
-		headers.add("Max-Forwards");
-		headers.add("If-Unmodified-Since");
-		headers.add("Origin");
-		headers.add("Pragma");
-		headers.add("Proxy-Authorization");
-		headers.add("Range");
-		headers.add("Referer");
-		headers.add("TE");
-		headers.add("Upgrade");
-		headers.add("User-Agent");
-		headers.add("Via");
-		headers.add("Warning");
+//		headers.add("If-Match");
+//		headers.add("If-None-Match");
+//		headers.add("If-Modified-Since");
+//		headers.add("If-Range");
+//		headers.add("Max-Forwards");
+//		headers.add("If-Unmodified-Since");
+//		headers.add("Origin");
+//		headers.add("Pragma");
+//		headers.add("Proxy-Authorization");
+//		headers.add("Range");
+//		headers.add("Referer");
+//		headers.add("TE");
+//		headers.add("Upgrade");
+//		headers.add("User-Agent");
+//		headers.add("Via");
+//		headers.add("Warning");
 
 		return headers;
 	}
@@ -96,6 +96,11 @@ public class HttpRequest {
 	}
 
 	public void setBody(String body){
+		if(!headers.containsKey("Content-Length"))
+		{
+			System.out.println("Missing content-length");
+			//TODO: VER QUE HACEMOS
+		}
 		this.body = body;
 	}
 }
