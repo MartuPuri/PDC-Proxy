@@ -1,6 +1,9 @@
 package itba.pdc.proxy.data;
 
-import itba.pdc.httpparser.HttpParser;
+import itba.pdc.httpparser.HttpParserRequest;
+import itba.pdc.httpparser.ParserCode;
+import itba.pdc.model.HttpRequest;
+import itba.pdc.model.HttpResponse;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -22,7 +25,9 @@ public class Attachment {
 	private ByteBuffer totalBuff;
 	private SocketChannel oppositeChannel;
 	private SocketChannel channel;
-	private HttpParser parser;
+	private HttpParserRequest parser;
+	private HttpRequest request = new HttpRequest();
+	private HttpResponse response = new HttpResponse();
 	private int buffSize;
 
 	public Attachment(SelectionKey _key, ProcessType _processID,
@@ -43,7 +48,7 @@ public class Attachment {
 	}
 
 	public Attachment(ProcessType _processID) {
-		this.parser = new HttpParser();
+		this.parser = new HttpParserRequest(this.request, this.response);
 		this.totalBuff = ByteBuffer.allocate(0);
 		this.processID = _processID;
 	}
@@ -84,19 +89,11 @@ public class Attachment {
 		this.buff = _buff;
 	}
 	
-	public boolean parseByteBuffer() {
+	public ParserCode parseByteBuffer() throws IOException {
 		this.buff.flip();
 		increaseTotalByteBuffer();
-		System.out.println("Total Buffer: " + new String(totalBuff.array()));
-//		System.out.println("Buff: " + this.buff.array());
-		this.buff.flip();
-		parser.pushByteBuffer(this.buff);
-		try {
-			parser.parse();
-		} catch (IOException e) {
-			return false;
-		}
-		return true;
+//		this.buff.flip();
+		return parser.parseMessage(this.buff);
 	}
 	
 	private void increaseTotalByteBuffer() {
@@ -104,7 +101,6 @@ public class Attachment {
 		this.totalBuff.flip();
 		aux.put(this.totalBuff);
 		aux.put(this.buff);
-		System.out.println("Aux: " + new String(aux.array()));
 		this.totalBuff = aux;
 	}
 
@@ -113,11 +109,11 @@ public class Attachment {
 	}
 	
 	public String getHost() {
-		return parser.getHeader("Host");
+		return request.getHeader("host");
 	}
 
 	public Integer getPort() {
-		String port = parser.getHeader("Port");
+		String port = request.getHeader("Port");
 		if (port == null) {
 			return 80;
 		}
@@ -133,11 +129,16 @@ public class Attachment {
 	}
 	
 	public void resetBuffer() {
-		this.buff = ByteBuffer.allocate(this.buffSize);
+//		this.buff = ByteBuffer.allocate(this.buffSize);
+		this.buff.compact();
 	}
 
 	@Deprecated
 	public String getState() {
-		return parser.toString();
+		return parser.getState();
+	}
+
+	public void setTotalByteBuffer(ByteBuffer totalByteBuffer) {
+		this.totalBuff = totalByteBuffer;
 	}
 }

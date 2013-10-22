@@ -27,15 +27,7 @@ public class HttpProtocol implements TCPProtocol {
 		// buffer
 		SelectionKey clientKey = clntChan.register(key.selector(),
 				SelectionKey.OP_READ);
-		// SocketChannel serverChannel = SocketChannel.open(new
-		// InetSocketAddress("192.168.1.108", 8080));
-		// serverChannel.configureBlocking(false);
-		// SelectionKey serverKey = serverChannel.register(key.selector(),
-		// SelectionKey.OP_READ);
-		// Attachment serverAtt = new Attachment(serverKey, ProcessType.SERVER,
-		// serverChannel,
-		// this.bufSize, clientKey, clntChan);
-		// serverKey.attach(serverAtt);
+		System.out.println("Accept");
 		Attachment clientAtt = new Attachment(clientKey, ProcessType.CLIENT,
 				clntChan, this.bufSize);
 		clientKey.attach(clientAtt);
@@ -44,16 +36,25 @@ public class HttpProtocol implements TCPProtocol {
 	public void handleRead(SelectionKey key) throws IOException {
 		// Client socket channel has pending data
 		Attachment att = (Attachment) key.attachment();
-//		System.out.println("PROCESS: " + att.getProcessID());
 		SocketChannel channel = att.getChannel();
-		// SocketChannel oppositeChannel = att.getOppositeChannel();
-		// SelectionKey oppositeKey = att.getOppositeKey();
-
+		System.out.println("READING FROM : " + att.getProcessID());
 		ByteBuffer buf = att.getByteBuffer();
-		System.out.println("Total Buffer yes: " + new String(att.getTotalByteBuffer().array()));
+		System.out.println("Position: " + buf.position() + " Limit: "
+				+ buf.limit() + " Remaining: " + buf.remaining()
+				+ " Capacity: " + buf.capacity());
 		long bytesRead = channel.read(buf);
+		System.out.println("Bytes read: " + bytesRead);
 		att.setBuffer(buf);
+		// ByteBuffer b = ByteBuffer.allocate(buf.capacity());
+		// buf.flip();
+		// b.put(buf);
+		// System.out.println("Read: " + new String(b.array()));
+		// buf.flip();
+		// buf.limit(limit);
+		// System.out.println("Total Buffer yes: " + new
+		// String(att.getTotalByteBuffer().array()));
 		if (bytesRead == -1) { // Did the other end close?
+			System.out.println("Cerre");
 			channel.close();
 		} else if (bytesRead > 0) {
 			// TODO: Hardcoding persistent connections. Fix this when the http
@@ -62,28 +63,29 @@ public class HttpProtocol implements TCPProtocol {
 			SocketChannel oppositeChannel;
 			if (att.getProcessID().equals(ProcessType.CLIENT)) {
 				att.parseByteBuffer();
-				System.out.println("att.requestFinished(): " + att.requestFinished());
+				// System.out.println("att.requestFinished(): " +
+				// att.requestFinished());
 				System.out.println("state: " + att.getState());
 				if (att.requestFinished()) {
+					System.out.println("TOTAL: "
+							+ new String(att.getTotalByteBuffer().array()));
 					String host = att.getHost();
 					Integer port = att.getPort();
 					oppositeChannel = SocketChannel.open(new InetSocketAddress(
 							host, port));
 					oppositeChannel.configureBlocking(false);
 					oppositeKey = oppositeChannel.register(key.selector(),
-							SelectionKey.OP_READ);
+							SelectionKey.OP_WRITE);
 					Attachment serverAtt = new Attachment(oppositeKey,
 							ProcessType.SERVER, oppositeChannel, this.bufSize,
 							att.getKey(), channel);
 					oppositeKey.attach(serverAtt);
 					att.setOppositeChannel(oppositeChannel);
 					att.setOppositeKey(oppositeKey);
-					serverAtt.setByteBuffer(att.getTotalByteBuffer());
-					System.out.println("TOTAL: " + new String(att.getTotalByteBuffer().array()));
-					oppositeKey.interestOps(SelectionKey.OP_WRITE);
+					serverAtt.setTotalByteBuffer(att.getTotalByteBuffer());
+					// oppositeKey.interestOps(SelectionKey.OP_WRITE);
 					key.interestOps(SelectionKey.OP_READ);
 				} else {
-					System.out.println("Entra aqui");
 					att.resetBuffer();
 					key.interestOps(SelectionKey.OP_READ);
 				}
@@ -95,8 +97,14 @@ public class HttpProtocol implements TCPProtocol {
 				// Attachment oppositeAtt = (Attachment)
 				// oppositeKey.attachment();
 			} else {
-				System.out.println("PORQUE ENTRAS");
+				// READ FROM SERVER
+				// ByteBuffer p = ByteBuffer.allocate(700);
+				// buf.flip();
+				// p.put(buf);
+				// System.out.println("FUCK: " + new String(p.array()));
+				// System.out.println("PORQUE ENTRAS");
 				oppositeKey = att.getOppositeKey();
+				((Attachment) oppositeKey.attachment()).setTotalByteBuffer(buf);
 				oppositeKey.interestOps(SelectionKey.OP_WRITE);
 				key.interestOps(SelectionKey.OP_READ);
 			}
@@ -111,20 +119,22 @@ public class HttpProtocol implements TCPProtocol {
 		 */
 		// Retrieve data read earlier
 		Attachment att = (Attachment) key.attachment();
-//		System.out.println("PROCESS: " + att.getProcessID());
+		// System.out.println("PROCESS: " + att.getProcessID());
 		SocketChannel channel = att.getChannel();
 		SocketChannel oppositeChannel = att.getOppositeChannel();
 		SelectionKey oppositeKey = att.getOppositeKey();
 
-		ByteBuffer buf = att.getByteBuffer();
-		System.out.println("PROCESS: " + att.getProcessID());
-		System.out.println("WRITE: " + new String(buf.array()));
+		ByteBuffer buf = att.getTotalByteBuffer();
+		System.out.println("WRITING TO PROCESS: " + att.getProcessID());
+		// System.out.println("DATA: " + new String(buf.array()));
 		buf.flip(); // Prepare buffer for writing
-		channel.write(buf);
-		if (!buf.hasRemaining()) { // Buffer completely written?
-			// Nothing left, so no longer interested in writes
-			key.interestOps(SelectionKey.OP_READ);
-		}
+		do {
+			channel.write(buf);
+			System.out.println("REMAINING: " + buf.remaining());
+		} while (buf.hasRemaining());
+		// Buffer completely written?
+		// Nothing left, so no longer interested in writes
 		buf.compact(); // Make room for more data to be read in
+		key.interestOps(SelectionKey.OP_READ);
 	}
 }

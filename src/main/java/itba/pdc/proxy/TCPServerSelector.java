@@ -11,7 +11,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
 
 public class TCPServerSelector {
-    private static final int BUFSIZE = 256; // Buffer size (bytes)
+    private static final int BUFSIZE = 512; // Buffer size (bytes)
     private static final int TIMEOUT = 3000; // Wait timeout (milliseconds)
 
     public static void main(String[] args) throws IOException {
