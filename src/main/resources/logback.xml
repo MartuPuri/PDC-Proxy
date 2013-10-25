@@ -20,12 +20,24 @@
 			</pattern>
 		</encoder>
 	</appender>
+	<appender name="PROXY-FILE" class="ch.qos.logback.core.FileAppender">
+		<file>proxy.log</file>
+		<level>DEBUG</level>
+		<append>true</append>
+		<encoder>
+			<pattern>${DEFAULT_PATTERN}
+			</pattern>
+		</encoder>
+	</appender>
 	<!-- additivity=false ensures analytics data only goes to the analytics 
 		log -->
 	<logger name="access.log">
-		<appender-ref ref="DEBUG-FILE" />
+		<appender-ref ref="ACCESS-FILE" />
 	</logger>
 	<logger name="error.log">
 		<appender-ref ref="INFO-FILE" />
+	</logger>
+	<logger name="proxy.log">
+		<appender-ref ref="PROXY-FILE" />
 	</logger>
 </configuration>

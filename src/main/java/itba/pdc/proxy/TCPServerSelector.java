@@ -5,13 +5,14 @@ import itba.pdc.proxy.data.ProcessType;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
 
 public class TCPServerSelector {
-    private static final int BUFSIZE = 512; // Buffer size (bytes)
+    private static final int BUFSIZE = 6000; // Buffer size (bytes)
     private static final int TIMEOUT = 3000; // Wait timeout (milliseconds)
 
     public static void main(String[] args) throws IOException {
@@ -22,23 +23,18 @@ public class TCPServerSelector {
         Selector selector = Selector.open();
         // Create listening socket channel for each port and register selector
         for (String arg : args) {
-        	//The open static method creates an instance of SocketChannel.
             ServerSocketChannel listnChannel = ServerSocketChannel.open();
-            //The connection to the server is made by the bind method.
             listnChannel.socket().bind(new InetSocketAddress(Integer.parseInt(arg)));
-            //The configureBlocking(false) invocation sets the channel as nonblocking. 
             listnChannel.configureBlocking(false); // must be nonblocking to
                                                    // register
             // Register selector with channel. The returned key is ignored
-            // The register method associates the selector to the socket channel.
-            listnChannel.register(selector, SelectionKey.OP_ACCEPT, new Attachment(ProcessType.CLIENT));
+            listnChannel.register(selector, SelectionKey.OP_ACCEPT, new Attachment(ProcessType.CLIENT, BUFSIZE));
             
         }
         // Create a handler that will implement the protocol
         TCPProtocol protocol = new HttpProtocol(BUFSIZE);
         while (true) { // Run forever, processing available I/O operations
             // Wait for some channel to be ready (or timeout)
-        	//  the select method blocks the execution and waits for events recorded on the selector.
             if (selector.select(TIMEOUT) == 0) { // returns # of ready chans
                 System.out.print(".");
                 continue;

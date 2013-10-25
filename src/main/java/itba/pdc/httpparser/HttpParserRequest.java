@@ -10,8 +10,6 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import exceptions.InvalidParserState;
-
 public class HttpParserRequest {
 	private HttpRequest request;
 	private HttpResponse response;
@@ -31,47 +29,38 @@ public class HttpParserRequest {
 		switch (state) {
 		case METHOD:
 			code = parseMethod();
-			if (!code.equals(ParserCode.CONTINUE)) {
+			if (code.equals(ParserCode.LOOP)
+					|| !code.equals(ParserCode.CONTINUE)) {
 				return code;
 			}
 		case HEADERS:
 			code = parseHeaders();
-			if (!code.equals(ParserCode.CONTINUE)) {
+			if (code.equals(ParserCode.LOOP)
+					|| !code.equals(ParserCode.CONTINUE)) {
 				return code;
-			}
-			if (this.state.equals(ParserState.HEADERS)) {
-				return ParserCode.CONTINUE;
 			}
 		case DATA:
 			code = parseData();
-			if (!code.equals(ParserCode.CONTINUE)) {
+			if (code.equals(ParserCode.LOOP)
+					|| !code.equals(ParserCode.CONTINUE)) {
 				return code;
 			}
 		case END:
 			return ParserCode.VALID;
 		default:
-			throw new InvalidParserState();
+			// throw new InvalidParserState();
+			return null;
 		}
 	}
 
 	private void concatBuffer(ByteBuffer _buff) {
-		buffer.flip();
-		buffer.limit(buffer.capacity());
-//		ByteBuffer b = ByteBuffer.allocate(700);
-//		ByteBuffer y = ByteBuffer.allocate(700);
-//		b.put(buffer);
-//		buffer.flip();
-//		String s = new String(b.array());
-		_buff.flip();
-//		y.put(_buff);
-//		_buff.flip();
-//		String a = new String(y.array());
 		ByteBuffer aux = ByteBuffer.allocate(buffer.capacity()
 				+ _buff.capacity());
-		
+
+		buffer.flip();
 		aux.put(buffer);
+		_buff.flip();
 		aux.put(_buff);
-//		int c = aux.capacity();
 		buffer = aux;
 	}
 
@@ -95,27 +84,21 @@ public class HttpParserRequest {
 			String tail = s.substring(index + matchLength, length);
 			buffer = ByteBuffer.allocate(tail.getBytes().length);
 			buffer.put(tail.getBytes());
-			buffer.flip();
 		} else if (index == length) {
 			buffer = ByteBuffer.allocate(length - index);
 		}
-		buffer.flip();
 		return line;
 	}
 
 	private ParserCode parseMethod() throws UnsupportedEncodingException {
 		String prms[], cmd[], temp[];
-		int idx, i, version[] = {0, 0};
+		int idx, i, version[] = { 0, 0 };
 		String line = readLine();
 
 		if (line == null) {
-			return ParserCode.CONTINUE;
+			return ParserCode.LOOP;
 		}
 		int length = line.length();
-//		int j = 0;
-//		while (j < length && Character.isWhitespace(line.charAt(j++)))
-			;
-//		line = line.substring(j);
 
 		cmd = line.split("\\s");
 
@@ -172,9 +155,6 @@ public class HttpParserRequest {
 			}
 		}
 		// TODO: Add Log
-//		ByteBuffer b = ByteBuffer.allocate(700);
-//		b.put(buffer);
-//		String s = new String(b.array());
 		request.setMethod(cmd[0]);
 		request.setVersion(version);
 		this.state = ParserState.HEADERS;
@@ -187,11 +167,8 @@ public class HttpParserRequest {
 		String line = readLine();
 		if (line == null) {
 			// TODO: Log
-			return ParserCode.CONTINUE;
+			return ParserCode.LOOP;
 		}
-		// if (line.equals("")) {
-		// this.state = State.DATA;
-		// }
 		while (!line.equals("")) {
 			idx = line.indexOf(':');
 			if (idx < 0) {
@@ -206,7 +183,7 @@ public class HttpParserRequest {
 			}
 			line = readLine();
 			if (line == null) {
-				return ParserCode.CONTINUE;
+				return ParserCode.LOOP;
 			}
 		}
 		String s = new String(buffer.array()).trim();
@@ -228,7 +205,7 @@ public class HttpParserRequest {
 		Integer bytes = Integer.parseInt(request.getHeader("Content-Length"));
 		String data = readBuffer(bytes);
 		if (data == null) {
-			return ParserCode.CONTINUE;
+			return ParserCode.LOOP;
 		}
 		request.setBody(data);
 		this.state = ParserState.END;
