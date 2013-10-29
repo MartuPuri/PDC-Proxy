@@ -39,6 +39,7 @@ public class HttpProtocol implements TCPProtocol {
 			bytesRead = channel.read(buf);
 			System.out.println("Bytes Read: " + bytesRead);
 		} catch (IOException e) {
+			e.printStackTrace();
 			key.cancel();
 			channel.close();
 			return;
@@ -56,7 +57,7 @@ public class HttpProtocol implements TCPProtocol {
 							att.getHost(), 80));
 					oppositeChannel.configureBlocking(false);
 					oppositeKey = oppositeChannel.register(key.selector(),
-							SelectionKey.OP_WRITE | SelectionKey.OP_READ);
+							SelectionKey.OP_WRITE);
 					Attachment serverAtt = new Attachment(ProcessType.SERVER,
 							this.bufSize);
 					serverAtt.setOppositeKey(key);
@@ -77,7 +78,7 @@ public class HttpProtocol implements TCPProtocol {
 				att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
 				((Attachment) att.getOppositeKey().attachment())
 						.setByteBuffer(buf);
-				key.interestOps(SelectionKey.OP_READ);
+//				key.interestOps(SelectionKey.OP_READ);
 			}
 		}
 	}
@@ -101,6 +102,7 @@ public class HttpProtocol implements TCPProtocol {
 				channel.write(buf);
 			} catch (IOException e) {
 //				channel.close();
+				System.out.println("Write exception");
 				return;
 			}
 		} while (buf.hasRemaining());
