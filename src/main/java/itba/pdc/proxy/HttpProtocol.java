@@ -24,8 +24,10 @@ public class HttpProtocol implements TCPProtocol {
 		// buffer
 		SelectionKey clientKey = clntChan.register(key.selector(),
 				SelectionKey.OP_READ);
-		Attachment clientAtt = new Attachment(ProcessType.CLIENT, this.bufSize);
+		Attachment att = (Attachment) key.attachment();
+		Attachment clientAtt = new Attachment(att.getProcessID(), this.bufSize);
 		clientKey.attach(clientAtt);
+		System.out.println("PROCESS: " + ((Attachment) key.attachment()).getProcessID());
 	}
 
 	public void handleRead(SelectionKey key) throws IOException {
@@ -81,13 +83,22 @@ public class HttpProtocol implements TCPProtocol {
 					// oppositeKey.interestOps(SelectionKey.OP_READ);
 				}
 				key.interestOps(SelectionKey.OP_READ);
-			} else {
+			} else if (att.getProcessID().equals(ProcessType.SERVER)){
 				if (att.getOppositeKey().isValid()) {
 					att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
 					((Attachment) att.getOppositeKey().attachment())
 							.setByteBuffer(buf);
 				}
 				// key.interestOps(SelectionKey.OP_READ);
+			} else if (att.getProcessID().equals(ProcessType.ADMIN)) {
+				String data = "<html><body><h1>Bahui la tenes adentro</h1></body></html>";
+				String response = "HTTP/1.1 200 OK\nDate: Fri, 31 Dec 1999 23:59:59 GMT\nContent-Type: text/html\nContent-Length: " + data.getBytes().length + "\n\n";
+				String aux = response + data;
+				ByteBuffer bufferResponse = ByteBuffer.allocate(aux.length());
+				bufferResponse.put(aux.getBytes());
+				bufferResponse.position(0);
+				att.setByteBuffer(bufferResponse);
+				key.interestOps(SelectionKey.OP_WRITE);
 			}
 		}
 	}
@@ -103,8 +114,10 @@ public class HttpProtocol implements TCPProtocol {
 
 		ByteBuffer buf = att.getByteBuffer();
 		buf.flip();
-		// System.out.println("Writing to " + att.getProcessID() + ": " + new
-		// String(buf.array()));
+		System.out.println(buf.limit());
+		System.out.println(buf.position());
+		 System.out.println("Writing to " + att.getProcessID() + ": " + new
+		 String(buf.array()));
 		// Prepare buffer for writing
 		do {
 			try {

@@ -1,6 +1,6 @@
 package exceptions;
 
-public class InvalidParserState extends RuntimeException {
+public class InvalidBufferSizeException extends RuntimeException {
 
 	/**
 	 * 

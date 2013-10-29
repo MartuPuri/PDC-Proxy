@@ -2,6 +2,7 @@ package itba.pdc.proxy;
 
 import itba.pdc.proxy.data.Attachment;
 import itba.pdc.proxy.data.ProcessType;
+import itba.pdc.proxy.lib.ConnectionManager;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -16,21 +17,24 @@ public class TCPServerSelector {
     private static final int TIMEOUT = 3000; // Wait timeout (milliseconds)
 
     public static void main(String[] args) throws IOException {
-        if (args.length < 1) { // Test for correct # of args
-            throw new IllegalArgumentException("Parameter(s): <Port> ...");
+        if (args.length != 0) { // Test for correct # of args
+            throw new IllegalArgumentException("The application did not use params");
         }
         // Create a selector to multiplex listening sockets and connections
         Selector selector = Selector.open();
+        ConnectionManager connectionManager = ConnectionManager.getInstance();
+        connectionManager.registerServerSocket(selector);
+        connectionManager.registerAdminSocket(selector);
         // Create listening socket channel for each port and register selector
-        for (String arg : args) {
-            ServerSocketChannel listnChannel = ServerSocketChannel.open();
-            listnChannel.socket().bind(new InetSocketAddress(Integer.parseInt(arg)));
-            listnChannel.configureBlocking(false); // must be nonblocking to
-                                                   // register
-            // Register selector with channel. The returned key is ignored
-            listnChannel.register(selector, SelectionKey.OP_ACCEPT, new Attachment(ProcessType.CLIENT, BUFSIZE));
-            
-        }
+//        for (String arg : args) {
+//            ServerSocketChannel listnChannel = ServerSocketChannel.open();
+//            listnChannel.socket().bind(new InetSocketAddress(Integer.parseInt(arg)));
+//            listnChannel.configureBlocking(false); // must be nonblocking to
+//                                                   // register
+//            // Register selector with channel. The returned key is ignored
+//            listnChannel.register(selector, SelectionKey.OP_ACCEPT, new Attachment(ProcessType.CLIENT, BUFSIZE));
+//            
+//        }
         // Create a handler that will implement the protocol
         TCPProtocol protocol = new HttpProtocol(BUFSIZE);
         while (true) { // Run forever, processing available I/O operations

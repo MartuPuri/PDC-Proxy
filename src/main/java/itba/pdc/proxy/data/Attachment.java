@@ -63,7 +63,8 @@ public class Attachment {
 	}
 
 	public void setByteBuffer(ByteBuffer _buff) {
-		this.buff = _buff;
+		this.buff = ByteBuffer.allocate(_buff.capacity());
+		this.buff.put(_buff);
 	}
 
 	public boolean requestFinished() {
