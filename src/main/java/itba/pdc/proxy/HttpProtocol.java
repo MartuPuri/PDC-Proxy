@@ -34,15 +34,21 @@ public class HttpProtocol implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getByteBuffer();
-		long bytesRead = channel.read(buf);
-		System.out.println("Bytes read : " + bytesRead);
+		long bytesRead = 0;
+		try {
+			bytesRead = channel.read(buf);
+			System.out.println("Bytes Read: " + bytesRead);
+		} catch (IOException e) {
+			key.cancel();
+			channel.close();
+			return;
+		}
 		if (bytesRead == -1) { // Did the other end close?
 			channel.close();
 		} else if (bytesRead > 0) {
 			// TODO: Hardcoding persistent connections. Fix this when the http
 			if (att.getProcessID().equals(ProcessType.CLIENT)) {
 				att.parseByteBuffer(buf);
-				System.out.println("State: " + att.getState());
 				if (att.requestFinished()) {
 					SelectionKey oppositeKey;
 					SocketChannel oppositeChannel;
@@ -50,7 +56,7 @@ public class HttpProtocol implements TCPProtocol {
 							att.getHost(), 80));
 					oppositeChannel.configureBlocking(false);
 					oppositeKey = oppositeChannel.register(key.selector(),
-							SelectionKey.OP_WRITE);
+							SelectionKey.OP_WRITE | SelectionKey.OP_READ);
 					Attachment serverAtt = new Attachment(ProcessType.SERVER,
 							this.bufSize);
 					serverAtt.setOppositeKey(key);
@@ -64,12 +70,14 @@ public class HttpProtocol implements TCPProtocol {
 					// Attachment oppositeAtt = (Attachment)
 					// oppositeKey.attachment();
 					serverAtt.setByteBuffer(att.getTotalBuffer());
-					oppositeKey.interestOps(SelectionKey.OP_WRITE);
+//					oppositeKey.interestOps(SelectionKey.OP_READ);
 				}
 				key.interestOps(SelectionKey.OP_READ);
 			} else {
 				att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
-				((Attachment)att.getOppositeKey().attachment()).setByteBuffer(buf);
+				((Attachment) att.getOppositeKey().attachment())
+						.setByteBuffer(buf);
+				key.interestOps(SelectionKey.OP_READ);
 			}
 		}
 	}
@@ -89,7 +97,12 @@ public class HttpProtocol implements TCPProtocol {
 		// String(buf.array()));
 		// Prepare buffer for writing
 		do {
-			channel.write(buf);
+			try{
+				channel.write(buf);
+			} catch (IOException e) {
+//				channel.close();
+				return;
+			}
 		} while (buf.hasRemaining());
 		if (!buf.hasRemaining()) { // Buffer completely written?
 			// Nothing left, so no longer interested in writes

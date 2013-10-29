@@ -82,7 +82,6 @@ public class Attachment {
 	private void increaseTotalByteBuffer() {
 		ByteBuffer aux = ByteBuffer.allocate(this.totalBuff.capacity()
 				+ this.buff.capacity());
-		// this.totalBuff.flip();
 		this.totalBuff.flip();
 		aux.put(this.totalBuff);
 		this.buff.flip();
