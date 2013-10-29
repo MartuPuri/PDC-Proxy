@@ -41,6 +41,10 @@ public class HttpProtocol implements TCPProtocol {
 		} catch (IOException e) {
 			e.printStackTrace();
 			key.cancel();
+			if (att.getOppositeKey() != null) {
+				att.getOppositeKey().cancel();
+				att.getOppositeChannel().close();
+			}
 			channel.close();
 			return;
 		}
@@ -75,9 +79,11 @@ public class HttpProtocol implements TCPProtocol {
 				}
 				key.interestOps(SelectionKey.OP_READ);
 			} else {
-				att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
-				((Attachment) att.getOppositeKey().attachment())
-						.setByteBuffer(buf);
+				if (att.getOppositeKey().isValid()) {
+					att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
+					((Attachment) att.getOppositeKey().attachment())
+					.setByteBuffer(buf);
+				}
 //				key.interestOps(SelectionKey.OP_READ);
 			}
 		}
