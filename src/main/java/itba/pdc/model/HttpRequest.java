@@ -70,7 +70,7 @@ public class HttpRequest {
 
 	public void addHeader(String header, String value) {
 		if (!supportedHeaders.contains(header)) {
-			System.out.println("Invalid header");
+//			System.out.println("Invalid header");
 			// TODO: VER QUE HACEMOS
 		}
 		headers.put(header, value);
@@ -85,7 +85,7 @@ public class HttpRequest {
 
 	public void setMethod(String method) {
 		if (!supportedMethods.contains(method)) {
-//			System.out.println("Invalid method");
+			System.out.println("Invalid method");
 			// TODO: VER QUE HACEMOS
 		}
 		this.method = method;

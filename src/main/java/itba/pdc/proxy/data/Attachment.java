@@ -93,20 +93,12 @@ public class Attachment {
 	public ByteBuffer getTotalBuffer() {
 		return this.totalBuff;
 	}
-
+	
 	public String getState() {
 		return this.parser.getState();
 	}
-
+	
 	public String getHost() {
-		return request.getHeader("host");
-	}
-
-	public Integer getPort() {
-		String port = request.getHeader("port");
-		if (port == null) {
-			return 80;
-		}
-		return Integer.parseInt(port);
+		return this.request.getHeader("host");
 	}
 }
