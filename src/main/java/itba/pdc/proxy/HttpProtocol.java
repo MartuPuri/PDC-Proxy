@@ -10,8 +10,14 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
+
 public class HttpProtocol implements TCPProtocol {
 	private int bufSize; // Size of I/O buffer
+	private static Logger debugLogger = (Logger) LoggerFactory.getLogger("debug.log");
+	private static Logger accessLogger = (Logger) LoggerFactory.getLogger("access.log");
 
 	public HttpProtocol(int bufSize) {
 		this.bufSize = bufSize;
@@ -26,6 +32,8 @@ public class HttpProtocol implements TCPProtocol {
 				SelectionKey.OP_READ);
 		Attachment clientAtt = new Attachment(ProcessType.CLIENT, this.bufSize);
 		clientKey.attach(clientAtt);
+		System.out.println("ENTRA");
+		accessLogger.info("Accepting new connection");
 	}
 
 	public void handleRead(SelectionKey key) throws IOException {
@@ -35,21 +43,23 @@ public class HttpProtocol implements TCPProtocol {
 
 		ByteBuffer buf = att.getByteBuffer();
 		long bytesRead = channel.read(buf);
-		System.out.println("Bytes read : " + bytesRead);
 		if (bytesRead == -1) { // Did the other end close?
+			accessLogger.info("Close connection from " + att.getProcessID());
 			channel.close();
 		} else if (bytesRead > 0) {
 			// TODO: Hardcoding persistent connections. Fix this when the http
 			if (att.getProcessID().equals(ProcessType.CLIENT)) {
+				debugLogger.info("Reading from client");
 				att.parseByteBuffer(buf);
-				System.out.println("State: " + att.getState());
 				if (att.requestFinished()) {
-					SelectionKey oppositeKey;
-					SocketChannel oppositeChannel;
-					oppositeChannel = SocketChannel.open(new InetSocketAddress(
-							"www.google.com", 80));
+					debugLogger.info("Request complete");
+					String host = att.getHost();
+					Integer port = att.getPort();
+					SocketChannel oppositeChannel = SocketChannel.open(new InetSocketAddress(
+							host, port));
+					accessLogger.info("Open new connection to " + host + " at " + port);
 					oppositeChannel.configureBlocking(false);
-					oppositeKey = oppositeChannel.register(key.selector(),
+					SelectionKey oppositeKey = oppositeChannel.register(key.selector(),
 							SelectionKey.OP_WRITE);
 					Attachment serverAtt = new Attachment(ProcessType.SERVER,
 							this.bufSize);
@@ -58,16 +68,12 @@ public class HttpProtocol implements TCPProtocol {
 					oppositeKey.attach(serverAtt);
 					att.setOppositeChannel(oppositeChannel);
 					att.setOppositeKey(oppositeKey);
-					// Indicate via key that reading/writing are both of
-					// interest
-					// now.
-					// Attachment oppositeAtt = (Attachment)
-					// oppositeKey.attachment();
 					serverAtt.setByteBuffer(att.getTotalBuffer());
 					oppositeKey.interestOps(SelectionKey.OP_WRITE);
 				}
 				key.interestOps(SelectionKey.OP_READ);
 			} else {
+				debugLogger.info("Reading from server");
 				att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
 				((Attachment)att.getOppositeKey().attachment()).setByteBuffer(buf);
 			}
@@ -84,6 +90,7 @@ public class HttpProtocol implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getByteBuffer();
+		debugLogger.info("Writing to " + att.getProcessID());
 		buf.flip();
 		// System.out.println("Writing to " + att.getProcessID() + ": " + new
 		// String(buf.array()));

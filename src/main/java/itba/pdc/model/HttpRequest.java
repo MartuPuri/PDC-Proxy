@@ -85,7 +85,7 @@ public class HttpRequest {
 
 	public void setMethod(String method) {
 		if (!supportedMethods.contains(method)) {
-			System.out.println("Invalid method");
+//			System.out.println("Invalid method");
 			// TODO: VER QUE HACEMOS
 		}
 		this.method = method;
