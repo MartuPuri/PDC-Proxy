@@ -82,8 +82,8 @@ public class HttpParserRequest {
 		if (index < length) {
 			int c = buffer.capacity();
 			String tail = s.substring(index + matchLength, length);
-			buffer = ByteBuffer.allocate(tail.getBytes().length);
-			buffer.put(tail.getBytes());
+			buffer.position(index + matchLength);
+			buffer.compact();
 		} else if (index == length) {
 			buffer = ByteBuffer.allocate(length - index);
 		}

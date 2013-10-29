@@ -36,10 +36,13 @@ public class HttpProtocol implements TCPProtocol {
 		ByteBuffer buf = att.getByteBuffer();
 		long bytesRead = 0;
 		try {
+			if (buf.position() == 0 && buf.limit() == 0) {
+				System.out.println("Bytes: " + bytesRead);
+				return;
+			}
 			bytesRead = channel.read(buf);
 			System.out.println("Bytes Read: " + bytesRead);
 		} catch (IOException e) {
-			e.printStackTrace();
 			key.cancel();
 			if (att.getOppositeKey() != null) {
 				att.getOppositeKey().cancel();
@@ -75,16 +78,16 @@ public class HttpProtocol implements TCPProtocol {
 					// Attachment oppositeAtt = (Attachment)
 					// oppositeKey.attachment();
 					serverAtt.setByteBuffer(att.getTotalBuffer());
-//					oppositeKey.interestOps(SelectionKey.OP_READ);
+					// oppositeKey.interestOps(SelectionKey.OP_READ);
 				}
 				key.interestOps(SelectionKey.OP_READ);
 			} else {
 				if (att.getOppositeKey().isValid()) {
 					att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
 					((Attachment) att.getOppositeKey().attachment())
-					.setByteBuffer(buf);
+							.setByteBuffer(buf);
 				}
-//				key.interestOps(SelectionKey.OP_READ);
+				// key.interestOps(SelectionKey.OP_READ);
 			}
 		}
 	}
@@ -104,10 +107,10 @@ public class HttpProtocol implements TCPProtocol {
 		// String(buf.array()));
 		// Prepare buffer for writing
 		do {
-			try{
+			try {
 				channel.write(buf);
 			} catch (IOException e) {
-//				channel.close();
+				// channel.close();
 				System.out.println("Write exception");
 				return;
 			}

@@ -44,6 +44,9 @@ public class TCPServerSelector {
             while (keyIter.hasNext()) {
                 SelectionKey key = keyIter.next(); // Key is bit mask
                 // Server socket channel has pending connection requests?
+                if (!key.isValid()) {
+					continue;
+				}
                 if (key.isAcceptable()) {
                     protocol.handleAccept(key);
                 }

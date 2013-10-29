@@ -71,9 +71,9 @@ public class Attachment {
 	}
 
 	public ParserCode parseByteBuffer(ByteBuffer buf) throws IOException {
-		this.buff = ByteBuffer.allocate(buf.capacity());
-		buf.flip();
-		buff.put(buf);
+//		this.buff = ByteBuffer.allocate(buf.capacity());
+//		buf.flip();
+//		buff.put(buf);
 		// this.buff.flip();
 		increaseTotalByteBuffer();
 		return parser.parseMessage(buf);
