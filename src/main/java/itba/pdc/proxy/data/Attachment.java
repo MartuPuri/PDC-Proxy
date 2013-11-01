@@ -2,13 +2,17 @@ package itba.pdc.proxy.data;
 
 import itba.pdc.httpparser.HttpParserRequest;
 import itba.pdc.httpparser.ParserCode;
+import itba.pdc.httpparser.ParserState;
 import itba.pdc.model.HttpRequest;
 import itba.pdc.model.HttpResponse;
+import itba.pdc.model.StatusRequest;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+
+import javax.swing.text.Position;
 
 /**
  * 
@@ -18,87 +22,53 @@ import java.nio.channels.SocketChannel;
  *          TODO:
  */
 public class Attachment {
+	private ByteBuffer buff;
 	private ProcessType processID;
 	private SelectionKey oppositeKey;
-	private ByteBuffer buff;
-	private ByteBuffer totalBuff;
 	private SocketChannel oppositeChannel;
-	private int buffSize;
 	private HttpParserRequest parser;
 	private HttpRequest request;
-	private HttpResponse response;
 
 	public Attachment(ProcessType processID, int buffSize) {
 		this.processID = processID;
-		this.buffSize = buffSize;
 		this.buff = ByteBuffer.allocate(buffSize);
 		this.request = new HttpRequest();
-		this.response = new HttpResponse();
-		this.parser = new HttpParserRequest(request, response);
-		this.totalBuff = ByteBuffer.allocate(0);
+		this.parser = new HttpParserRequest(request);
+	}
+
+	public ByteBuffer getBuff() {
+		return buff;
 	}
 
 	public ProcessType getProcessID() {
-		return this.processID;
-	}
-
-	public SocketChannel getOppositeChannel() {
-		return this.oppositeChannel;
-	}
-
-	public ByteBuffer getByteBuffer() {
-		return this.buff;
+		return processID;
 	}
 
 	public SelectionKey getOppositeKey() {
-		return this.oppositeKey;
+		return oppositeKey;
 	}
 
-	public void setOppositeKey(SelectionKey _key) {
-		this.oppositeKey = _key;
+	public SocketChannel getOppositeChannel() {
+		return oppositeChannel;
 	}
 
-	public void setOppositeChannel(SocketChannel _channel) {
-		this.oppositeChannel = _channel;
+	public HttpParserRequest getParser() {
+		return parser;
 	}
 
-	public void setByteBuffer(ByteBuffer _buff) {
-		this.buff = ByteBuffer.allocate(_buff.capacity());
-		this.buff.put(_buff);
+	public HttpRequest getRequest() {
+		return request;
 	}
 
-	public boolean requestFinished() {
-		return parser.requestFinish();
+	public void setOppositeKey(SelectionKey oppositeKey) {
+		this.oppositeKey = oppositeKey;
 	}
 
-	public ParserCode parseByteBuffer(ByteBuffer buf) throws IOException {
-//		this.buff = ByteBuffer.allocate(buf.capacity());
-//		buf.flip();
-//		buff.put(buf);
-		// this.buff.flip();
-		increaseTotalByteBuffer();
-		return parser.parseMessage(buf);
+	public void setOppositeChannel(SocketChannel oppositeChannel) {
+		this.oppositeChannel = oppositeChannel;
 	}
 
-	private void increaseTotalByteBuffer() {
-		ByteBuffer aux = ByteBuffer.allocate(this.totalBuff.capacity()
-				+ this.buff.capacity());
-		this.totalBuff.flip();
-		aux.put(this.totalBuff);
-		this.buff.flip();
-		aux.put(this.buff);
-		this.totalBuff = aux;
-	}
-
-	public ByteBuffer getTotalBuffer() {
-		return this.totalBuff;
-	}
-	
-	public String getState() {
-		return this.parser.getState();
-	}
-	
-	public String getHost() {
-		return this.request.getHeader("host");
+	public void setBuff(ByteBuffer buff) {
+		this.buff = buff;
 	}
 }

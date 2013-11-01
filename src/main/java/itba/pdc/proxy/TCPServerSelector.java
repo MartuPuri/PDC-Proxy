@@ -1,19 +1,14 @@
 package itba.pdc.proxy;
 
-import itba.pdc.proxy.data.Attachment;
-import itba.pdc.proxy.data.ProcessType;
 import itba.pdc.proxy.lib.ConnectionManager;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
 
 public class TCPServerSelector {
-    private static final int BUFSIZE = 6000; // Buffer size (bytes)
+    private static final int BUFSIZE = 1500; // Buffer size (bytes)
     private static final int TIMEOUT = 3000; // Wait timeout (milliseconds)
 
     public static void main(String[] args) throws IOException {

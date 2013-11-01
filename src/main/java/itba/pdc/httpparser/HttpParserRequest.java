@@ -1,7 +1,7 @@
 package itba.pdc.httpparser;
 
 import itba.pdc.model.HttpRequest;
-import itba.pdc.model.HttpResponse;
+import itba.pdc.model.StatusRequest;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -12,13 +12,12 @@ import java.util.Map;
 
 public class HttpParserRequest {
 	private HttpRequest request;
-	private HttpResponse response;
 	private ParserState state;
 	private ByteBuffer buffer;
+	private StatusRequest statusRequest = StatusRequest.OK;
 
-	public HttpParserRequest(HttpRequest _request, HttpResponse _response) {
+	public HttpParserRequest(HttpRequest _request) {
 		this.request = _request;
-		this.response = _response;
 		this.state = ParserState.METHOD;
 		this.buffer = ByteBuffer.allocate(0);
 	}
@@ -49,17 +48,16 @@ public class HttpParserRequest {
 			return ParserCode.VALID;
 		default:
 			// throw new InvalidParserState();
-			return null;
+			return ParserCode.INVALID;
 		}
 	}
 
 	private void concatBuffer(ByteBuffer _buff) {
 		ByteBuffer aux = ByteBuffer.allocate(buffer.capacity()
 				+ _buff.capacity());
-
+		_buff.flip();
 		buffer.flip();
 		aux.put(buffer);
-		_buff.flip();
 		aux.put(_buff);
 		buffer = aux;
 	}
@@ -98,11 +96,11 @@ public class HttpParserRequest {
 		if (line == null) {
 			return ParserCode.LOOP;
 		}
-		int length = line.length();
 
 		cmd = line.split("\\s");
 
 		if (cmd.length != 3) {
+			statusRequest = StatusRequest.BAD_REQUEST;
 			System.out.println("BAD REQUEST");// TODO: Change for log
 			// request.invalidRequestLine(response);
 			return ParserCode.INVALID;
@@ -115,21 +113,22 @@ public class HttpParserRequest {
 				version[1] = Integer.parseInt(temp[1]);
 				if (!request.validVersion(version)) {
 					// TODO: Add log
-					// request.invalidVersion(response);
+					statusRequest = request.getStatusRequest();
 					return ParserCode.INVALID;
 				}
 			} catch (NumberFormatException nfe) {
 				// TODO: Add Log
 				// request.invalidRequestLine(response);
+				statusRequest = request.getStatusRequest();
 				return ParserCode.INVALID;
 			}
 		} else {
 			// request.invalidRequestLine(response);
+			statusRequest = request.getStatusRequest();
 			return ParserCode.INVALID;
 		}
 
-		if (cmd[0].equals("GET") || cmd[0].equals("HEAD")
-				|| cmd[0].equals("POST")) {
+		if (request.validMethod(cmd[0])) {
 			String method = cmd[0];
 			// System.out.println(cmd);
 			String uri;
@@ -151,8 +150,11 @@ public class HttpParserRequest {
 					}
 				}
 				request.setParams(params);
-				request.setUri(uri);
 			}
+			request.setUri(uri);
+		} else {
+			statusRequest = request.getStatusRequest();
+			return ParserCode.INVALID;
 		}
 		// TODO: Add Log
 		request.setMethod(cmd[0]);
@@ -169,9 +171,10 @@ public class HttpParserRequest {
 			// TODO: Log
 			return ParserCode.LOOP;
 		}
-		while (!line.equals("")) {
+		while (!line.trim().equals("")) {
 			idx = line.indexOf(':');
 			if (idx < 0) {
+				statusRequest = StatusRequest.CONFLICT;
 				// TODO: request.invalidHeader(response);
 				// TODO: Add log
 				return ParserCode.INVALID;
@@ -200,6 +203,7 @@ public class HttpParserRequest {
 
 	private ParserCode parseData() {
 		if (!request.bodyEnable()) {
+			statusRequest = request.getStatusRequest();
 			return ParserCode.INVALID;
 		}
 		Integer bytes = Integer.parseInt(request.getHeader("Content-Length"));

@@ -21,7 +21,7 @@
 		</encoder>
 	</appender>
 	<appender name="ACCESS-FILE" class="ch.qos.logback.core.FileAppender">
-		<file>log/acess.log</file>
+		<file>log/access.log</file>
 		<level>DEBUG</level>
 		<append>true</append>
 		<encoder>

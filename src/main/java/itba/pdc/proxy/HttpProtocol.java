@@ -1,33 +1,43 @@
 package itba.pdc.proxy;
 
+import itba.pdc.model.HttpRequest;
 import itba.pdc.proxy.data.Attachment;
 import itba.pdc.proxy.data.ProcessType;
+import itba.pdc.proxy.lib.ManageByteBuffer;
+import itba.pdc.proxy.lib.ManageParser;
+import itba.pdc.proxy.lib.ReadingState;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
-public class HttpProtocol implements TCPProtocol {
-	private int bufSize; // Size of I/O buffer
+import org.slf4j.LoggerFactory;
 
-	public HttpProtocol(int bufSize) {
-		this.bufSize = bufSize;
+import ch.qos.logback.classic.Logger;
+
+public class HttpProtocol implements TCPProtocol {
+	private int bufferSize; // Size of I/O buffer
+	private Logger accessLog = (Logger) LoggerFactory.getLogger("access.log");
+	private Logger debugLog = (Logger) LoggerFactory.getLogger("debug.log");
+
+	public HttpProtocol(int bufferSize) {
+		this.bufferSize = bufferSize;
 	}
 
 	public void handleAccept(SelectionKey key) throws IOException {
 		SocketChannel clntChan = ((ServerSocketChannel) key.channel()).accept();
-		clntChan.configureBlocking(false); // Must be nonblocking to register
-		// Register the selector with new channel for read and attach byte
-		// buffer
+		clntChan.configureBlocking(false);
+
 		SelectionKey clientKey = clntChan.register(key.selector(),
 				SelectionKey.OP_READ);
 		Attachment att = (Attachment) key.attachment();
-		Attachment clientAtt = new Attachment(att.getProcessID(), this.bufSize);
+		Attachment clientAtt = new Attachment(att.getProcessID(), this.bufferSize);
 		clientKey.attach(clientAtt);
-		System.out.println("PROCESS: " + ((Attachment) key.attachment()).getProcessID());
+		accessLog.info("Accept new connection");
 	}
 
 	public void handleRead(SelectionKey key) throws IOException {
@@ -35,71 +45,46 @@ public class HttpProtocol implements TCPProtocol {
 		Attachment att = (Attachment) key.attachment();
 		SocketChannel channel = (SocketChannel) key.channel();
 
-		ByteBuffer buf = att.getByteBuffer();
-		long bytesRead = 0;
-		try {
-			if (buf.position() == 0 && buf.limit() == 0) {
-				System.out.println("Bytes: " + bytesRead);
-				return;
-			}
-			bytesRead = channel.read(buf);
-			System.out.println("Bytes Read: " + bytesRead);
-		} catch (IOException e) {
+		ByteBuffer buf = att.getBuff();
+		System.out.println("Buff to read: " + buf);
+		System.out.println("Reading from " + att.getProcessID());
+		final long bytesRead = channel.read(buf);
+		System.out.println("BytesRead: " + bytesRead);
+		if (bytesRead == -1) {
+			accessLog.info("Connection with " + att.getProcessID() + " close");
+			channel.close();
 			key.cancel();
-			if (att.getOppositeKey() != null) {
-				att.getOppositeKey().cancel();
-				att.getOppositeChannel().close();
-			}
-			channel.close();
-			return;
-		}
-		if (bytesRead == -1) { // Did the other end close?
-			channel.close();
 		} else if (bytesRead > 0) {
-			// TODO: Hardcoding persistent connections. Fix this when the http
-			if (att.getProcessID().equals(ProcessType.CLIENT)) {
-				att.parseByteBuffer(buf);
-				if (att.requestFinished()) {
-					SelectionKey oppositeKey;
-					SocketChannel oppositeChannel;
-					oppositeChannel = SocketChannel.open(new InetSocketAddress(
-							att.getHost(), 80));
-					oppositeChannel.configureBlocking(false);
-					oppositeKey = oppositeChannel.register(key.selector(),
-							SelectionKey.OP_WRITE);
-					Attachment serverAtt = new Attachment(ProcessType.SERVER,
-							this.bufSize);
-					serverAtt.setOppositeKey(key);
-					serverAtt.setOppositeChannel((SocketChannel) key.channel());
-					oppositeKey.attach(serverAtt);
-					att.setOppositeChannel(oppositeChannel);
-					att.setOppositeKey(oppositeKey);
-					// Indicate via key that reading/writing are both of
-					// interest
-					// now.
-					// Attachment oppositeAtt = (Attachment)
-					// oppositeKey.attachment();
-					serverAtt.setByteBuffer(att.getTotalBuffer());
-					// oppositeKey.interestOps(SelectionKey.OP_READ);
-				}
-				key.interestOps(SelectionKey.OP_READ);
-			} else if (att.getProcessID().equals(ProcessType.SERVER)){
-				if (att.getOppositeKey().isValid()) {
-					att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
-					((Attachment) att.getOppositeKey().attachment())
-							.setByteBuffer(buf);
-				}
-				// key.interestOps(SelectionKey.OP_READ);
-			} else if (att.getProcessID().equals(ProcessType.ADMIN)) {
-				String data = "<html><body><h1>Bahui la tenes adentro</h1></body></html>";
-				String response = "HTTP/1.1 200 OK\nDate: Fri, 31 Dec 1999 23:59:59 GMT\nContent-Type: text/html\nContent-Length: " + data.getBytes().length + "\n\n";
-				String aux = response + data;
-				ByteBuffer bufferResponse = ByteBuffer.allocate(aux.length());
-				bufferResponse.put(aux.getBytes());
-				bufferResponse.position(0);
-				att.setByteBuffer(bufferResponse);
-				key.interestOps(SelectionKey.OP_WRITE);
+			switch (att.getProcessID()) {
+			case CLIENT:
+				debugLog.debug("Handle client reading");
+				handleClient(key);
+				break;
+			case SERVER:
+				debugLog.debug("Handle server reading");
+				handleServer(att);
+				break;
+			default:
+				debugLog.error("Trying to read from an invalid process");
+				break;
 			}
+
+		} else if (att.getProcessID().equals(ProcessType.SERVER)) {
+
+			// key.interestOps(SelectionKey.OP_READ);
+			// } else if (att.getProcessID().equals(ProcessType.ADMIN)) {
+			// String data =
+			// "<html><body><h1>Bahui la tenes adentro</h1></body></html>";
+			// String response =
+			// "HTTP/1.1 200 OK\nDate: Fri, 31 Dec 1999 23:59:59 GMT\nContent-Type: text/html\nContent-Length: "
+			// + data.getBytes().length + "\n\n";
+			// String aux = response + data;
+			// ByteBuffer bufferResponse = ByteBuffer.allocate(aux.length());
+			// bufferResponse.put(aux.getBytes());
+			// bufferResponse.position(0);
+			// att.setByteBuffer(bufferResponse);
+			// key.interestOps(SelectionKey.OP_WRITE);
+			// }
 		}
 	}
 
@@ -112,26 +97,77 @@ public class HttpProtocol implements TCPProtocol {
 		Attachment att = (Attachment) key.attachment();
 		SocketChannel channel = (SocketChannel) key.channel();
 
-		ByteBuffer buf = att.getByteBuffer();
+		ByteBuffer buf = att.getBuff();
 		buf.flip();
-		System.out.println(buf.limit());
-		System.out.println(buf.position());
-		 System.out.println("Writing to " + att.getProcessID() + ": " + new
-		 String(buf.array()));
+		try {
+			System.out.println("Write to " + att.getProcessID() + " : " + ManageByteBuffer.decode(buf));
+		} catch(Exception e) {
+			
+		}
 		// Prepare buffer for writing
 		do {
-			try {
-				channel.write(buf);
-			} catch (IOException e) {
-				// channel.close();
-				System.out.println("Write exception");
-				return;
-			}
+			channel.write(buf);
 		} while (buf.hasRemaining());
 		if (!buf.hasRemaining()) { // Buffer completely written?
 			// Nothing left, so no longer interested in writes
 			key.interestOps(SelectionKey.OP_READ);
 		}
 		buf.compact(); // Make room for more data to be read in
+		System.out.println(buf);
+	}
+
+	private void handleClient(SelectionKey key) {
+		Attachment att = (Attachment) key.attachment();
+		ReadingState requestFinished = ManageParser.parseRequest(att
+				.getParser(), att.getBuff());
+		switch (requestFinished) {
+		case FINISHED:
+			HttpRequest request = att.getRequest();
+			SocketChannel oppositeChannel = null;
+			SelectionKey oppositeKey = null;
+			try {
+				oppositeChannel = SocketChannel
+					.open(new InetSocketAddress(request.getHost(), request
+							.getPort()));
+				oppositeChannel.configureBlocking(false);
+			} catch (Exception e) {
+				accessLog.error("Trying to connect to ad invalid host or invalid port");
+				return;
+			}
+			try {
+				oppositeKey = oppositeChannel.register(key.selector(),
+						SelectionKey.OP_WRITE);
+			} catch (ClosedChannelException e) {
+				debugLog.error("Trying to register a key in a closed channel");
+				return;
+			}
+			Attachment serverAtt = new Attachment(ProcessType.SERVER,
+					this.bufferSize);
+
+			serverAtt.setOppositeKey(key);
+			serverAtt.setOppositeChannel((SocketChannel) key.channel());
+
+			att.setOppositeChannel(oppositeChannel);
+			att.setOppositeKey(oppositeKey);
+			ByteBuffer requestBuffer = request.getStream();
+			serverAtt.setBuff(requestBuffer);
+			oppositeKey.attach(serverAtt);
+			break;
+		case UNFINISHED:
+			key.interestOps(SelectionKey.OP_READ);
+			break;
+		case ERROR:
+			// HttpResponse.generateResponse(att.getStatusRequest());
+			break;
+		}
+//		att.getBuff().compact();
+	}
+
+	private void handleServer(Attachment att) {
+		if (att.getOppositeKey().isValid()) {
+			att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
+			Attachment oppositeAtt = (Attachment) (Attachment) att.getOppositeKey().attachment();
+			oppositeAtt.setBuff(att.getBuff());
+		}
 	}
 }
