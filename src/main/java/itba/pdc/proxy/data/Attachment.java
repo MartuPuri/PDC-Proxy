@@ -69,6 +69,8 @@ public class Attachment {
 	}
 
 	public void setBuff(ByteBuffer buff) {
-		this.buff = buff;
+		this.buff = ByteBuffer.allocate(buff.capacity());
+		buff.flip();
+		this.buff.put(buff);
 	}
 }

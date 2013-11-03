@@ -21,7 +21,7 @@ import ch.qos.logback.classic.Logger;
 
 public class HttpProtocol implements TCPProtocol {
 	private int bufferSize; // Size of I/O buffer
-	private Logger accessLog = (Logger) LoggerFactory.getLogger("access.log");
+	private Logger accessLogger = (Logger) LoggerFactory.getLogger("access.log");
 	private Logger debugLog = (Logger) LoggerFactory.getLogger("debug.log");
 
 	public HttpProtocol(int bufferSize) {
@@ -35,9 +35,10 @@ public class HttpProtocol implements TCPProtocol {
 		SelectionKey clientKey = clntChan.register(key.selector(),
 				SelectionKey.OP_READ);
 		Attachment att = (Attachment) key.attachment();
-		Attachment clientAtt = new Attachment(att.getProcessID(), this.bufferSize);
+		Attachment clientAtt = new Attachment(att.getProcessID(),
+				this.bufferSize);
 		clientKey.attach(clientAtt);
-		accessLog.info("Accept new connection");
+		accessLogger.info("Accept new connection");
 	}
 
 	public void handleRead(SelectionKey key) throws IOException {
@@ -51,17 +52,15 @@ public class HttpProtocol implements TCPProtocol {
 		final long bytesRead = channel.read(buf);
 		System.out.println("BytesRead: " + bytesRead);
 		if (bytesRead == -1) {
-			accessLog.info("Connection with " + att.getProcessID() + " close");
+			accessLogger.info("Connection with " + att.getProcessID() + " close");
 			channel.close();
 			key.cancel();
 		} else if (bytesRead > 0) {
 			switch (att.getProcessID()) {
 			case CLIENT:
-				debugLog.debug("Handle client reading");
 				handleClient(key);
 				break;
 			case SERVER:
-				debugLog.debug("Handle server reading");
 				handleServer(att);
 				break;
 			default:
@@ -69,23 +68,24 @@ public class HttpProtocol implements TCPProtocol {
 				break;
 			}
 
-		} else if (att.getProcessID().equals(ProcessType.SERVER)) {
-
-			// key.interestOps(SelectionKey.OP_READ);
-			// } else if (att.getProcessID().equals(ProcessType.ADMIN)) {
-			// String data =
-			// "<html><body><h1>Bahui la tenes adentro</h1></body></html>";
-			// String response =
-			// "HTTP/1.1 200 OK\nDate: Fri, 31 Dec 1999 23:59:59 GMT\nContent-Type: text/html\nContent-Length: "
-			// + data.getBytes().length + "\n\n";
-			// String aux = response + data;
-			// ByteBuffer bufferResponse = ByteBuffer.allocate(aux.length());
-			// bufferResponse.put(aux.getBytes());
-			// bufferResponse.position(0);
-			// att.setByteBuffer(bufferResponse);
-			// key.interestOps(SelectionKey.OP_WRITE);
-			// }
+		} else {
+			buf.compact();
 		}
+
+		// key.interestOps(SelectionKey.OP_READ);
+		// } else if (att.getProcessID().equals(ProcessType.ADMIN)) {
+		// String data =
+		// "<html><body><h1>Bahui la tenes adentro</h1></body></html>";
+		// String response =
+		// "HTTP/1.1 200 OK\nDate: Fri, 31 Dec 1999 23:59:59 GMT\nContent-Type: text/html\nContent-Length: "
+		// + data.getBytes().length + "\n\n";
+		// String aux = response + data;
+		// ByteBuffer bufferResponse = ByteBuffer.allocate(aux.length());
+		// bufferResponse.put(aux.getBytes());
+		// bufferResponse.position(0);
+		// att.setByteBuffer(bufferResponse);
+		// key.interestOps(SelectionKey.OP_WRITE);
+		// }
 	}
 
 	public void handleWrite(SelectionKey key) throws IOException {
@@ -100,13 +100,18 @@ public class HttpProtocol implements TCPProtocol {
 		ByteBuffer buf = att.getBuff();
 		buf.flip();
 		try {
-			System.out.println("Write to " + att.getProcessID() + " : " + ManageByteBuffer.decode(buf));
-		} catch(Exception e) {
-			
+			System.out.println("Write to " + att.getProcessID() + " : "
+					+ ManageByteBuffer.decode(buf));
+		} catch (Exception e) {
+
 		}
 		// Prepare buffer for writing
 		do {
-			channel.write(buf);
+			if (channel.isOpen() && channel.isConnected()) {
+				channel.write(buf);
+			} else {
+				break;
+			}
 		} while (buf.hasRemaining());
 		if (!buf.hasRemaining()) { // Buffer completely written?
 			// Nothing left, so no longer interested in writes
@@ -118,20 +123,23 @@ public class HttpProtocol implements TCPProtocol {
 
 	private void handleClient(SelectionKey key) {
 		Attachment att = (Attachment) key.attachment();
-		ReadingState requestFinished = ManageParser.parseRequest(att
-				.getParser(), att.getBuff());
+		ReadingState requestFinished = ManageParser.parseRequest(
+				att.getParser(), att.getBuff());
 		switch (requestFinished) {
 		case FINISHED:
 			HttpRequest request = att.getRequest();
 			SocketChannel oppositeChannel = null;
 			SelectionKey oppositeKey = null;
 			try {
-				oppositeChannel = SocketChannel
-					.open(new InetSocketAddress(request.getHost(), request
-							.getPort()));
+				oppositeChannel = SocketChannel.open(new InetSocketAddress(
+						request.getHost(), request.getPort()));
+				// oppositeChannel = SocketChannel
+				// .open(new InetSocketAddress("192.168.1.108", 8080));
 				oppositeChannel.configureBlocking(false);
 			} catch (Exception e) {
-				accessLog.error("Trying to connect to ad invalid host or invalid port");
+				accessLogger
+						.error("Trying to connect to an invalid host or invalid port: "
+								+ request.getHost() + ", " + request.getPort());
 				return;
 			}
 			try {
@@ -160,14 +168,16 @@ public class HttpProtocol implements TCPProtocol {
 			// HttpResponse.generateResponse(att.getStatusRequest());
 			break;
 		}
-//		att.getBuff().compact();
+		// att.getBuff().compact();
 	}
 
 	private void handleServer(Attachment att) {
 		if (att.getOppositeKey().isValid()) {
 			att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
-			Attachment oppositeAtt = (Attachment) (Attachment) att.getOppositeKey().attachment();
+			Attachment oppositeAtt = (Attachment) (Attachment) att
+					.getOppositeKey().attachment();
 			oppositeAtt.setBuff(att.getBuff());
+			att.getBuff().compact();
 		}
 	}
 }

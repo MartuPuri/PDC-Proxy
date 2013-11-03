@@ -15,7 +15,11 @@ public final class ManageParser {
 	public static ReadingState parseRequest(HttpParserRequest parser, ByteBuffer buff) {
 		ParserCode code = ParserCode.INVALID;
 		try {
-			code = parser.parseMessage(buff);
+			ByteBuffer preparedBuffer = ByteBuffer.allocate(buff.capacity());
+			buff.flip();
+			preparedBuffer.put(buff);
+			buff.compact();
+			code = parser.parseMessage(preparedBuffer);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			return ReadingState.ERROR;

@@ -1,13 +1,15 @@
 package itba.pdc.model;
 
-import itba.pdc.proxy.lib.ManageByteBuffer;
-
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
 
 public class HttpRequest {
 
@@ -20,6 +22,7 @@ public class HttpRequest {
 	private Map<String, String> headers;
 	private static final Set<String> supportedMethods = createMethods();
 	private static final Set<String> supportedHeaders = createHeaders();
+	private Logger debugLogger = (Logger) LoggerFactory.getLogger("debug.log");
 
 	private static Set<String> createHeaders() {
 		Set<String> headers = new HashSet<String>();
@@ -173,6 +176,7 @@ public class HttpRequest {
 			line += body;
 		}
 		line += "\n";
+		debugLogger.debug("Request: \n" + line);
 		ByteBuffer buff = ByteBuffer.allocate(line.getBytes().length);
 		buff.put(line.getBytes());
 		return buff;
