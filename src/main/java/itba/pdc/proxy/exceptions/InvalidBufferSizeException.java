@@ -1,4 +1,4 @@
-package exceptions;
+package itba.pdc.proxy.exceptions;
 
 public class InvalidBufferSizeException extends RuntimeException {
 

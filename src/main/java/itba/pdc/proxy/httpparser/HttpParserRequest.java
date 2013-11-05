@@ -1,7 +1,7 @@
-package itba.pdc.httpparser;
+package itba.pdc.proxy.httpparser;
 
-import itba.pdc.model.HttpRequest;
-import itba.pdc.model.StatusRequest;
+import itba.pdc.proxy.model.HttpRequest;
+import itba.pdc.proxy.model.StatusRequest;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpParserRequest {
+public class HttpParserRequest implements HttpParser {
 	private HttpRequest request;
 	private ParserState state;
 	private ByteBuffer buffer;
@@ -189,8 +189,8 @@ public class HttpParserRequest {
 				return ParserCode.LOOP;
 			}
 		}
-		String s = new String(buffer.array()).trim();
-		if (s.equals("")) {
+		
+		if (!request.bodyEnable()) {
 			// TODO: Add Log
 			state = ParserState.END;
 			return ParserCode.VALID;
@@ -206,7 +206,7 @@ public class HttpParserRequest {
 			statusRequest = request.getStatusRequest();
 			return ParserCode.INVALID;
 		}
-		Integer bytes = Integer.parseInt(request.getHeader("Content-Length"));
+		Integer bytes = Integer.parseInt(request.getHeader("content-length"));
 		String data = readBuffer(bytes);
 		if (data == null) {
 			return ParserCode.LOOP;

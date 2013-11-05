@@ -1,4 +1,4 @@
-package itba.pdc.model;
+package itba.pdc.proxy.model;
 
 import java.util.HashSet;
 import java.util.Set;

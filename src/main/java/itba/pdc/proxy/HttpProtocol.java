@@ -1,11 +1,12 @@
 package itba.pdc.proxy;
 
-import itba.pdc.model.HttpRequest;
 import itba.pdc.proxy.data.Attachment;
 import itba.pdc.proxy.data.ProcessType;
 import itba.pdc.proxy.lib.ManageByteBuffer;
 import itba.pdc.proxy.lib.ManageParser;
 import itba.pdc.proxy.lib.ReadingState;
+import itba.pdc.proxy.model.HttpRequest;
+import itba.pdc.proxy.model.HttpResponse;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -21,7 +22,8 @@ import ch.qos.logback.classic.Logger;
 
 public class HttpProtocol implements TCPProtocol {
 	private int bufferSize; // Size of I/O buffer
-	private Logger accessLogger = (Logger) LoggerFactory.getLogger("access.log");
+	private Logger accessLogger = (Logger) LoggerFactory
+			.getLogger("access.log");
 	private Logger debugLog = (Logger) LoggerFactory.getLogger("debug.log");
 
 	public HttpProtocol(int bufferSize) {
@@ -47,12 +49,12 @@ public class HttpProtocol implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
-		System.out.println("Buff to read: " + buf);
-		System.out.println("Reading from " + att.getProcessID());
 		final long bytesRead = channel.read(buf);
+		System.out.println("Reading from " + att.getProcessID());
 		System.out.println("BytesRead: " + bytesRead);
 		if (bytesRead == -1) {
-			accessLogger.info("Connection with " + att.getProcessID() + " close");
+			accessLogger.info("Connection with " + att.getProcessID()
+					+ " close");
 			channel.close();
 			key.cancel();
 		} else if (bytesRead > 0) {
@@ -61,7 +63,7 @@ public class HttpProtocol implements TCPProtocol {
 				handleClient(key);
 				break;
 			case SERVER:
-				handleServer(att);
+				handleServer(key);
 				break;
 			default:
 				debugLog.error("Trying to read from an invalid process");
@@ -118,13 +120,14 @@ public class HttpProtocol implements TCPProtocol {
 			key.interestOps(SelectionKey.OP_READ);
 		}
 		buf.compact(); // Make room for more data to be read in
-		System.out.println(buf);
 	}
 
 	private void handleClient(SelectionKey key) {
 		Attachment att = (Attachment) key.attachment();
-		ReadingState requestFinished = ManageParser.parseRequest(
-				att.getParser(), att.getBuff());
+		ReadingState requestFinished = ManageParser.parse(att.getParser(),
+				att.getBuff());
+		System.out.println("Client status: " + att.getParser().getState());
+		System.out.println("Client request: " + requestFinished);
 		switch (requestFinished) {
 		case FINISHED:
 			HttpRequest request = att.getRequest();
@@ -133,8 +136,8 @@ public class HttpProtocol implements TCPProtocol {
 			try {
 				oppositeChannel = SocketChannel.open(new InetSocketAddress(
 						request.getHost(), request.getPort()));
-				// oppositeChannel = SocketChannel
-				// .open(new InetSocketAddress("192.168.1.108", 8080));
+//				 oppositeChannel = SocketChannel
+//				 .open(new InetSocketAddress("127.0.0.1", 9099));
 				oppositeChannel.configureBlocking(false);
 			} catch (Exception e) {
 				accessLogger
@@ -171,13 +174,29 @@ public class HttpProtocol implements TCPProtocol {
 		// att.getBuff().compact();
 	}
 
-	private void handleServer(Attachment att) {
-		if (att.getOppositeKey().isValid()) {
-			att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
-			Attachment oppositeAtt = (Attachment) (Attachment) att
-					.getOppositeKey().attachment();
-			oppositeAtt.setBuff(att.getBuff());
-			att.getBuff().compact();
+	private void handleServer(SelectionKey key) {
+		System.out.println("Entra server");
+		Attachment att = (Attachment) key.attachment();
+		ReadingState responseFinished = ManageParser.parse(att.getParser(),
+				att.getBuff());
+		System.out.println("Server response: " + responseFinished);
+		switch (responseFinished) {
+		case FINISHED:
+			if (att.getOppositeKey().isValid()) {
+				att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
+				Attachment oppositeAtt = (Attachment) (Attachment) att
+						.getOppositeKey().attachment();
+				HttpResponse response = att.getResponse();
+				oppositeAtt.setBuff(response.getStream());
+//				att.getBuff().compact();
+			}
+			break;
+		case UNFINISHED:
+			key.interestOps(SelectionKey.OP_READ);
+			break;
+		case ERROR:
+			// HttpResponse.generateResponse(att.getStatusRequest());
+			break;
 		}
 	}
 }

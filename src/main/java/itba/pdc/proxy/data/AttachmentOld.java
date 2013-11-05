@@ -1,11 +1,11 @@
 package itba.pdc.proxy.data;
 
-import itba.pdc.httpparser.HttpParserRequest;
-import itba.pdc.httpparser.ParserCode;
-import itba.pdc.httpparser.ParserState;
-import itba.pdc.model.HttpRequest;
-import itba.pdc.model.HttpResponse;
-import itba.pdc.model.StatusRequest;
+import itba.pdc.proxy.httpparser.HttpParserRequest;
+import itba.pdc.proxy.httpparser.ParserCode;
+import itba.pdc.proxy.httpparser.ParserState;
+import itba.pdc.proxy.lib.GenerateHttpResponse;
+import itba.pdc.proxy.model.HttpRequest;
+import itba.pdc.proxy.model.StatusRequest;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

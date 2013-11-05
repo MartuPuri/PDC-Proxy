@@ -1,18 +1,14 @@
 package itba.pdc.proxy.data;
 
-import itba.pdc.httpparser.HttpParserRequest;
-import itba.pdc.httpparser.ParserCode;
-import itba.pdc.httpparser.ParserState;
-import itba.pdc.model.HttpRequest;
-import itba.pdc.model.HttpResponse;
-import itba.pdc.model.StatusRequest;
+import itba.pdc.proxy.httpparser.HttpParser;
+import itba.pdc.proxy.httpparser.HttpParserRequest;
+import itba.pdc.proxy.httpparser.HttpParserResponse;
+import itba.pdc.proxy.model.HttpRequest;
+import itba.pdc.proxy.model.HttpResponse;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-
-import javax.swing.text.Position;
 
 /**
  * 
@@ -26,14 +22,23 @@ public class Attachment {
 	private ProcessType processID;
 	private SelectionKey oppositeKey;
 	private SocketChannel oppositeChannel;
-	private HttpParserRequest parser;
+	private HttpParser parser;
 	private HttpRequest request;
+	private HttpResponse response;
 
 	public Attachment(ProcessType processID, int buffSize) {
 		this.processID = processID;
 		this.buff = ByteBuffer.allocate(buffSize);
-		this.request = new HttpRequest();
-		this.parser = new HttpParserRequest(request);
+		switch (processID) {
+		case SERVER:
+			this.response = new HttpResponse();
+			parser = new HttpParserResponse(response);
+			break;
+		case CLIENT:
+			this.request = new HttpRequest();
+			parser = new HttpParserRequest(request);
+			break;
+		}
 	}
 
 	public ByteBuffer getBuff() {
@@ -52,7 +57,7 @@ public class Attachment {
 		return oppositeChannel;
 	}
 
-	public HttpParserRequest getParser() {
+	public HttpParser getParser() {
 		return parser;
 	}
 
@@ -72,5 +77,9 @@ public class Attachment {
 		this.buff = ByteBuffer.allocate(buff.capacity());
 		buff.flip();
 		this.buff.put(buff);
+	}
+	
+	public HttpResponse getResponse() {
+		return this.response;
 	}
 }

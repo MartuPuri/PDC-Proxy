@@ -1,4 +1,6 @@
-package itba.pdc.model;
+package itba.pdc.proxy.lib;
+
+import itba.pdc.proxy.model.StatusRequest;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -15,7 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public final class HttpResponse {
+public final class GenerateHttpResponse {
 
 	private static int status;
 	private static String body;
@@ -23,7 +25,7 @@ public final class HttpResponse {
 	private static Set<String> supportedHeaders = createHeaders();
 	private static List<String> supportedVersions = createVersions();
 
-	private HttpResponse() {
+	private GenerateHttpResponse() {
 	}
 
 	private static Set<String> createHeaders() {

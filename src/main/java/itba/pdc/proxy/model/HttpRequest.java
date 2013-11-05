@@ -1,4 +1,4 @@
-package itba.pdc.model;
+package itba.pdc.proxy.model;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -102,7 +102,7 @@ public class HttpRequest {
 	}
 
 	public void setBody(String body) {
-		if (!headers.containsKey("Content-Length")) {
+		if (!headers.containsKey("content-length")) {
 			System.out.println("Missing content-length");
 			// TODO: VER QUE HACEMOS
 		}

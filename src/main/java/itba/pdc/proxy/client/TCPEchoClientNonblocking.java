@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011 Popego Corporation -- All rights reserved
  */
-package itba.pdc.client;
+package itba.pdc.proxy.client;
 
 import java.net.InetSocketAddress;
 import java.net.SocketException;

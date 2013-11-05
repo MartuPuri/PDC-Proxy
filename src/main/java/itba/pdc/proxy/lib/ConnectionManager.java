@@ -2,6 +2,8 @@ package itba.pdc.proxy.lib;
 
 import itba.pdc.proxy.data.Attachment;
 import itba.pdc.proxy.data.ProcessType;
+import itba.pdc.proxy.exceptions.InvalidBufferSizeException;
+import itba.pdc.proxy.exceptions.InvalidDefaultPortException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,8 +15,6 @@ import java.nio.channels.ServerSocketChannel;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
-import exceptions.InvalidBufferSizeException;
-import exceptions.InvalidDefaultPortException;
 
 public class ConnectionManager {
 	private static ConnectionManager instance = null;
