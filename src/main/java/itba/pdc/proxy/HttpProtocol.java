@@ -22,6 +22,7 @@ import ch.qos.logback.classic.Logger;
 
 public class HttpProtocol implements TCPProtocol {
 	private int bufferSize; // Size of I/O buffer
+	private int bytes = 0;
 	private Logger accessLogger = (Logger) LoggerFactory
 			.getLogger("access.log");
 	private Logger debugLog = (Logger) LoggerFactory.getLogger("debug.log");
@@ -50,8 +51,8 @@ public class HttpProtocol implements TCPProtocol {
 
 		ByteBuffer buf = att.getBuff();
 		final long bytesRead = channel.read(buf);
-		System.out.println("Reading from " + att.getProcessID());
-		System.out.println("BytesRead: " + bytesRead);
+//		System.out.println("Reading from " + att.getProcessID());
+//		System.out.println("BytesRead: " + bytesRead);
 		if (bytesRead == -1) {
 			accessLogger.info("Connection with " + att.getProcessID()
 					+ " close");
@@ -63,6 +64,8 @@ public class HttpProtocol implements TCPProtocol {
 				handleClient(key);
 				break;
 			case SERVER:
+				bytes += bytesRead;
+				System.out.println("Bytes: " + bytes + " Bytes read: " + bytesRead);
 				handleServer(key);
 				break;
 			default:
@@ -100,6 +103,7 @@ public class HttpProtocol implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
+		System.out.println("Write Buff position: " + buf.position() + " limit: " + buf.limit());
 		buf.flip();
 		try {
 			System.out.println("Write to " + att.getProcessID() + " : "
@@ -126,8 +130,8 @@ public class HttpProtocol implements TCPProtocol {
 		Attachment att = (Attachment) key.attachment();
 		ReadingState requestFinished = ManageParser.parse(att.getParser(),
 				att.getBuff());
-		System.out.println("Client status: " + att.getParser().getState());
-		System.out.println("Client request: " + requestFinished);
+//		System.out.println("Client status: " + att.getParser().getState());
+//		System.out.println("Client request: " + requestFinished);
 		switch (requestFinished) {
 		case FINISHED:
 			HttpRequest request = att.getRequest();
@@ -175,11 +179,11 @@ public class HttpProtocol implements TCPProtocol {
 	}
 
 	private void handleServer(SelectionKey key) {
-		System.out.println("Entra server");
+//		System.out.println("Entra server");
 		Attachment att = (Attachment) key.attachment();
 		ReadingState responseFinished = ManageParser.parse(att.getParser(),
 				att.getBuff());
-		System.out.println("Server response: " + responseFinished);
+//		System.out.println("Server response: " + responseFinished);
 		switch (responseFinished) {
 		case FINISHED:
 			if (att.getOppositeKey().isValid()) {

@@ -53,8 +53,8 @@ public class HttpParserRequest implements HttpParser {
 	}
 
 	private void concatBuffer(ByteBuffer _buff) {
-		ByteBuffer aux = ByteBuffer.allocate(buffer.capacity()
-				+ _buff.capacity());
+		ByteBuffer aux = ByteBuffer.allocate(buffer.position()
+				+ _buff.position());
 		_buff.flip();
 		buffer.flip();
 		aux.put(buffer);
@@ -80,8 +80,10 @@ public class HttpParserRequest implements HttpParser {
 		if (index < length) {
 			int c = buffer.capacity();
 			String tail = s.substring(index + matchLength, length);
-			buffer.position(index + matchLength);
-			buffer.compact();
+			buffer = ByteBuffer.allocate(tail.getBytes().length);
+			buffer.put(tail.getBytes());
+//			buffer.position(index + matchLength);
+//			buffer.compact();
 		} else if (index == length) {
 			buffer = ByteBuffer.allocate(length - index);
 		}
@@ -101,7 +103,7 @@ public class HttpParserRequest implements HttpParser {
 
 		if (cmd.length != 3) {
 			statusRequest = StatusRequest.BAD_REQUEST;
-			System.out.println("BAD REQUEST");// TODO: Change for log
+//			System.out.println("BAD REQUEST");// TODO: Change for log
 			// request.invalidRequestLine(response);
 			return ParserCode.INVALID;
 		}

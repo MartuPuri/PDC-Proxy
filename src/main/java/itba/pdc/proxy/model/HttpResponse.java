@@ -88,7 +88,7 @@ public class HttpResponse {
 	}
 
 	public void setBody(ByteBuffer buffer) {
-		if (!headers.containsKey("Content-Length")) {
+		if (!headers.containsKey("content-length")) {
 			System.out.println("Missing content-length");
 			// TODO: VER QUE HACEMOS
 		}
@@ -125,8 +125,9 @@ public class HttpResponse {
 			headersLine += entry.getKey() + ": " + entry.getValue() + "\r\n";
 		}
 		line += firstLine + headersLine + "\n";
+		System.out.println("Byttes header: " + line.getBytes().length);
 		debugLogger.debug("Response: \n" + line);
-		ByteBuffer buff = ByteBuffer.allocate(line.getBytes().length + body.capacity());
+		ByteBuffer buff = ByteBuffer.allocate(line.getBytes().length + body.position());
 		buff.put(line.getBytes());
 		body.flip();
 		buff.put(body);

@@ -26,22 +26,22 @@ public class HttpRequest {
 
 	private static Set<String> createHeaders() {
 		Set<String> headers = new HashSet<String>();
-		headers.add("Accept");
+		headers.add("accept");
 		// headers.add("Accept-Charset");
 		// headers.add("Accept-Encoding");
 		// headers.add("Accept-Language");
 		// headers.add("Accept-Datetime");
 		// headers.add("Authorization");
 		// headers.add("Cache-Control");
-		headers.add("Connection");
+		headers.add("connection");
 		// headers.add("Cookie");
-		headers.add("Content-Length");
+		headers.add("content-length");
 		// headers.add("Content-MD5");
 		// headers.add("Content-Type");
-		headers.add("Date");
-		headers.add("Expect");
-		headers.add("From");
-		headers.add("Host");
+		headers.add("date");
+		headers.add("expect");
+		headers.add("from");
+		headers.add("host");
 		// headers.add("If-Match");
 		// headers.add("If-None-Match");
 		// headers.add("If-Modified-Since");
@@ -78,7 +78,7 @@ public class HttpRequest {
 
 	public void addHeader(String header, String value) {
 		if (!supportedHeaders.contains(header)) {
-			// System.out.println("Invalid header");
+			 System.out.println("Invalid header");
 			// TODO: VER QUE HACEMOS
 		}
 		headers.put(header, value);
@@ -114,7 +114,7 @@ public class HttpRequest {
 	}
 
 	public boolean bodyEnable() {
-		if (headers.containsKey("Content-Length")) {
+		if (headers.containsKey("content-length")) {
 			return true;
 		}
 		status = StatusRequest.LENGTH_REQUIRED;

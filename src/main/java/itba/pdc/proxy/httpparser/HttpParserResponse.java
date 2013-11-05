@@ -4,6 +4,9 @@ import itba.pdc.proxy.model.HttpRequest;
 import itba.pdc.proxy.model.HttpResponse;
 import itba.pdc.proxy.model.StatusRequest;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -15,6 +18,7 @@ public class HttpParserResponse implements HttpParser {
 	private HttpResponse response;
 	private ParserState state;
 	private ByteBuffer buffer;
+	private int bytes = 0;
 
 	public HttpParserResponse(HttpResponse response) {
 		this.response = response;
@@ -52,6 +56,8 @@ public class HttpParserResponse implements HttpParser {
 	}
 
 	private void concatBuffer(ByteBuffer _buff) {
+		System.out.println("Concat: buffer position:" + buffer.position() + "  buffer. limit: " + buffer.limit());
+		System.out.println("Concat: _BUFF position:" + _buff.position() + "  _BUFF. limit: " + _buff.limit());
 		ByteBuffer aux = ByteBuffer.allocate(buffer.position()
 				+ _buff.position());
 		_buff.flip();
@@ -59,10 +65,13 @@ public class HttpParserResponse implements HttpParser {
 		aux.put(buffer);
 		aux.put(_buff);
 		buffer = aux;
+		System.out.println("Buffer limit: " + buffer.limit() + " position: " + buffer.position());
 	}
 
 	private String readLine() {
+		System.out.println("Read line Buffer limit: " + buffer.limit() + " position: " + buffer.position());
 		String s = new String(buffer.array());
+		System.out.println("S: " + s);
 		String match = "\r\n";
 		int index = s.indexOf(match);
 		int matchLength = match.length();
@@ -76,15 +85,20 @@ public class HttpParserResponse implements HttpParser {
 		}
 		int length = s.length();
 		String line = s.substring(0, index);
+		bytes += index + matchLength;
+		System.out.println("Read: " + line.getBytes().length);
+		System.out.println("Bytes read from buffer: " + bytes);
 		if (index < length) {
-			int c = buffer.capacity();
+			System.out.println("s.length: " + s.length());
+			System.out.println("Diffrence: " + (length - index - matchLength));
 			String tail = s.substring(index + matchLength, length);
+			System.out.println("Tail: " + tail);
+			System.out.println("Tail.length:" + tail.length());
+			System.out.println("tail.getBytes().length: " + tail.getBytes().length);
 			buffer = ByteBuffer.allocate(tail.getBytes().length);
 			buffer.put(tail.getBytes());
-//			buffer.position(index + matchLength);
-//			buffer.compact();
 		} else if (index == length) {
-			buffer = ByteBuffer.allocate(length - index);
+			buffer = ByteBuffer.allocate(0);
 		}
 		return line;
 	}
@@ -150,14 +164,21 @@ public class HttpParserResponse implements HttpParser {
 			} else {
 				String headerType = line.substring(0, idx).toLowerCase();
 				String headerValue = line.substring(idx + 1).trim();
+				System.out.println("Header type: " + headerType + "  headerValue: " + headerValue);
 				response.addHeader(headerType, headerValue);
 				// TODO: Add log
 			}
 			line = readLine();
+//			System.out.println("Header line: " + line);
 			if (line == null) {
 				return ParserCode.LOOP;
 			}
 		}
+		System.out.println("Finish header: pos: " + buffer.position() + " lmit: " + buffer.limit());
+//		buffer.flip();
+//		System.out.println("Buff: " + new String(buffer.array()));
+//		int position = buffer.position() - 8;
+//		buffer.position(position);
 		state = ParserState.DATA;
 		return ParserCode.CONTINUE;
 	}
@@ -171,13 +192,24 @@ public class HttpParserResponse implements HttpParser {
 		if (data == null) {
 			return ParserCode.LOOP;
 		}
+//		FileWriter f;
+//		try {
+//			f = new FileWriter("imagen.txt");
+//			BufferedWriter bw = new BufferedWriter(f);
+//			System.out.println("BYTES DATA: " + data.getBytes().le);
+//			bw.write(data);
+//			bw.close();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		response.setBody(this.buffer);
 		this.state = ParserState.END;
 		return ParserCode.VALID;
 	}
 
 	private String readBuffer(Integer contentLength) {
-		System.out.println("Limit: " + this.buffer.limit() + " position: " + this.buffer.position());
+//		System.out.println("Limit: " + this.buffer.limit() + " position: " + this.buffer.position());
 		System.out.println("length: " + contentLength);
 		if (this.buffer.limit() >= contentLength) {
 			return new String(this.buffer.array());
