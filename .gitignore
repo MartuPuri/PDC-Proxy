@@ -10,3 +10,5 @@
 *.war
 *.ear
 /target
+
+/log
