@@ -169,7 +169,9 @@ public class HttpRequest {
 		String firstLine = method + " " + uri + " HTTP/" + version[0] + "." + version[1] + "\n";
 		String headersLine = "";
 		for (Entry<String, String> entry : headers.entrySet()) {
-			headersLine += entry.getKey() + ": " + entry.getValue() + "\n";
+			if (!entry.getKey().contains("encoding")) {
+				headersLine += entry.getKey() + ": " + entry.getValue() + "\n";
+			}
 		}
 		line += firstLine + headersLine;
 		if (bodyEnable()) {

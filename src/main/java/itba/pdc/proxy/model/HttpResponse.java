@@ -1,8 +1,9 @@
 package itba.pdc.proxy.model;
 
-import itba.pdc.proxy.lib.ManageByteBuffer;
-
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -119,7 +120,8 @@ public class HttpResponse {
 
 	public ByteBuffer getStream() {
 		String line = "";
-		String firstLine = "HTTP/" + version[0] + "." + version[1] +  " " + code + " " + messageCode + "\r\n";
+		String firstLine = "HTTP/" + version[0] + "." + version[1] + " " + code
+				+ " " + messageCode + "\r\n";
 		String headersLine = "";
 		for (Entry<String, String> entry : headers.entrySet()) {
 			headersLine += entry.getKey() + ": " + entry.getValue() + "\r\n";
@@ -127,8 +129,32 @@ public class HttpResponse {
 		line += firstLine + headersLine + "\n";
 		System.out.println("Byttes header: " + line.getBytes().length);
 		debugLogger.debug("Response: \n" + line);
-		ByteBuffer buff = ByteBuffer.allocate(line.getBytes().length + body.position());
+		ByteBuffer buff = ByteBuffer.allocate(line.getBytes().length
+				+ body.position());
 		buff.put(line.getBytes());
+//		FileInputStream fIn;
+//		FileChannel fChan;
+//		long fSize;
+//		ByteBuffer mBuf = ByteBuffer.allocate(0);
+//
+//		try {
+//			fIn = new FileInputStream("imagen.txt");
+//			fChan = fIn.getChannel();
+//			fSize = fChan.size();
+//			mBuf = ByteBuffer.allocate((int) fSize);
+//			fChan.read(mBuf);
+////			mBuf.rewind();
+////			for (int i = 0; i < fSize; i++)
+////				System.out.print((char) mBuf.get());
+//			fChan.close();
+//			fIn.close();
+//			mBuf.flip();
+//			buff.put(mBuf);
+//		} catch (IOException exc) {
+//			System.out.println(exc);
+//			System.exit(1);
+//		}
+		
 		body.flip();
 		buff.put(body);
 		return buff;

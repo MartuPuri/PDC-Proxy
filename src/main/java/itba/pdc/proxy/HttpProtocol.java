@@ -141,7 +141,7 @@ public class HttpProtocol implements TCPProtocol {
 				oppositeChannel = SocketChannel.open(new InetSocketAddress(
 						request.getHost(), request.getPort()));
 //				 oppositeChannel = SocketChannel
-//				 .open(new InetSocketAddress("127.0.0.1", 9099));
+//				 .open(new InetSocketAddress("10.6.0.158", 8080));
 				oppositeChannel.configureBlocking(false);
 			} catch (Exception e) {
 				accessLogger
