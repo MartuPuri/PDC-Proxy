@@ -24,7 +24,7 @@ public class HttpRequest {
 	private static final Set<String> supportedHeaders = createHeaders();
 	private Logger debugLogger = (Logger) LoggerFactory.getLogger("debug.log");
 
-	private static Set<String> createHeaders() {
+	protected static Set<String> createHeaders() {
 		Set<String> headers = new HashSet<String>();
 		headers.add("accept");
 		// headers.add("Accept-Charset");
@@ -62,7 +62,7 @@ public class HttpRequest {
 		return headers;
 	}
 
-	private static Set<String> createMethods() {
+	protected static Set<String> createMethods() {
 		Set<String> headers = new HashSet<String>();
 		headers.add("GET");
 		headers.add("POST");
@@ -163,7 +163,11 @@ public class HttpRequest {
 			}
 		}
 	}
-
+	
+	public String getMethod(){
+		return this.method;
+	}
+	
 	public ByteBuffer getStream() {
 		String line = "";
 		String firstLine = method + " " + uri + " HTTP/" + version[0] + "." + version[1] + "\n";
