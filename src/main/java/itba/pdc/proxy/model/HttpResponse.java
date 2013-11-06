@@ -1,5 +1,7 @@
 package itba.pdc.proxy.model;
 
+import itba.pdc.admin.MetricManager;
+
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.HashMap;
@@ -81,6 +83,7 @@ public class HttpResponse {
 	}
 
 	public void setCode(Integer code) {
+		MetricManager.getInstance().addStatusCode(code);
 		this.code = code;
 		this.messageCode = httpReplies.get(code);
 	}

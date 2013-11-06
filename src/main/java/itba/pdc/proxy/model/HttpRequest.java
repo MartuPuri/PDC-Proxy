@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
 
-public class HttpRequest extends HttpRequestAbstract {
+public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 
 //	private String method;
 //	private String body;
@@ -76,6 +76,7 @@ public class HttpRequest extends HttpRequestAbstract {
 //		this.version = new int[2];
 	}
 
+	@Override
 	public void addHeader(String header, String value) {
 		if (!supportedHeaders.contains(header)) {
 			 System.out.println("Invalid header");
@@ -89,13 +90,13 @@ public class HttpRequest extends HttpRequestAbstract {
 //		this.version[1] = version[1];
 //	}
 
-	public void setMethod(String method) {
-//		if (!supportedMethods.contains(method)) {
-//			// System.out.println("Invalid method");
-//			// TODO: VER QUE HACEMOS
-//		}
-		super.setMethod(method);
-	}
+//	public void setMethod(String method) {
+////		if (!supportedMethods.contains(method)) {
+////			// System.out.println("Invalid method");
+////			// TODO: VER QUE HACEMOS
+////		}
+//		super.setMethod(method);
+//	}
 
 //	public void setParams(Map<String, String> params) {
 //		this.params.putAll(params);
@@ -139,15 +140,6 @@ public class HttpRequest extends HttpRequestAbstract {
 //		return status;
 //	}
 
-	public boolean validMethod(String method) {
-		if (supportedMethods.contains(method)) {
-			return true;
-		}
-		super.setStatus(StatusRequest.METHOD_NOT_ALLOWED);
-//		status = StatusRequest.METHOD_NOT_ALLOWED;
-		return false;
-	}
-
 //	public String getHost() {
 //		return headers.get("host");
 //	}
@@ -173,22 +165,31 @@ public class HttpRequest extends HttpRequestAbstract {
 		String line = "";
 		
 		//TODO: Fix query
-		String firstLine = method + " " + uri + " HTTP/" + version[0] + "." + version[1] + "\n";
+		String firstLine = super.getMethod() + " " + super.getUri() + " HTTP/" + super.getVersion()[0] + "." + super.getVersion()[1] + "\n";
 		String headersLine = "";
-		for (Entry<String, String> entry : headers.entrySet()) {
+		for (Entry<String, String> entry : super.getHeaders().entrySet()) {
 			if (!entry.getKey().contains("encoding")) {
 				headersLine += entry.getKey() + ": " + entry.getValue() + "\n";
 			}
 		}
 		line += firstLine + headersLine;
 		if (bodyEnable()) {
-			line += body;
+			line += super.getBody();
 		}
 		line += "\n";
 		debugLogger.debug("Request: \n" + line);
 		ByteBuffer buff = ByteBuffer.allocate(line.getBytes().length);
 		buff.put(line.getBytes());
 		return buff;
+	}
+
+	public boolean validMethod(String method) {
+		if (supportedMethods.contains(method)) {
+			return true;
+		}
+		super.setStatus(StatusRequest.METHOD_NOT_ALLOWED);
+//		status = StatusRequest.METHOD_NOT_ALLOWED;
+		return false;
 	}
 
 }

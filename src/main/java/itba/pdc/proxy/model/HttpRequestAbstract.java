@@ -1,5 +1,6 @@
 package itba.pdc.proxy.model;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -7,10 +8,10 @@ public abstract class HttpRequestAbstract {
 	private String method;
 	private String body;
 	private String uri;
-	private int[] version;
+	private int[] version = new int[2];
 	private StatusRequest status = StatusRequest.OK;
-	private Map<String, String> params;
-	private Map<String, String> headers;
+	private Map<String, String> params = new HashMap<String, String>();
+	private Map<String, String> headers = new HashMap<String, String>();
 
 	// private static final Set<String> supportedMethods = createMethods();
 	// private static final Set<String> supportedHeaders = createHeaders();
@@ -48,7 +49,6 @@ public abstract class HttpRequestAbstract {
 		if (headers.containsKey("content-length")) {
 			return true;
 		}
-		status = StatusRequest.LENGTH_REQUIRED;
 		return false;
 	}
 
@@ -64,10 +64,6 @@ public abstract class HttpRequestAbstract {
 
 	public String getHeader(String key) {
 		return headers.get(key);
-	}
-
-	public StatusRequest getStatusRequest() {
-		return status;
 	}
 
 	public void setStatus(StatusRequest status) {
@@ -95,8 +91,32 @@ public abstract class HttpRequestAbstract {
 	public String getMethod() {
 		return this.method;
 	}
-	
-	protected String getBody() {
-		
+
+	/*
+	 * TODO: Change this for buffer
+	 */
+	@Deprecated
+	public String getBody() {
+		return body;
+	}
+
+	public String getUri() {
+		return uri;
+	}
+
+	public int[] getVersion() {
+		return version;
+	}
+
+	public StatusRequest getStatus() {
+		return status;
+	}
+
+	public Map<String, String> getParams() {
+		return params;
+	}
+
+	public Map<String, String> getHeaders() {
+		return headers;
 	}
 }

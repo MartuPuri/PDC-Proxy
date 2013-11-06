@@ -1,5 +1,8 @@
 package itba.pdc.proxy;
 
+import itba.pdc.proxy.data.Attachment;
+import itba.pdc.proxy.data.ProxyType;
+
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -29,7 +32,9 @@ public class TCPServerSelector {
 //            
 //        }
         // Create a handler that will implement the protocol
-        TCPProtocol protocol = new HttpHandler(BUFSIZE);
+        TCPProtocol http = new HttpHandler(BUFSIZE);
+        TCPProtocol ehttp = new EHttpHandler(BUFSIZE);
+        TCPProtocol protocol = http;
         while (true) { // Run forever, processing available I/O operations
             // Wait for some channel to be ready (or timeout)
             if (selector.select(TIMEOUT) == 0) { // returns # of ready chans
@@ -41,6 +46,17 @@ public class TCPServerSelector {
             while (keyIter.hasNext()) {
                 SelectionKey key = keyIter.next(); // Key is bit mask
                 // Server socket channel has pending connection requests?
+                Attachment att = (Attachment) key.attachment();
+                ProxyType proxyType = att.getProxyType();
+                switch (proxyType) {
+				case ADMIN:
+					protocol = ehttp;
+					break;
+				case PROXY:
+					protocol = http;
+				default:
+					break;
+				}
                 if (!key.isValid()) {
 					continue;
 				}

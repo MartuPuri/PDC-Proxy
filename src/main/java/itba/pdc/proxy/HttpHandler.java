@@ -1,7 +1,8 @@
 package itba.pdc.proxy;
 
-import itba.pdc.proxy.data.Attachment;
+import itba.pdc.proxy.data.AttachmentProxy;
 import itba.pdc.proxy.data.ProcessType;
+import itba.pdc.proxy.data.ProxyType;
 import itba.pdc.proxy.lib.ManageByteBuffer;
 import itba.pdc.proxy.lib.ManageParser;
 import itba.pdc.proxy.lib.ReadingState;
@@ -37,21 +38,21 @@ public class HttpHandler implements TCPProtocol {
 
 		SelectionKey clientKey = clntChan.register(key.selector(),
 				SelectionKey.OP_READ);
-		Attachment att = (Attachment) key.attachment();
-		Attachment clientAtt = new Attachment(att.getProcessID(),
-				this.bufferSize);
+		AttachmentProxy att = (AttachmentProxy) key.attachment();
+		AttachmentProxy clientAtt = new AttachmentProxy(att.getProcessID(),
+				att.getProxyType(), this.bufferSize);
 		clientKey.attach(clientAtt);
 		accessLogger.info("Accept new connection");
 	}
 
 	public void handleRead(SelectionKey key) throws IOException {
 		// Client socket channel has pending data
-		Attachment att = (Attachment) key.attachment();
+		AttachmentProxy att = (AttachmentProxy) key.attachment();
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
 		final long bytesRead = channel.read(buf);
-//		System.out.println("Reading from " + att.getProcessID());
+		// System.out.println("Reading from " + att.getProcessID());
 		System.out.println("BytesRead: " + bytesRead);
 		if (bytesRead == -1) {
 			accessLogger.info("Connection with " + att.getProcessID()
@@ -65,7 +66,8 @@ public class HttpHandler implements TCPProtocol {
 				break;
 			case SERVER:
 				bytes += bytesRead;
-				System.out.println("Bytes: " + bytes + " Bytes read: " + bytesRead);
+				System.out.println("Bytes: " + bytes + " Bytes read: "
+						+ bytesRead);
 				handleServer(key);
 				break;
 			default:
@@ -99,11 +101,12 @@ public class HttpHandler implements TCPProtocol {
 		 * channel not closed).
 		 */
 		// Retrieve data read earlier
-		Attachment att = (Attachment) key.attachment();
+		AttachmentProxy att = (AttachmentProxy) key.attachment();
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
-		System.out.println("Write Buff position: " + buf.position() + " limit: " + buf.limit());
+		System.out.println("Write Buff position: " + buf.position()
+				+ " limit: " + buf.limit());
 		buf.flip();
 		try {
 			System.out.println("Write to " + att.getProcessID() + " : "
@@ -127,11 +130,11 @@ public class HttpHandler implements TCPProtocol {
 	}
 
 	private void handleClient(SelectionKey key) {
-		Attachment att = (Attachment) key.attachment();
+		AttachmentProxy att = (AttachmentProxy) key.attachment();
 		ReadingState requestFinished = ManageParser.parse(att.getParser(),
 				att.getBuff());
-//		System.out.println("Client status: " + att.getParser().getState());
-//		System.out.println("Client request: " + requestFinished);
+		// System.out.println("Client status: " + att.getParser().getState());
+		// System.out.println("Client request: " + requestFinished);
 		switch (requestFinished) {
 		case FINISHED:
 			HttpRequest request = att.getRequest();
@@ -140,8 +143,8 @@ public class HttpHandler implements TCPProtocol {
 			try {
 				oppositeChannel = SocketChannel.open(new InetSocketAddress(
 						request.getHost(), request.getPort()));
-//				 oppositeChannel = SocketChannel
-//				 .open(new InetSocketAddress("10.6.0.158", 8080));
+				// oppositeChannel = SocketChannel
+				// .open(new InetSocketAddress("10.6.0.158", 8080));
 				oppositeChannel.configureBlocking(false);
 			} catch (Exception e) {
 				accessLogger
@@ -156,8 +159,8 @@ public class HttpHandler implements TCPProtocol {
 				debugLog.error("Trying to register a key in a closed channel");
 				return;
 			}
-			Attachment serverAtt = new Attachment(ProcessType.SERVER,
-					this.bufferSize);
+			AttachmentProxy serverAtt = new AttachmentProxy(ProcessType.SERVER,
+					ProxyType.PROXY, this.bufferSize);
 
 			serverAtt.setOppositeKey(key);
 			serverAtt.setOppositeChannel((SocketChannel) key.channel());
@@ -179,20 +182,20 @@ public class HttpHandler implements TCPProtocol {
 	}
 
 	private void handleServer(SelectionKey key) {
-//		System.out.println("Entra server");
-		Attachment att = (Attachment) key.attachment();
+		// System.out.println("Entra server");
+		AttachmentProxy att = (AttachmentProxy) key.attachment();
 		ReadingState responseFinished = ManageParser.parse(att.getParser(),
 				att.getBuff());
-//		System.out.println("Server response: " + responseFinished);
+		// System.out.println("Server response: " + responseFinished);
 		switch (responseFinished) {
 		case FINISHED:
 			if (att.getOppositeKey().isValid()) {
 				att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
-				Attachment oppositeAtt = (Attachment) (Attachment) att
+				AttachmentProxy oppositeAtt = (AttachmentProxy) (AttachmentProxy) att
 						.getOppositeKey().attachment();
 				HttpResponse response = att.getResponse();
 				oppositeAtt.setBuff(response.getStream());
-//				att.getBuff().compact();
+				// att.getBuff().compact();
 			}
 			break;
 		case UNFINISHED:

@@ -2,7 +2,6 @@ package itba.pdc.proxy.model;
 
 import java.util.Map;
 
-@Deprecated
 public interface HttpMessage {
 	
 	public void addHeader(String header, String value);
@@ -12,4 +11,11 @@ public interface HttpMessage {
 	public void setBody(String body);
 	public void setUri(String uri);
 	public boolean bodyEnable();
+	public boolean validVersion(int[] version);
+	public String getHeader(String key);
+	public String getHost();
+	public boolean validMethod(String method);
+	public StatusRequest getStatus();
+	@Deprecated
+	public Integer getPort();
 }

@@ -1,6 +1,6 @@
 package itba.pdc.proxy.httpparser;
 
-import itba.pdc.proxy.model.HttpRequest;
+import itba.pdc.proxy.model.HttpMessage;
 import itba.pdc.proxy.model.StatusRequest;
 
 import java.io.IOException;
@@ -11,12 +11,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpParserRequest implements HttpParser {
-	private HttpRequest request;
+	private HttpMessage request;
 	private ParserState state;
 	private ByteBuffer buffer;
 	private StatusRequest statusRequest = StatusRequest.OK;
 
-	public HttpParserRequest(HttpRequest _request) {
+	public HttpParserRequest(HttpMessage _request) {
 		this.request = _request;
 		this.state = ParserState.METHOD;
 		this.buffer = ByteBuffer.allocate(0);
@@ -122,18 +122,18 @@ public class HttpParserRequest implements HttpParser {
 				version[1] = Integer.parseInt(temp[1]);
 				if (!request.validVersion(version)) {
 					// TODO: Add log
-					statusRequest = request.getStatusRequest();
+					statusRequest = request.getStatus();
 					return ParserCode.INVALID;
 				}
 			} catch (NumberFormatException nfe) {
 				// TODO: Add Log
 				// request.invalidRequestLine(response);
-				statusRequest = request.getStatusRequest();
+				statusRequest = request.getStatus();
 				return ParserCode.INVALID;
 			}
 		} else {
 			// request.invalidRequestLine(response);
-			statusRequest = request.getStatusRequest();
+			statusRequest = request.getStatus();
 			return ParserCode.INVALID;
 		}
 
@@ -164,7 +164,7 @@ public class HttpParserRequest implements HttpParser {
 				request.setParams(params);
 			}
 		} else {
-			statusRequest = request.getStatusRequest();
+			statusRequest = request.getStatus();
 			return ParserCode.INVALID;
 		}
 		// TODO: Add Log
@@ -214,7 +214,7 @@ public class HttpParserRequest implements HttpParser {
 
 	private ParserCode parseData() {
 		if (!request.bodyEnable()) {
-			statusRequest = request.getStatusRequest();
+			statusRequest = request.getStatus();
 			return ParserCode.INVALID;
 		}
 		Integer bytes = Integer.parseInt(request.getHeader("content-length"));

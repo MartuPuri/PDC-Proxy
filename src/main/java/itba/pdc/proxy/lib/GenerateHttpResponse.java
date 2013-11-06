@@ -1,5 +1,9 @@
 package itba.pdc.proxy.lib;
 
+import itba.pdc.admin.GroupByHour;
+import itba.pdc.admin.JsonFormatter;
+import itba.pdc.admin.MetricManager;
+import itba.pdc.proxy.model.EHttpRequest;
 import itba.pdc.proxy.model.StatusRequest;
 
 import java.io.BufferedReader;
@@ -112,6 +116,11 @@ public final class GenerateHttpResponse {
 		result.put(503, "Service Unavailable");
 		result.put(504, "Gateway Timeout");
 		result.put(505, "Http Version Not Supported");
+		result.put(601, "Received and sended bytes");
+		result.put(602, "Amount of access to the proxy");
+		result.put(603, "Histogram for specific status code");
+		result.put(604, "Status of the proxy");
+		result.put(605, "Activate or deactivate filter");
 
 		return Collections.unmodifiableMap(result);
 	}
@@ -191,6 +200,33 @@ public final class GenerateHttpResponse {
 	// this.status = 505;
 	// this.addDefaultHeaders();
 	// }
+	
+	public static String generateAdminResponse(EHttpRequest request) throws IOException {
+		StatusRequest statusRequest = request.getStatus();
+		String firstLine = generateFirstLine(statusRequest);
+		String dataLine = "";
+		System.out.println("request.getHeader(historam): " + request.getHeader("histogram"));
+		MetricManager metric = MetricManager.getInstance();
+		switch (statusRequest) {
+		case HISTOGRAM:
+			dataLine = metric.generateHistogram(Integer.parseInt(request.getHeader("histogram")), new JsonFormatter(), new GroupByHour());
+			break;
+		case BYTES:
+			dataLine = metric.getBytes();
+			break;
+		case ACCESSES:
+			//TODO: getAccesses
+			break;
+		case STATUS:
+			//TODO: getStatus
+			break;
+		default:
+			return generateResponseError(statusRequest);
+		}
+		String headersLine = generateHeadersLine(statusRequest, dataLine.getBytes().length);
+
+		return firstLine + "\n" + headersLine + "\n" + dataLine;
+	}
 
 	public static String generateResponseError(StatusRequest status) throws IOException {
 		String firstLine = generateFirstLine(status);
@@ -248,6 +284,8 @@ public final class GenerateHttpResponse {
 			break;
 		case VERSION_NOT_SUPPORTED:
 			break;
+//		default:
+//			throw new IllegalAccessError("Response not implemented for this error");
 		}
 		String headersLine = "";
 		for (Entry<String, String> mapElement : headers.entrySet()) {

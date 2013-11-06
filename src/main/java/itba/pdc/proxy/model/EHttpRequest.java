@@ -1,16 +1,15 @@
 package itba.pdc.proxy.model;
 
-import java.awt.HeadlessException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class EHttpRequest extends HttpRequestAbstract {
+public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 	
 	private static final Set<String> supportedMethods = createMethods();
 	private static final Set<String> supportedHeaders = createHeaders();
-	private StatusRequest status = StatusRequest.OK;
+	private FilterStatus filterStatus = FilterStatus.NO_STATUS;
 	
 	private static Set<String> createMethods() {
 		Set<String> headers = new HashSet<String>();
@@ -25,22 +24,24 @@ public class EHttpRequest extends HttpRequestAbstract {
 			headers.add("authorization");
 			headers.add("date");
 			headers.add("host");
+			headers.add("histogram");
+			headers.add("filter");
 		return headers;
 	}
 	
 	@Override
 	public void setUri(String uri) {
 		super.setUri(uri);
-		if (uri.equals("bytes")) {
-			status = StatusRequest.BYTES;
-		} else if (uri.equals("histogram")) {
-			status = StatusRequest.HISTOGRAM;
-		} else if (uri.equals("status")) {
-			status = StatusRequest.STATUS;
-		} else if (uri.equals("accesses")) {
-			status = StatusRequest.ACCESSES;
-		} else if (uri.equals("filter")) {
-			status = StatusRequest.FILTER;
+		if (uri.equals("/bytes")) {
+			super.setStatus(StatusRequest.BYTES);
+		} else if (uri.equals("/histogram")) {
+			super.setStatus(StatusRequest.HISTOGRAM);
+		} else if (uri.equals("/status")) {
+			super.setStatus(StatusRequest.STATUS);
+		} else if (uri.equals("/accesses")) {
+			super.setStatus(StatusRequest.ACCESSES);
+		} else if (uri.equals("/filter")) {
+			super.setStatus(StatusRequest.FILTER);
 		}
 	}
 	
@@ -48,15 +49,35 @@ public class EHttpRequest extends HttpRequestAbstract {
 	public void setParams(Map<String, String> params) {
 		super.setParams(params);
 		for (Entry<String, String> p : params.entrySet()) {
+			StatusRequest status = super.getStatus();
 			if (status.equals(StatusRequest.HISTOGRAM)) {
 				if (p.getKey().equals("code")) {
-//					super.addHeader(p.ge, value);
+					addHeader("histogram", p.getValue());
+				}
+			} else if (status.equals(StatusRequest.FILTER)) {
+				if (p.getKey().equals("transformer")) {
+					addHeader("filter", p.getValue());
+					filterStatus = FilterStatus.TRANSFORMER;
 				}
 			}
 		}
 	}
 	
-	public void add(String a , String p) {
-		super.addHeader(a, p);
+	@Override
+	public void addHeader(String header, String value) {
+		if (!supportedHeaders.contains(header)) {
+			 System.out.println("Invalid header");
+			// TODO: VER QUE HACEMOS
+		}
+		super.addHeader(header, value);
+	}
+
+	public boolean validMethod(String method) {
+		if (supportedMethods.contains(method)) {
+			return true;
+		}
+		super.setStatus(StatusRequest.METHOD_NOT_ALLOWED);
+//		status = StatusRequest.METHOD_NOT_ALLOWED;
+		return false;
 	}
 }

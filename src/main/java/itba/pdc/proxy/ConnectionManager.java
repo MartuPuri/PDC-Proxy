@@ -1,8 +1,9 @@
 package itba.pdc.proxy;
 
-import itba.pdc.proxy.data.Attachment;
+import itba.pdc.proxy.data.AttachmentProxy;
 import itba.pdc.proxy.data.AttachmentAdmin;
 import itba.pdc.proxy.data.ProcessType;
+import itba.pdc.proxy.data.ProxyType;
 import itba.pdc.proxy.exceptions.InvalidBufferSizeException;
 import itba.pdc.proxy.exceptions.InvalidDefaultPortException;
 import itba.pdc.proxy.lib.ReadConstantsConfiguration;
@@ -58,7 +59,8 @@ public class ConnectionManager {
 			infoLogger.info("The proxy will listen at my ip at port " + port);
 			listnChannel.socket().bind(new InetSocketAddress(port));
 		} else {
-			infoLogger.info("The proxy will listen at " + host + " at port " + port);
+			infoLogger.info("The proxy will listen at " + host + " at port "
+					+ port);
 			listnChannel.socket().bind(new InetSocketAddress(host, port));
 		}
 		listnChannel.configureBlocking(false);
@@ -66,8 +68,9 @@ public class ConnectionManager {
 		if (bufferSize == null) {
 			throw new InvalidBufferSizeException();
 		}
-		listnChannel.register(selector, SelectionKey.OP_ACCEPT, new Attachment(
-				ProcessType.CLIENT, bufferSize));
+		listnChannel.register(selector, SelectionKey.OP_ACCEPT,
+				new AttachmentProxy(ProcessType.CLIENT, ProxyType.PROXY,
+						bufferSize));
 	}
 
 	public void registerAdminSocket(Selector selector) throws IOException {
@@ -84,14 +87,16 @@ public class ConnectionManager {
 			}
 			port = defaultPort;
 		}
-		infoLogger.info("The proxy will lister at my ip for admin clients at port " + port);
+		infoLogger
+				.info("The proxy will lister at my ip for admin clients at port "
+						+ port);
 		listnChannel.socket().bind(new InetSocketAddress(port));
 		listnChannel.configureBlocking(false);
 		Integer bufferSize = constantsConfiguration.getBufferSize();
 		if (bufferSize == null) {
 			throw new InvalidBufferSizeException();
 		}
-		listnChannel.register(selector, SelectionKey.OP_ACCEPT, new AttachmentAdmin(
-				ProcessType.ADMIN, bufferSize));
+		listnChannel.register(selector, SelectionKey.OP_ACCEPT,
+				new AttachmentAdmin(ProxyType.ADMIN, bufferSize));
 	}
 }

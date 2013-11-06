@@ -3,12 +3,8 @@ package itba.pdc.proxy.data;
 import itba.pdc.proxy.httpparser.HttpParser;
 import itba.pdc.proxy.httpparser.HttpParserRequest;
 import itba.pdc.proxy.model.EHttpRequest;
-import itba.pdc.proxy.model.HttpRequest;
-import itba.pdc.proxy.model.HttpResponse;
 
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.SocketChannel;
 
 /**
  * 
@@ -17,14 +13,14 @@ import java.nio.channels.SocketChannel;
  * 
  *          TODO:
  */
-public class AttachmentAdmin {
+public class AttachmentAdmin implements Attachment {
 	private ByteBuffer buff;
-	private ProcessType processID;
+	private ProxyType proxyType;
 	private HttpParser parser;
 	private EHttpRequest request;
 
-	public AttachmentAdmin(ProcessType processID, int buffSize) {
-		this.processID = processID;
+	public AttachmentAdmin(ProxyType proxyType, int buffSize) {
+		this.proxyType = proxyType;
 		this.buff = ByteBuffer.allocate(buffSize);
 		this.request = new EHttpRequest();
 		this.parser = new HttpParserRequest(request);
@@ -32,10 +28,6 @@ public class AttachmentAdmin {
 
 	public ByteBuffer getBuff() {
 		return buff;
-	}
-
-	public ProcessType getProcessID() {
-		return processID;
 	}
 
 	public HttpParser getParser() {
@@ -48,7 +40,11 @@ public class AttachmentAdmin {
 
 	public void setBuff(ByteBuffer buff) {
 		this.buff = ByteBuffer.allocate(buff.capacity());
-		buff.flip();
+//		buff.flip();
 		this.buff.put(buff);
+	}
+
+	public ProxyType getProxyType() {
+		return proxyType;
 	}
 }
