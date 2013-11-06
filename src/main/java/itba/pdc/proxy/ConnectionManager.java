@@ -14,6 +14,12 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.LoggerFactory;
 
@@ -22,13 +28,23 @@ import ch.qos.logback.classic.Logger;
 public class ConnectionManager {
 	private static ConnectionManager instance = null;
 	private Logger infoLogger = (Logger) LoggerFactory.getLogger("info.log");
-
+	private String chained_ip;
+	private Integer chained_port;
+	private int max_conns;
+	private Map<String, Set<SocketChannel>> persistent_connections;
+	
+	//TODO: CONEXIONES PERSISTENTES VAN ACA LA PUTA MADRE!!!
+	
 	private ConnectionManager() throws FileNotFoundException, IOException {
 		if (instance != null) {
 			infoLogger
 					.error("Instance of ReadProxyConfiguration already created");
 			throw new IllegalArgumentException("Istance already created");
 		}
+		ReadProxyConfiguration pconf = ReadProxyConfiguration.getInstance();
+		chained_ip = pconf.getChainedIp();
+		chained_port = pconf.getChainedPort();
+		persistent_connections = new HashMap<String, Set<SocketChannel>>();
 	}
 
 	public static synchronized ConnectionManager getInstance()
@@ -93,5 +109,46 @@ public class ConnectionManager {
 		}
 		listnChannel.register(selector, SelectionKey.OP_ACCEPT, new AttachmentAdmin(
 				ProcessType.ADMIN, bufferSize));
+	}
+	
+	@Deprecated
+	public SocketChannel getChannel(String host, Integer port) throws IOException{
+		if(chained_ip == null || chained_port == null){
+			return persistentConnection(host, port);
+		}
+		return persistentConnection(chained_ip, chained_port);
+	}
+	
+	@Deprecated
+	public void close(String host, SocketChannel channel) throws IOException{
+		Set<SocketChannel> channels = persistent_connections.get(host);
+		if(channels.size() == max_conns)
+			channel.close();
+		else
+			channels.add(channel);
+		persistent_connections.put(host, channels);
+	}
+	
+	@Deprecated
+	private SocketChannel persistentConnection(String host, Integer port) throws IOException{
+		Set<SocketChannel> opened_channels = persistent_connections.get(host);
+		SocketChannel channel = null;
+		if(opened_channels == null){
+			opened_channels = new HashSet<SocketChannel>();
+		}
+		if(opened_channels.size() == 0){
+			channel = SocketChannel.open(new InetSocketAddress(
+					chained_ip, chained_port));
+		}else{
+			Iterator<SocketChannel> it = opened_channels.iterator();
+			boolean found = false;
+			while (it.hasNext() && !found) {
+				channel = it.next();
+				if(channel.isOpen() && channel.isConnected()){
+					found = true;
+				}
+			}
+		}
+		return channel;	
 	}
 }
