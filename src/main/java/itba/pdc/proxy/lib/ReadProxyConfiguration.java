@@ -59,7 +59,8 @@ public class ReadProxyConfiguration {
 		if(str == null){
 			str = prop.getProperty(s);
 			if (str.isEmpty()) {
-				throw new IllegalStateException("No esta seteado ese parametro en el .properties");
+				return null;
+//				throw new IllegalStateException("No esta seteado ese parametro en el .properties");
 			}
 			data.put(s, str);
 		}
@@ -67,6 +68,10 @@ public class ReadProxyConfiguration {
 	}
 	
 	private Integer getInteger(String s){
+		String value = this.getString(s);
+		if (value == null) {
+			return null;
+		}
 		return Integer.parseInt(this.getString(s));
 	}
 }

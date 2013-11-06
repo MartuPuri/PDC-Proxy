@@ -104,6 +104,9 @@ public class HttpParserResponse implements HttpParser {
 			return null;
 		} else {
 			if (crFlag) {
+				if (buffer.limit() == 0 || buffer.limit() == buffer.position()) {
+					return null;
+				}
 				b = buffer.get();
 				if (b != lf) {
 					throw new RuntimeErrorException(null); //TODO: Change this exception
