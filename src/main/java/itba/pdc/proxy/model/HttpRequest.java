@@ -11,15 +11,15 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
 
-public class HttpRequest {
+public class HttpRequest extends HttpRequestAbstract {
 
-	private String method;
-	private String body;
-	private String uri;
-	private int[] version;
-	private StatusRequest status = StatusRequest.OK;
-	private Map<String, String> params;
-	private Map<String, String> headers;
+//	private String method;
+//	private String body;
+//	private String uri;
+//	private int[] version;
+//	private StatusRequest status = StatusRequest.OK;
+//	private Map<String, String> params;
+//	private Map<String, String> headers;
 	private static final Set<String> supportedMethods = createMethods();
 	private static final Set<String> supportedHeaders = createHeaders();
 	private Logger debugLogger = (Logger) LoggerFactory.getLogger("debug.log");
@@ -71,9 +71,9 @@ public class HttpRequest {
 	}
 
 	public HttpRequest() {
-		this.params = new HashMap<String, String>();
-		this.headers = new HashMap<String, String>();
-		this.version = new int[2];
+//		this.params = new HashMap<String, String>();
+//		this.headers = new HashMap<String, String>();
+//		this.version = new int[2];
 	}
 
 	public void addHeader(String header, String value) {
@@ -81,69 +81,70 @@ public class HttpRequest {
 			 System.out.println("Invalid header");
 			// TODO: VER QUE HACEMOS
 		}
-		headers.put(header, value);
+		super.addHeader(header, value);
 	}
 
-	public void setVersion(int[] version) {
-		this.version[0] = version[0];
-		this.version[1] = version[1];
-	}
+//	public void setVersion(int[] version) {
+//		this.version[0] = version[0];
+//		this.version[1] = version[1];
+//	}
 
 	public void setMethod(String method) {
 		if (!supportedMethods.contains(method)) {
 			// System.out.println("Invalid method");
 			// TODO: VER QUE HACEMOS
 		}
-		this.method = method;
+		super.setMethod(method);
 	}
 
-	public void setParams(Map<String, String> params) {
-		this.params.putAll(params);
-	}
+//	public void setParams(Map<String, String> params) {
+//		this.params.putAll(params);
+//	}
 
-	public void setBody(String body) {
-		if (!headers.containsKey("content-length")) {
-			System.out.println("Missing content-length");
-			// TODO: VER QUE HACEMOS
-		}
-		this.body = body;
-	}
+//	public void setBody(String body) {
+//		if (!headers.containsKey("content-length")) {
+//			System.out.println("Missing content-length");
+//			// TODO: VER QUE HACEMOS
+//		}
+//		this.body = body;
+//	}
 
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
+//	public void setUri(String uri) {
+//		this.uri = uri;
+//	}
 
-	public boolean bodyEnable() {
-		if (headers.containsKey("content-length")) {
-			return true;
-		}
-		status = StatusRequest.LENGTH_REQUIRED;
-		return false;
-	}
+//	public boolean bodyEnable() {
+//		if (headers.containsKey("content-length")) {
+//			return true;
+//		}
+//		status = StatusRequest.LENGTH_REQUIRED;
+//		return false;
+//	}
 
-	public boolean validVersion(int[] version) {
-		if (version[0] != 1 && !(version[1] == 1 || version[1] == 0)) {
-			System.out.println("Invalid version");
-			// TODO: VER QUE HACER
-			status = StatusRequest.VERSION_NOT_SUPPORTED;
-			return false;
-		}
-		return true;
-	}
+//	public boolean validVersion(int[] version) {
+//		if (version[0] != 1 && !(version[1] == 1 || version[1] == 0)) {
+//			System.out.println("Invalid version");
+//			// TODO: VER QUE HACER
+//			status = StatusRequest.VERSION_NOT_SUPPORTED;
+//			return false;
+//		}
+//		return true;
+//	}
 
-	public String getHeader(String key) {
-		return headers.get(key);
-	}
-
-	public StatusRequest getStatusRequest() {
-		return status;
-	}
+//	public String getHeader(String key) {
+//		return headers.get(key);
+//	}
+//
+//	public StatusRequest getStatusRequest() {
+//		return status;
+//	}
 
 	public boolean validMethod(String method) {
 		if (supportedMethods.contains(method)) {
 			return true;
 		}
-		status = StatusRequest.METHOD_NOT_ALLOWED;
+		super.setStatus(StatusRequest.METHOD_NOT_ALLOWED);
+//		status = StatusRequest.METHOD_NOT_ALLOWED;
 		return false;
 	}
 
@@ -170,6 +171,8 @@ public class HttpRequest {
 	
 	public ByteBuffer getStream() {
 		String line = "";
+		
+		//TODO: Fix query
 		String firstLine = method + " " + uri + " HTTP/" + version[0] + "." + version[1] + "\n";
 		String headersLine = "";
 		for (Entry<String, String> entry : headers.entrySet()) {

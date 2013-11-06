@@ -1,7 +1,5 @@
 package itba.pdc.proxy;
 
-import itba.pdc.proxy.lib.ConnectionManager;
-
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -31,7 +29,7 @@ public class TCPServerSelector {
 //            
 //        }
         // Create a handler that will implement the protocol
-        TCPProtocol protocol = new HttpProtocol(BUFSIZE);
+        TCPProtocol protocol = new HttpHandler(BUFSIZE);
         while (true) { // Run forever, processing available I/O operations
             // Wait for some channel to be ready (or timeout)
             if (selector.select(TIMEOUT) == 0) { // returns # of ready chans

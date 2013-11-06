@@ -100,6 +100,7 @@ public class HttpParserRequest implements HttpParser {
 		String prms[], cmd[], temp[];
 		int idx, i, version[] = { 0, 0 };
 		String line = readLine();
+		Map<String, String> params = null;
 
 		if (line == null) {
 			return ParserCode.LOOP;
@@ -146,7 +147,7 @@ public class HttpParserRequest implements HttpParser {
 			} else {
 				uri = URLDecoder.decode(cmd[1].substring(0, idx), "ISO-8859-1");
 				prms = cmd[1].substring(idx + 1).split("&");
-				Map<String, String> params = new HashMap<String, String>();
+				params = new HashMap<String, String>();
 				for (i = 0; i < prms.length; i++) {
 					temp = prms[i].split("=");
 					if (temp.length == 2) {
@@ -157,9 +158,11 @@ public class HttpParserRequest implements HttpParser {
 						params.put(URLDecoder.decode(temp[0], "ISO-8859-1"), "");
 					}
 				}
-				request.setParams(params);
 			}
 			request.setUri(uri);
+			if (params != null) {
+				request.setParams(params);
+			}
 		} else {
 			statusRequest = request.getStatusRequest();
 			return ParserCode.INVALID;

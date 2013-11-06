@@ -20,14 +20,14 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
 
-public class HttpProtocol implements TCPProtocol {
+public class HttpHandler implements TCPProtocol {
 	private int bufferSize; // Size of I/O buffer
 	private int bytes = 0;
 	private Logger accessLogger = (Logger) LoggerFactory
 			.getLogger("access.log");
 	private Logger debugLog = (Logger) LoggerFactory.getLogger("debug.log");
 
-	public HttpProtocol(int bufferSize) {
+	public HttpHandler(int bufferSize) {
 		this.bufferSize = bufferSize;
 	}
 

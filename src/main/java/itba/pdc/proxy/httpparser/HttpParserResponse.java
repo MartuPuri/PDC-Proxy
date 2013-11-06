@@ -106,7 +106,7 @@ public class HttpParserResponse implements HttpParser {
 			if (crFlag) {
 				b = buffer.get();
 				if (b != lf) {
-					throw new RuntimeErrorException(null);
+					throw new RuntimeErrorException(null); //TODO: Change this exception
 				}
 				array[i] = b;
 			}

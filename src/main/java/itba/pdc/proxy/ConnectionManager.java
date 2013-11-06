@@ -1,9 +1,12 @@
-package itba.pdc.proxy.lib;
+package itba.pdc.proxy;
 
 import itba.pdc.proxy.data.Attachment;
+import itba.pdc.proxy.data.AttachmentAdmin;
 import itba.pdc.proxy.data.ProcessType;
 import itba.pdc.proxy.exceptions.InvalidBufferSizeException;
 import itba.pdc.proxy.exceptions.InvalidDefaultPortException;
+import itba.pdc.proxy.lib.ReadConstantsConfiguration;
+import itba.pdc.proxy.lib.ReadProxyConfiguration;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -88,7 +91,7 @@ public class ConnectionManager {
 		if (bufferSize == null) {
 			throw new InvalidBufferSizeException();
 		}
-		listnChannel.register(selector, SelectionKey.OP_ACCEPT, new Attachment(
+		listnChannel.register(selector, SelectionKey.OP_ACCEPT, new AttachmentAdmin(
 				ProcessType.ADMIN, bufferSize));
 	}
 }
