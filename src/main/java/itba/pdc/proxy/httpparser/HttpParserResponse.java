@@ -1,6 +1,7 @@
 package itba.pdc.proxy.httpparser;
 
 import itba.pdc.proxy.lib.ManageByteBuffer;
+import itba.pdc.proxy.lib.ReadConstantsConfiguration;
 import itba.pdc.proxy.model.HttpResponse;
 
 import java.io.FileOutputStream;
@@ -12,6 +13,8 @@ import java.nio.channels.FileChannel;
 import javax.management.RuntimeErrorException;
 
 public class HttpParserResponse implements HttpParser {
+	private static Integer cr = ReadConstantsConfiguration.getInstance().getCR();
+	private static Integer lf = ReadConstantsConfiguration.getInstance().getLF();
 	private HttpResponse response;
 	private ParserState state;
 	private ByteBuffer buffer;
@@ -77,7 +80,11 @@ public class HttpParserResponse implements HttpParser {
 	 *         return null
 	 */
 	private String readLine() {
-		boolean lf = false;
+		boolean crFlag = false;
+		boolean lfFlag = false;
+		if (buffer.limit() == 0) {
+			return null;
+		}
 		byte[] array = new byte[buffer.limit()];
 		int i = 0;
 		byte b;
@@ -87,22 +94,26 @@ public class HttpParserResponse implements HttpParser {
 		do {
 			b = buffer.get();
 			array[i++] = b;
-			if (b == 13) {
-				lf = true;
-			} // TODO: Enter check 10
-		} while (buffer.hasRemaining() && !lf);
-		if (lf) {
-			b = buffer.get();
-			if (b != 10) {
-				throw new RuntimeErrorException(null);
+			if (b == cr) {
+				crFlag = true;
+			} else if (b == lf) {
+				lfFlag = true;
 			}
-			array[i] = b;
+		} while (buffer.hasRemaining() && !crFlag && !lfFlag);
+		if (!crFlag && !lfFlag) {
+			return null;
+		} else {
+			if (crFlag) {
+				b = buffer.get();
+				if (b != lf) {
+					throw new RuntimeErrorException(null);
+				}
+				array[i] = b;
+			}
 			buffer.compact();
 			int position = buffer.position();
 			buffer.limit(position);
 			return new String(array).trim();
-		} else {
-			return null;
 		}
 	}
 

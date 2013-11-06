@@ -14,16 +14,22 @@ public class ReadConstantsConfiguration {
 	private Logger infoLogger = (Logger) LoggerFactory.getLogger("info.log");
 	private Properties prop;
 	
-	private ReadConstantsConfiguration() throws FileNotFoundException, IOException {
+	private ReadConstantsConfiguration() {
 		if (instance != null) {
 			infoLogger.error("Instance of ReadProxyConfiguration already created");
 			throw new IllegalArgumentException("Istance already created");
 		}
 		prop = new Properties();
-		prop.load(new FileInputStream("src/main/resources/constants.properties"));
+		try {
+			prop.load(new FileInputStream("src/main/resources/constants.properties"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		}
 	}
 	
-	public static synchronized ReadConstantsConfiguration getInstance() throws FileNotFoundException, IOException {
+	public static synchronized ReadConstantsConfiguration getInstance()  {
 		if (instance == null) {
 			instance = new ReadConstantsConfiguration();
 		}
@@ -87,4 +93,13 @@ public class ReadConstantsConfiguration {
 		}
 	}
 	
+	public Integer getCR() {
+		Integer cr = Integer.parseInt((String) prop.get("cr-byte"));
+		return cr;
+	}
+	
+	public Integer getLF() {
+		Integer lf = Integer.parseInt((String) prop.get("lf-byte"));
+		return lf;
+	}
 }
