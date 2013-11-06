@@ -90,10 +90,10 @@ public class HttpRequest extends HttpRequestAbstract {
 //	}
 
 	public void setMethod(String method) {
-		if (!supportedMethods.contains(method)) {
-			// System.out.println("Invalid method");
-			// TODO: VER QUE HACEMOS
-		}
+//		if (!supportedMethods.contains(method)) {
+//			// System.out.println("Invalid method");
+//			// TODO: VER QUE HACEMOS
+//		}
 		super.setMethod(method);
 	}
 
@@ -148,26 +148,26 @@ public class HttpRequest extends HttpRequestAbstract {
 		return false;
 	}
 
-	public String getHost() {
-		return headers.get("host");
-	}
-
-	public Integer getPort() {
-		String port = headers.get("port");
-		if (port == null) {
-			return 80;
-		} else {
-			try {
-				return Integer.parseInt(port);
-			} catch (NumberFormatException e) {
-				return 80;
-			}
-		}
-	}
-	
-	public String getMethod(){
-		return this.method;
-	}
+//	public String getHost() {
+//		return headers.get("host");
+//	}
+//
+//	public Integer getPort() {
+//		String port = headers.get("port");
+//		if (port == null) {
+//			return 80;
+//		} else {
+//			try {
+//				return Integer.parseInt(port);
+//			} catch (NumberFormatException e) {
+//				return 80;
+//			}
+//		}
+//	}
+//	
+//	public String getMethod(){
+//		return this.method;
+//	}
 	
 	public ByteBuffer getStream() {
 		String line = "";
