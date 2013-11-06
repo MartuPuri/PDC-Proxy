@@ -68,18 +68,28 @@ public class HttpParserResponse implements HttpParser {
 				+ buffer.position());
 	}
 
+	/**
+	 * @author mpurita
+	 *
+	 * @brief Parse a line at byte level
+	 * 
+	 * @return The first line of the buffer that have \r\n or \n otherwise
+	 *         return null
+	 */
 	private String readLine() {
 		boolean lf = false;
 		byte[] array = new byte[buffer.limit()];
 		int i = 0;
 		byte b;
+		System.out.println("Before flip: " + buffer);
 		buffer.flip();
+		System.out.println("After flip: " + buffer);
 		do {
 			b = buffer.get();
 			array[i++] = b;
 			if (b == 13) {
 				lf = true;
-			}
+			} // TODO: Enter check 10
 		} while (buffer.hasRemaining() && !lf);
 		if (lf) {
 			b = buffer.get();
@@ -96,38 +106,6 @@ public class HttpParserResponse implements HttpParser {
 		}
 	}
 
-	// private String readLine() {
-	// System.out.println("Read line Buffer limit: " + buffer.limit()
-	// + " position: " + buffer.position());
-	// String s = new String(buffer.array());
-	// System.out.println("S: " + s);
-	// String match = "\r\n";
-	// int index = s.indexOf(match);
-	// int matchLength = match.length();
-	// if (index < 0) {
-	// match = "\n";
-	// index = s.indexOf(match);
-	// if (index < 0) {
-	// return null;
-	// }
-	// matchLength = match.length();
-	// }
-	// int length = s.length();
-	// String line = s.substring(0, index);
-	// bytes += index + matchLength;
-	// System.out.println("Read: " + line.getBytes().length);
-	// System.out.println("Bytes read from buffer: " + bytes);
-	// if (index < length) {
-	// System.out.println("s.length: " + s.length());
-	// System.out.println("Diffrence: " + (length - index - matchLength));
-	// String tail = s.substring(index + matchLength, length);
-	// buffer = ByteBuffer.allocate(tail.getBytes().length);
-	// buffer.put(tail.getBytes());
-	// } else if (index == length) {
-	// buffer = ByteBuffer.allocate(0);
-	// }
-	// return line;
-	// }
 
 	private ParserCode parseMethod() throws UnsupportedEncodingException {
 		String prms[], cmd[], temp[];

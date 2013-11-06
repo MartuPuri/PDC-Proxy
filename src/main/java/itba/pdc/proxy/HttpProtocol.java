@@ -52,7 +52,7 @@ public class HttpProtocol implements TCPProtocol {
 		ByteBuffer buf = att.getBuff();
 		final long bytesRead = channel.read(buf);
 //		System.out.println("Reading from " + att.getProcessID());
-//		System.out.println("BytesRead: " + bytesRead);
+		System.out.println("BytesRead: " + bytesRead);
 		if (bytesRead == -1) {
 			accessLogger.info("Connection with " + att.getProcessID()
 					+ " close");

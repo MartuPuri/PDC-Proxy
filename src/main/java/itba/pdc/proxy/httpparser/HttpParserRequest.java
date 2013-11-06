@@ -62,6 +62,12 @@ public class HttpParserRequest implements HttpParser {
 		buffer = aux;
 	}
 
+	/**
+	 * 
+	 *
+	 * @deprecated use {HttpParserResponse.readLine()} instead.  
+	 */
+	@Deprecated
 	private String readLine() {
 		String s = new String(buffer.array());
 		String match = "\r\n";
