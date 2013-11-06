@@ -3,6 +3,8 @@ package itba.pdc.proxy.lib;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ public class ReadProxyConfiguration {
 	private static ReadProxyConfiguration instance;
 	private Logger infoLogger = (Logger) LoggerFactory.getLogger("info.log");
 	private Properties prop;
+	private Map<String, String> data;
 	
 	private ReadProxyConfiguration() throws FileNotFoundException, IOException {
 		if (instance != null) {
@@ -20,6 +23,7 @@ public class ReadProxyConfiguration {
 			throw new IllegalArgumentException("Istance already created");
 		}
 		prop = new Properties();
+		data = new HashMap<String,String>();
 		prop.load(new FileInputStream("src/main/resources/proxy.properties"));
 	}
 	
@@ -31,27 +35,38 @@ public class ReadProxyConfiguration {
 	}
 	
 	public String getServerIp() {
-		String ip = prop.getProperty("server-ip");
-		if (ip.isEmpty()) {
-			return null;
-		}
-		return ip;
+		return this.getString("server-ip");
+	}
+	
+	public String getChainedIp() {
+		return this.getString("chained-ip");
 	}
 	
 	public Integer getServerPort() {
-		String port = prop.getProperty("server-port");
-		if (port.isEmpty()) {
-			return null;
-		}
-		return Integer.parseInt(port);
+		return this.getInteger("server-port");
 	}
 	
 	public Integer getAdminPort() {
-		String port = prop.getProperty("admin-port");
-		if (port.isEmpty()) {
-			return null;
-		}
-		return Integer.parseInt(port);
+		return this.getInteger("admin-port");
 	}
 	
+	public Integer getChainedPort() {
+		return this.getInteger("chained-port");
+	}
+	
+	private String getString(String s) {
+		String str = data.get(s);
+		if(str == null){
+			str = prop.getProperty(s);
+			if (str.isEmpty()) {
+				throw new IllegalStateException("No esta seteado ese parametro en el .properties");
+			}
+			data.put(s, str);
+		}
+		return str;
+	}
+	
+	private Integer getInteger(String s){
+		return Integer.parseInt(this.getString(s));
+	}
 }
