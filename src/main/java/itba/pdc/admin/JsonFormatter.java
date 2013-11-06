@@ -24,7 +24,7 @@ public class JsonFormatter implements HistogramFormatter {
 		for (String k : keys) {
 			to_send += "\"" + k + "\"" + " : " + "\"" + data.get(k) + "\""; 
 			if(i++ != keys.size() -1)
-				to_send = to_send + ", ";
+				to_send += ", ";
 		}
 		to_send = to_send + end;
 		return to_send;
