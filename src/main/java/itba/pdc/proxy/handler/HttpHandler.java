@@ -1,17 +1,16 @@
 package itba.pdc.proxy.handler;
 
+import itba.pdc.proxy.ConnectionManager;
 import itba.pdc.proxy.data.AttachmentProxy;
 import itba.pdc.proxy.data.ProcessType;
 import itba.pdc.proxy.data.ProxyType;
 import itba.pdc.proxy.httpparser.HttpParserResponse;
-import itba.pdc.proxy.lib.ManageByteBuffer;
 import itba.pdc.proxy.lib.ManageParser;
 import itba.pdc.proxy.lib.ReadingState;
 import itba.pdc.proxy.model.HttpRequest;
 import itba.pdc.proxy.model.HttpResponse;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
@@ -148,8 +147,10 @@ public class HttpHandler implements TCPProtocol {
 			SocketChannel oppositeChannel = null;
 			SelectionKey oppositeKey = null;
 			try {
-				oppositeChannel = SocketChannel.open(new InetSocketAddress(
-						request.getHost(), request.getPort()));
+				oppositeChannel = ConnectionManager.getInstance().
+						getChannel(request.getHost(), request.getPort());
+//				oppositeChannel = SocketChannel.open(new InetSocketAddress(
+//						request.getHost(), request.getPort()));
 				// oppositeChannel = SocketChannel
 				// .open(new InetSocketAddress("10.6.0.158", 8080));
 				oppositeChannel.configureBlocking(false);

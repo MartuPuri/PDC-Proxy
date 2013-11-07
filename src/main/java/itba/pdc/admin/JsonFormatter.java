@@ -16,18 +16,21 @@ public class JsonFormatter implements HistogramFormatter {
 	}
 	
 	public String format(Map<String, Integer> data) {
+		final StringBuilder builder = new StringBuilder();
 		String to_send = "{ ";
 		String end = " }";
 		
 		Set<String> keys = data.keySet();
 		int i = 0;
+		builder.append(to_send);
 		for (String k : keys) {
-			to_send += "\"" + k + "\"" + " : " + "\"" + data.get(k) + "\""; 
+			builder.append("\"").append(k).append("\"").append(" : ")
+			.append("\"").append(data.get(k)).append("\"");
 			if(i++ != keys.size() -1)
-				to_send += ", ";
+				builder.append(", ");
 		}
-		to_send = to_send + end;
-		return to_send;
+		builder.append(end);
+		return builder.toString();
 	}
 	
 }

@@ -23,16 +23,19 @@ public class GroupByHour implements GroupMetrics {
 						return i1.compareTo(i2);
 					}
 				});
-		String[] keys = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+		final String[] keys = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
 				"10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
 				"20", "21", "22", "23" };
+		
 		for (String k : keys) {
 			map_data.put(k,0);
 		}
+		
 		for (Date d : data) {
 			int h = d.getHours();
 			map_data.put(keys[h], map_data.get(keys[h] + 1));
 		}
+		
 		return map_data;
 	}
 
