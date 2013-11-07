@@ -6,29 +6,30 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
-	
+
 	private static final Set<String> supportedMethods = createMethods();
 	private static final Set<String> supportedHeaders = createHeaders();
 	private FilterStatus filterStatus = FilterStatus.NO_STATUS;
-	
+	private int port = 80;
+
 	private static Set<String> createMethods() {
 		Set<String> headers = new HashSet<String>();
 		headers.add("GET");
 		headers.add("POST");
 		return headers;
 	}
-	
+
 	private static Set<String> createHeaders() {
 		Set<String> headers = new HashSet<String>();
-			headers.add("accept");
-			headers.add("authorization");
-			headers.add("date");
-			headers.add("host");
-			headers.add("histogram");
-			headers.add("filter");
+		headers.add("accept");
+		headers.add("authorization");
+		headers.add("date");
+		headers.add("host");
+		headers.add("histogram");
+		headers.add("filter");
 		return headers;
 	}
-	
+
 	@Override
 	public void setUri(String uri) {
 		super.setUri(uri);
@@ -44,7 +45,7 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 			super.setStatus(StatusRequest.FILTER);
 		}
 	}
-	
+
 	@Override
 	public void setParams(Map<String, String> params) {
 		super.setParams(params);
@@ -62,14 +63,23 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 			}
 		}
 	}
-	
+
 	@Override
 	public void addHeader(String header, String value) {
 		if (!supportedHeaders.contains(header)) {
-			 System.out.println("Invalid header");
+			System.out.println("Invalid header");
 			// TODO: VER QUE HACEMOS
 		}
-		super.addHeader(header, value);
+		if (header.equals("host")) {
+			int idx = value.indexOf(":");
+			int length = value.length();
+			if (idx > 0) {
+				port = Integer.parseInt(value.substring(idx + 1, length));
+				super.addHeader(header, value.substring(0, idx));
+			} else {
+				super.addHeader(header, value);
+			}
+		}
 	}
 
 	public boolean validMethod(String method) {
@@ -77,11 +87,16 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 			return true;
 		}
 		super.setStatus(StatusRequest.METHOD_NOT_ALLOWED);
-//		status = StatusRequest.METHOD_NOT_ALLOWED;
+		// status = StatusRequest.METHOD_NOT_ALLOWED;
 		return false;
 	}
-	
+
 	public void setStatusRequest(StatusRequest status) {
 		super.setStatus(status);
+	}
+
+	public Integer getPort() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -74,20 +74,6 @@ public abstract class HttpRequestAbstract {
 		return headers.get("host");
 	}
 
-	@Deprecated
-	public Integer getPort() {
-		String port = headers.get("port");
-		if (port == null) {
-			return 80;
-		} else {
-			try {
-				return Integer.parseInt(port);
-			} catch (NumberFormatException e) {
-				return 80;
-			}
-		}
-	}
-
 	public String getMethod() {
 		return this.method;
 	}

@@ -17,6 +17,5 @@ public interface HttpMessage {
 	public boolean validMethod(String method);
 	public StatusRequest getStatus();
 	public void setStatusRequest(StatusRequest status);
-	@Deprecated
 	public Integer getPort();
 }

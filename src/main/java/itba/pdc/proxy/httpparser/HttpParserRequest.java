@@ -115,7 +115,6 @@ public class HttpParserRequest implements HttpParser {
 
 		if (cmd.length != 3) {
 			request.setStatusRequest(StatusRequest.BAD_REQUEST);
-			// System.out.println("BAD REQUEST");// TODO: Change for log
 			// request.invalidRequestLine(response);
 			return ParserCode.INVALID;
 		}
@@ -141,7 +140,6 @@ public class HttpParserRequest implements HttpParser {
 
 		if (request.validMethod(cmd[0])) {
 			String method = cmd[0];
-			// System.out.println(cmd);
 			String uri;
 			idx = cmd[1].indexOf('?');
 			if (idx < 0) {
@@ -239,4 +237,5 @@ public class HttpParserRequest implements HttpParser {
 	public String getState() {
 		return this.state.toString();
 	}
+
 }

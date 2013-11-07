@@ -131,31 +131,9 @@ public class HttpResponse {
 		ByteBuffer buff = ByteBuffer.allocate(head.getBytes().length
 				+ body.position());
 		buff.put(head.getBytes());
-//		FileInputStream fIn;
-//		FileChannel fChan;
-//		long fSize;
-//		ByteBuffer mBuf = ByteBuffer.allocate(0);
-//
-//		try {
-//			fIn = new FileInputStream("imagen.txt");
-//			fChan = fIn.getChannel();
-//			fSize = fChan.size();
-//			mBuf = ByteBuffer.allocate((int) fSize);
-//			fChan.read(mBuf);
-////			mBuf.rewind();
-////			for (int i = 0; i < fSize; i++)
-////				System.out.print((char) mBuf.get());
-//			fChan.close();
-//			fIn.close();
-//			mBuf.flip();
-//			buff.put(mBuf);
-//		} catch (IOException exc) {
-//			System.out.println(exc);
-//			System.exit(1);
-//		}
-		
 		body.flip();
 		buff.put(body);
+		String s = new String(buff.array());
 		return buff;
 	}
 }

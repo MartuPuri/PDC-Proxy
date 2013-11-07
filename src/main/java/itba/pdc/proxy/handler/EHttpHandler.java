@@ -47,8 +47,6 @@ public class EHttpHandler implements TCPProtocol {
 		final long bytesRead = channel.read(buf);
 		MetricManager.getInstance().addBytesRead(bytesRead);
 		MetricManager.getInstance().addBytesWrite(808);
-		// System.out.println("Reading from " + att.getProcessID());
-		System.out.println("BytesRead: " + bytesRead);
 		if (bytesRead == -1) {
 			channel.close();
 			key.cancel();
@@ -68,8 +66,6 @@ public class EHttpHandler implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
-		System.out.println("Write Buff position: " + buf.position()
-				+ " limit: " + buf.limit());
 		buf.flip();
 		// Prepare buffer for writing
 		do {

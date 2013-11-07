@@ -3,6 +3,7 @@ package itba.pdc.proxy.handler;
 import itba.pdc.proxy.data.AttachmentProxy;
 import itba.pdc.proxy.data.ProcessType;
 import itba.pdc.proxy.data.ProxyType;
+import itba.pdc.proxy.httpparser.HttpParserResponse;
 import itba.pdc.proxy.lib.ManageByteBuffer;
 import itba.pdc.proxy.lib.ManageParser;
 import itba.pdc.proxy.lib.ReadingState;
@@ -52,9 +53,21 @@ public class HttpHandler implements TCPProtocol {
 
 		ByteBuffer buf = att.getBuff();
 		final long bytesRead = channel.read(buf);
-		// System.out.println("Reading from " + att.getProcessID());
-		System.out.println("BytesRead: " + bytesRead);
 		if (bytesRead == -1) {
+			if (att.getProcessID().equals(ProcessType.SERVER)) {
+				HttpParserResponse parser = (HttpParserResponse) att
+						.getParser();
+				if (parser.isConnectionClose()) {
+					if (att.getOppositeKey().isValid()) {
+						att.getResponse().setBody(parser.getBuffer());
+						att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
+						AttachmentProxy oppositeAtt = (AttachmentProxy) (AttachmentProxy) att
+								.getOppositeKey().attachment();
+						HttpResponse response = att.getResponse();
+						oppositeAtt.setBuff(response.getStream());
+					}
+				}
+			}
 			accessLogger.info("Connection with " + att.getProcessID()
 					+ " close");
 			channel.close();
@@ -66,8 +79,6 @@ public class HttpHandler implements TCPProtocol {
 				break;
 			case SERVER:
 				bytes += bytesRead;
-				System.out.println("Bytes: " + bytes + " Bytes read: "
-						+ bytesRead);
 				handleServer(key);
 				break;
 			default:
@@ -105,16 +116,10 @@ public class HttpHandler implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
-//		System.out.println("Write to " + att.getProcessID() + " : "
-//				+ new String(buf.array()));
 		debugLog.error("Reponse write: \n" + new String(buf.array()));
-		System.out.println("Write Buff position: " + buf.position()
-				+ " limit: " + buf.limit());
 		buf.flip();
 		try {
 			debugLog.error("Reponse write: \n" + new String(buf.array()));
-//			System.out.println("Write to " + att.getProcessID() + " : "
-//					+ new String(buf.array()));
 		} catch (Exception e) {
 
 		}
@@ -137,8 +142,6 @@ public class HttpHandler implements TCPProtocol {
 		AttachmentProxy att = (AttachmentProxy) key.attachment();
 		ReadingState requestFinished = ManageParser.parse(att.getParser(),
 				att.getBuff());
-		// System.out.println("Client status: " + att.getParser().getState());
-		// System.out.println("Client request: " + requestFinished);
 		switch (requestFinished) {
 		case FINISHED:
 			HttpRequest request = att.getRequest();
@@ -186,11 +189,9 @@ public class HttpHandler implements TCPProtocol {
 	}
 
 	private void handleServer(SelectionKey key) {
-		// System.out.println("Entra server");
 		AttachmentProxy att = (AttachmentProxy) key.attachment();
 		ReadingState responseFinished = ManageParser.parse(att.getParser(),
 				att.getBuff());
-		// System.out.println("Server response: " + responseFinished);
 		switch (responseFinished) {
 		case FINISHED:
 			if (att.getOppositeKey().isValid()) {
