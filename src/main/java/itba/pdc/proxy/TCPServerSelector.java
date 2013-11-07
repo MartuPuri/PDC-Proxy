@@ -2,6 +2,9 @@ package itba.pdc.proxy;
 
 import itba.pdc.proxy.data.Attachment;
 import itba.pdc.proxy.data.ProxyType;
+import itba.pdc.proxy.handler.EHttpHandler;
+import itba.pdc.proxy.handler.HttpHandler;
+import itba.pdc.proxy.handler.TCPProtocol;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;

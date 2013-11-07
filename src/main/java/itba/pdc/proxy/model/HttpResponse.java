@@ -119,19 +119,18 @@ public class HttpResponse {
 	}
 
 	public ByteBuffer getStream() {
-		String line = "";
-		String firstLine = "HTTP/" + version[0] + "." + version[1] + " " + code
-				+ " " + messageCode + "\r\n";
-		String headersLine = "";
+		final StringBuilder builder = new StringBuilder();
+		builder.append("HTTP/1.1 ").append(code)
+				.append(" ").append(messageCode).append("\r\n");
 		for (Entry<String, String> entry : headers.entrySet()) {
-			headersLine += entry.getKey() + ": " + entry.getValue() + "\r\n";
+			builder.append(entry.getKey()).append(": ").append(entry.getValue()).append("\r\n");
 		}
-		line += firstLine + headersLine + "\n";
-		System.out.println("Byttes header: " + line.getBytes().length);
-		debugLogger.debug("Response: \n" + line);
-		ByteBuffer buff = ByteBuffer.allocate(line.getBytes().length
+		builder.append("\n");
+		final String head = builder.toString();
+		debugLogger.debug("Response: \n" + head);
+		ByteBuffer buff = ByteBuffer.allocate(head.getBytes().length
 				+ body.position());
-		buff.put(line.getBytes());
+		buff.put(head.getBytes());
 //		FileInputStream fIn;
 //		FileChannel fChan;
 //		long fSize;

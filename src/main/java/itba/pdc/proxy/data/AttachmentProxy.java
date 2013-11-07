@@ -1,8 +1,8 @@
 package itba.pdc.proxy.data;
 
-import itba.pdc.proxy.httpparser.HttpParser;
 import itba.pdc.proxy.httpparser.HttpParserRequest;
 import itba.pdc.proxy.httpparser.HttpParserResponse;
+import itba.pdc.proxy.httpparser.interfaces.HttpParser;
 import itba.pdc.proxy.model.HttpRequest;
 import itba.pdc.proxy.model.HttpResponse;
 

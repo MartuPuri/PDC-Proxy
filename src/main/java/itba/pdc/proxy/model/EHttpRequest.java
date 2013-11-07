@@ -80,4 +80,8 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 //		status = StatusRequest.METHOD_NOT_ALLOWED;
 		return false;
 	}
+	
+	public void setStatusRequest(StatusRequest status) {
+		super.setStatus(status);
+	}
 }

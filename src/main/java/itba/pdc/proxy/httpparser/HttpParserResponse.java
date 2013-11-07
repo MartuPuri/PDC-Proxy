@@ -1,5 +1,8 @@
 package itba.pdc.proxy.httpparser;
 
+import itba.pdc.proxy.httpparser.enums.ParserCode;
+import itba.pdc.proxy.httpparser.enums.ParserState;
+import itba.pdc.proxy.httpparser.interfaces.HttpParser;
 import itba.pdc.proxy.lib.ManageByteBuffer;
 import itba.pdc.proxy.lib.ReadConstantsConfiguration;
 import itba.pdc.proxy.model.HttpResponse;
@@ -13,12 +16,9 @@ import java.nio.channels.FileChannel;
 import javax.management.RuntimeErrorException;
 
 public class HttpParserResponse implements HttpParser {
-	private static Integer cr = ReadConstantsConfiguration.getInstance().getCR();
-	private static Integer lf = ReadConstantsConfiguration.getInstance().getLF();
 	private HttpResponse response;
 	private ParserState state;
 	private ByteBuffer buffer;
-	private int bytes = 0;
 
 	public HttpParserResponse(HttpResponse response) {
 		this.response = response;
@@ -26,6 +26,16 @@ public class HttpParserResponse implements HttpParser {
 		this.buffer = ByteBuffer.allocate(0);
 	}
 
+	/**
+	 * 
+	 * @author mpurita
+	 * 
+	 * @param Receive the buffer that the socket read
+	 * 
+	 * @return A code that indicate if the parser is valid or invalid when the
+	 *         request is finished or continue in the other case
+	 *         
+	 */
 	public ParserCode parseMessage(ByteBuffer _buff) throws IOException {
 		ParserCode code;
 		concatBuffer(_buff);
@@ -55,6 +65,7 @@ public class HttpParserResponse implements HttpParser {
 		}
 	}
 
+	
 	private void concatBuffer(ByteBuffer _buff) {
 		System.out.println("Concat: buffer position:" + buffer.position()
 				+ "  buffer. limit: " + buffer.limit());
@@ -71,60 +82,11 @@ public class HttpParserResponse implements HttpParser {
 				+ buffer.position());
 	}
 
-	/**
-	 * @author mpurita
-	 *
-	 * @brief Parse a line at byte level
-	 * 
-	 * @return The first line of the buffer that have \r\n or \n otherwise
-	 *         return null
-	 */
-	private String readLine() {
-		boolean crFlag = false;
-		boolean lfFlag = false;
-		if (buffer.limit() == 0) {
-			return null;
-		}
-		byte[] array = new byte[buffer.limit()];
-		int i = 0;
-		byte b;
-		System.out.println("Before flip: " + buffer);
-		buffer.flip();
-		System.out.println("After flip: " + buffer);
-		do {
-			b = buffer.get();
-			array[i++] = b;
-			if (b == cr) {
-				crFlag = true;
-			} else if (b == lf) {
-				lfFlag = true;
-			}
-		} while (buffer.hasRemaining() && !crFlag && !lfFlag);
-		if (!crFlag && !lfFlag) {
-			return null;
-		} else {
-			if (crFlag) {
-				if (buffer.limit() == 0 || buffer.limit() == buffer.position()) {
-					return null;
-				}
-				b = buffer.get();
-				if (b != lf) {
-					throw new RuntimeErrorException(null); //TODO: Change this exception
-				}
-				array[i] = b;
-			}
-			buffer.compact();
-			int position = buffer.position();
-			buffer.limit(position);
-			return new String(array).trim();
-		}
-	}
-
 
 	private ParserCode parseMethod() throws UnsupportedEncodingException {
 		String prms[], cmd[], temp[];
 		int idx, i, version[] = { 0, 0 };
-		String line = readLine();
+		String line = ManageByteBuffer.readLine(this.buffer);
 
 		if (line == null) {
 			return ParserCode.LOOP;
@@ -168,7 +130,7 @@ public class HttpParserResponse implements HttpParser {
 	private ParserCode parseHeaders() throws IOException {
 		int idx;
 
-		String line = readLine();
+		String line = ManageByteBuffer.readLine(this.buffer);
 		if (line == null) {
 			// TODO: Log
 			return ParserCode.LOOP;
@@ -187,7 +149,7 @@ public class HttpParserResponse implements HttpParser {
 				response.addHeader(headerType, headerValue);
 				// TODO: Add log
 			}
-			line = readLine();
+			line = ManageByteBuffer.readLine(this.buffer);
 			// System.out.println("Header line: " + line);
 			if (line == null) {
 				return ParserCode.LOOP;
@@ -208,8 +170,7 @@ public class HttpParserResponse implements HttpParser {
 			return ParserCode.INVALID;
 		}
 		Integer bytes = Integer.parseInt(response.getHeader("content-length"));
-		String data = readBuffer(bytes);
-		if (data == null) {
+		if (!readBuffer(bytes)) {
 			return ParserCode.LOOP;
 		}
 		try {
@@ -235,22 +196,14 @@ public class HttpParserResponse implements HttpParser {
 		return ParserCode.VALID;
 	}
 
-	private String readBuffer(Integer contentLength) {
+	private boolean readBuffer(Integer contentLength) {
 		// System.out.println("Limit: " + this.buffer.limit() + " position: " +
 		// this.buffer.position());
 		System.out.println("length: " + contentLength);
-		if (this.buffer.limit() >= contentLength) {
-			return new String(this.buffer.array());
+		if (this.buffer.limit() == contentLength) {
+			return true;
 		}
-		return null;
-	}
-
-	public boolean requestIsComplete() {
-		return state == ParserState.END;
-	}
-
-	public boolean requestFinish() {
-		return this.state == ParserState.END;
+		return false;
 	}
 
 	public String getState() {

@@ -1,4 +1,4 @@
-package itba.pdc.proxy.exceptions;
+package itba.pdc.exceptions;
 
 public class InvalidDefaultPortException extends RuntimeException {
 

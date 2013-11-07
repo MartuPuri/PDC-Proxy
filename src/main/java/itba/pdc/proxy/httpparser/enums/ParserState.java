@@ -1,4 +1,4 @@
-package itba.pdc.proxy.httpparser;
+package itba.pdc.proxy.httpparser.enums;
 
 
 public enum ParserState {

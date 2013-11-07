@@ -192,4 +192,8 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 		return false;
 	}
 
+	public void setStatusRequest(StatusRequest status) {
+		super.setStatus(status);
+	}
+
 }

@@ -1,4 +1,4 @@
-package itba.pdc.proxy;
+package itba.pdc.proxy.handler;
 
 import itba.pdc.proxy.data.AttachmentProxy;
 import itba.pdc.proxy.data.ProcessType;
@@ -105,12 +105,16 @@ public class HttpHandler implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
+//		System.out.println("Write to " + att.getProcessID() + " : "
+//				+ new String(buf.array()));
+		debugLog.error("Reponse write: \n" + new String(buf.array()));
 		System.out.println("Write Buff position: " + buf.position()
 				+ " limit: " + buf.limit());
 		buf.flip();
 		try {
-			System.out.println("Write to " + att.getProcessID() + " : "
-					+ ManageByteBuffer.decode(buf));
+			debugLog.error("Reponse write: \n" + new String(buf.array()));
+//			System.out.println("Write to " + att.getProcessID() + " : "
+//					+ new String(buf.array()));
 		} catch (Exception e) {
 
 		}
