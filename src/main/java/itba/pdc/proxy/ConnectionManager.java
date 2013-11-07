@@ -143,7 +143,7 @@ public class ConnectionManager {
 		}
 		if(opened_channels.size() == 0){
 			channel = SocketChannel.open(new InetSocketAddress(
-					chained_ip, chained_port));
+					host, port));
 		}else{
 			Iterator<SocketChannel> it = opened_channels.iterator();
 			boolean found = false;
@@ -151,6 +151,8 @@ public class ConnectionManager {
 				channel = it.next();
 				if(channel.isOpen() && channel.isConnected()){
 					found = true;
+				} else {
+					it.remove();
 				}
 			}
 		}
