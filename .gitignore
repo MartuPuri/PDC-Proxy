@@ -9,6 +9,7 @@
 *.jar
 *.war
 *.ear
+src/main/resources/proxy.properties
 /target
 /log/*
 /log
