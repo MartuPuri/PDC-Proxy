@@ -66,18 +66,16 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 
 	@Override
 	public void addHeader(String header, String value) {
-		if (!supportedHeaders.contains(header)) {
-			System.out.println("Invalid header");
-			// TODO: VER QUE HACEMOS
-		}
-		if (header.equals("host")) {
-			int idx = value.indexOf(":");
-			int length = value.length();
-			if (idx > 0) {
-				port = Integer.parseInt(value.substring(idx + 1, length));
-				super.addHeader(header, value.substring(0, idx));
-			} else {
-				super.addHeader(header, value);
+		if (supportedHeaders.contains(header)) {
+			if (header.equals("host")) {
+				int idx = value.indexOf(":");
+				int length = value.length();
+				if (idx > 0) {
+					port = Integer.parseInt(value.substring(idx + 1, length));
+					super.addHeader(header, value.substring(0, idx));
+				} else {
+					super.addHeader(header, value);
+				}
 			}
 		}
 	}

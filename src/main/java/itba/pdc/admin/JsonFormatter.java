@@ -12,7 +12,6 @@ public class JsonFormatter implements HistogramFormatter {
 		data.put("1",15);
 		data.put("5", 40);
 		data.put("3", 10);
-		System.out.println(new JsonFormatter().format(data));
 	}
 	
 	public String format(Map<String, Integer> data) {

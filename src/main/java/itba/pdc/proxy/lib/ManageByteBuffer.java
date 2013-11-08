@@ -12,8 +12,10 @@ public final class ManageByteBuffer {
 	private static Charset charset = Charset.forName("UTF-8");
 	private static CharsetEncoder encoder = charset.newEncoder();
 	private static CharsetDecoder decoder = charset.newDecoder();
-	private static Integer cr = ReadConstantsConfiguration.getInstance().getCR();
-	private static Integer lf = ReadConstantsConfiguration.getInstance().getLF();
+	private static Integer cr = ReadConstantsConfiguration.getInstance()
+			.getCR();
+	private static Integer lf = ReadConstantsConfiguration.getInstance()
+			.getLF();
 
 	private ManageByteBuffer() {
 		throw new IllegalAccessError("This class cannot be instantiated");
@@ -23,7 +25,7 @@ public final class ManageByteBuffer {
 		try {
 			return encoder.encode(CharBuffer.wrap(message));
 		} catch (Exception e) {
-//			e.printStackTrace();
+			// e.printStackTrace();
 		}
 		return null;
 	}
@@ -36,15 +38,15 @@ public final class ManageByteBuffer {
 			// reset buffer's position to its original so it is not altered:
 			buffer.position(old_position);
 		} catch (Exception e) {
-//			e.printStackTrace();
+			// e.printStackTrace();
 			return "";
 		}
 		return data;
 	}
-	
+
 	/**
 	 * @author mpurita
-	 *
+	 * 
 	 * @brief Parse a line at byte level
 	 * 
 	 * @return The first line of the buffer that have \r\n or \n otherwise
@@ -59,9 +61,7 @@ public final class ManageByteBuffer {
 		byte[] array = new byte[buffer.limit()];
 		int i = 0;
 		byte b;
-		System.out.println("Before flip: " + buffer);
 		buffer.flip();
-		System.out.println("After flip: " + buffer);
 		do {
 			b = buffer.get();
 			array[i++] = b;
@@ -80,7 +80,8 @@ public final class ManageByteBuffer {
 				}
 				b = buffer.get();
 				if (b != lf) {
-					throw new RuntimeErrorException(null); //TODO: Change this exception
+					throw new RuntimeErrorException(null); // TODO: Change this
+															// exception
 				}
 				array[i] = b;
 			}

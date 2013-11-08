@@ -127,13 +127,11 @@ public class HttpResponse {
 		}
 		builder.append("\n");
 		final String head = builder.toString();
-		debugLogger.debug("Response: \n" + head);
 		ByteBuffer buff = ByteBuffer.allocate(head.getBytes().length
 				+ body.position());
 		buff.put(head.getBytes());
 		body.flip();
 		buff.put(body);
-		String s = new String(buff.array());
 		return buff;
 	}
 }

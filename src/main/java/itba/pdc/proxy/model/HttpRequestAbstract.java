@@ -1,12 +1,12 @@
 package itba.pdc.proxy.model;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public abstract class HttpRequestAbstract {
 	private String method;
-	private String body;
+	private ByteBuffer body = ByteBuffer.allocate(0);
 	private String uri;
 	private int[] version = new int[2];
 	private StatusRequest status = StatusRequest.OK;
@@ -33,12 +33,12 @@ public abstract class HttpRequestAbstract {
 		this.params.putAll(params);
 	}
 
-	public void setBody(String body) {
-		if (!headers.containsKey("content-length")) {
-			System.out.println("Missing content-length");
-			// TODO: VER QUE HACEMOS
+	public void setBody(ByteBuffer buffer) {
+		if (headers.containsKey("content-length")) {
+			this.body = ByteBuffer.allocate(buffer.limit());
+			buffer.flip();
+			this.body.put(buffer);
 		}
-		this.body = body;
 	}
 
 	public void setUri(String uri) {
@@ -53,9 +53,7 @@ public abstract class HttpRequestAbstract {
 	}
 
 	public boolean validVersion(int[] version) {
-		if (version[0] != 1 && !(version[1] == 1 || version[1] == 0)) {
-			System.out.println("Invalid version");
-			// TODO: VER QUE HACER
+		if (version[0] != 1 || version[1] != 1 && version[1] != 0) {
 			status = StatusRequest.VERSION_NOT_SUPPORTED;
 			return false;
 		}
@@ -78,11 +76,7 @@ public abstract class HttpRequestAbstract {
 		return this.method;
 	}
 
-	/*
-	 * TODO: Change this for buffer
-	 */
-	@Deprecated
-	public String getBody() {
+	public ByteBuffer getBody() {
 		return body;
 	}
 

@@ -136,76 +136,18 @@ public final class GenerateHttpResponse {
 		});
 		return supportedVersions;
 	}
-
-	// public String getStatusValue(){
-	// if(!httpReplies.containsKey(this.status)){
-	// //TODO: VER QUE HACEMOS
-	// }
-	// return httpReplies.get(this.status);
-	// }
-	//
-	// public void setStatus(int status){
-	// if(!httpReplies.containsKey(status)){
-	// System.out.println("Invalid Status");
-	// //TODO: VER QUE HACER
-	// }
-	// this.status = status;
-	// }
-	//
-	// public void addHeader(String header, String value) {
-	// if (!supportedHeaders.contains(header)) {
-	// System.out.println("Invalid header");
-	// // TODO: VER QUE HACEMOS
-	// }
-	// headers.put(header, value);
-	// }
-
-	// public void setBody(String body){
-	// this.body = body;
-	// }
-	//
 	private static void generateDefaultHeaders(Map<String, String> headers) {
 		headers = new HashMap<String, String>();
 		headers.put("Date",
 				new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 		headers.put("Connection", "close");
 		headers.put("Cache-Control", "no-cache");
-		// this.headers.put("Status", this.status + " " +
-		// this.getStatusValue());
 	}
-
-	//
-	// private void unsopportedMethod(){
-	// this.status = 405;
-	// this.headers.put("Allow", "GET,POST,HEAD");
-	// this.addDefaultHeaders();
-	// }
-	//
-	// private void badRequest(){
-	// this.status = 400;
-	// this.addDefaultHeaders();
-	// }
-	//
-	// private void lengthRequired(){
-	// this.status = 411;
-	// this.addDefaultHeaders();
-	// }
-	//
-	// private void unsopportedMediaType(){
-	// this.status = 415;
-	// this.addDefaultHeaders();
-	// }
-	//
-	// private void httpVersionNotSupported(){
-	// this.status = 505;
-	// this.addDefaultHeaders();
-	// }
 	
 	public static String generateAdminResponse(EHttpRequest request) throws IOException {
 		StatusRequest statusRequest = request.getStatus();
 		String firstLine = generateFirstLine(statusRequest);
 		String dataLine = "";
-		System.out.println("request.getHeader(historam): " + request.getHeader("histogram"));
 		MetricManager metric = MetricManager.getInstance();
 		switch (statusRequest) {
 		case HISTOGRAM:

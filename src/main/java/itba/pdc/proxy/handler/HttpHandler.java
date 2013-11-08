@@ -46,7 +46,6 @@ public class HttpHandler implements TCPProtocol {
 	}
 
 	public void handleRead(SelectionKey key) throws IOException {
-		// Client socket channel has pending data
 		AttachmentProxy att = (AttachmentProxy) key.attachment();
 		SocketChannel channel = (SocketChannel) key.channel();
 
@@ -86,23 +85,9 @@ public class HttpHandler implements TCPProtocol {
 			}
 
 		} else {
+			System.out.println(new String(buf.array()));
 			buf.compact();
 		}
-
-		// key.interestOps(SelectionKey.OP_READ);
-		// } else if (att.getProcessID().equals(ProcessType.ADMIN)) {
-		// String data =
-		// "<html><body><h1>Bahui la tenes adentro</h1></body></html>";
-		// String response =
-		// "HTTP/1.1 200 OK\nDate: Fri, 31 Dec 1999 23:59:59 GMT\nContent-Type: text/html\nContent-Length: "
-		// + data.getBytes().length + "\n\n";
-		// String aux = response + data;
-		// ByteBuffer bufferResponse = ByteBuffer.allocate(aux.length());
-		// bufferResponse.put(aux.getBytes());
-		// bufferResponse.position(0);
-		// att.setByteBuffer(bufferResponse);
-		// key.interestOps(SelectionKey.OP_WRITE);
-		// }
 	}
 
 	public void handleWrite(SelectionKey key) throws IOException {
@@ -115,13 +100,8 @@ public class HttpHandler implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
-		debugLog.error("Reponse write: \n" + new String(buf.array()));
 		buf.flip();
-		try {
-			debugLog.error("Reponse write: \n" + new String(buf.array()));
-		} catch (Exception e) {
-
-		}
+		debugLog.debug("Write to " + att.getProcessID() + ": \n" + new String(buf.array()));
 		// Prepare buffer for writing
 		do {
 			if (channel.isOpen() && channel.isConnected()) {
@@ -147,17 +127,14 @@ public class HttpHandler implements TCPProtocol {
 			SocketChannel oppositeChannel = null;
 			SelectionKey oppositeKey = null;
 			try {
-				oppositeChannel = ConnectionManager.getInstance().
-						getChannel(request.getHost(), request.getPort());
-//				oppositeChannel = SocketChannel.open(new InetSocketAddress(
-//						request.getHost(), request.getPort()));
-				// oppositeChannel = SocketChannel
-				// .open(new InetSocketAddress("10.6.0.158", 8080));
+				oppositeChannel = ConnectionManager.getInstance().getChannel(
+						request.getHost(), request.getPort());
 				oppositeChannel.configureBlocking(false);
 			} catch (Exception e) {
 				accessLogger
 						.error("Trying to connect to an invalid host or invalid port: "
 								+ request.getHost() + ", " + request.getPort());
+				e.printStackTrace();
 				return;
 			}
 			try {
@@ -165,6 +142,7 @@ public class HttpHandler implements TCPProtocol {
 						SelectionKey.OP_WRITE);
 			} catch (ClosedChannelException e) {
 				debugLog.error("Trying to register a key in a closed channel");
+				e.printStackTrace();
 				return;
 			}
 			AttachmentProxy serverAtt = new AttachmentProxy(ProcessType.SERVER,

@@ -1,9 +1,7 @@
 package itba.pdc.proxy.model;
 
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -13,13 +11,6 @@ import ch.qos.logback.classic.Logger;
 
 public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 
-	// private String method;
-	// private String body;
-	// private String uri;
-	// private int[] version;
-	// private StatusRequest status = StatusRequest.OK;
-	// private Map<String, String> params;
-	// private Map<String, String> headers;
 	private static final Set<String> supportedMethods = createMethods();
 	private static final Set<String> supportedHeaders = createHeaders();
 	private Logger debugLogger = (Logger) LoggerFactory.getLogger("debug.log");
@@ -30,7 +21,7 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 		headers.add("accept");
 		// headers.add("Accept-Charset");
 		// headers.add("Accept-Encoding");
-		// headers.add("Accept-Language");
+		headers.add("accept-Language");
 		// headers.add("Accept-Datetime");
 		// headers.add("Authorization");
 		// headers.add("Cache-Control");
@@ -38,11 +29,12 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 		// headers.add("Cookie");
 		headers.add("content-length");
 		// headers.add("Content-MD5");
-		// headers.add("Content-Type");
+		headers.add("content-Type");
 		headers.add("date");
 		headers.add("expect");
 		headers.add("from");
 		headers.add("host");
+		headers.add("proxy-connection");
 		// headers.add("If-Match");
 		// headers.add("If-None-Match");
 		// headers.add("If-Modified-Since");
@@ -53,10 +45,10 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 		// headers.add("Pragma");
 		// headers.add("Proxy-Authorization");
 		// headers.add("Range");
-		// headers.add("Referer");
+		 headers.add("referer");
 		// headers.add("TE");
 		// headers.add("Upgrade");
-		// headers.add("User-Agent");
+		headers.add("user-Agent");
 		// headers.add("Via");
 		// headers.add("Warning");
 
@@ -71,56 +63,44 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 		return headers;
 	}
 
-	public HttpRequest() {
-		// this.params = new HashMap<String, String>();
-		// this.headers = new HashMap<String, String>();
-		// this.version = new int[2];
-	}
-
 	@Override
 	public void addHeader(String header, String value) {
-		if (!supportedHeaders.contains(header)) {
-			System.out.println("Invalid header");
-			// TODO: VER QUE HACEMOS
-		}
-		if (header.equals("host")) {
-			int idx = value.indexOf(":");
-			int length = value.length();
-			if (idx > 0) {
-				port = Integer.parseInt(value.substring(idx + 1, length));
-				super.addHeader(header, value.substring(0, idx));
-			} else {
-				super.addHeader(header, value);
+		if (supportedHeaders.contains(header)) {
+			if (header.equals("host")) {
+				int idx = value.indexOf(":");
+				int length = value.length();
+				if (idx > 0) {
+					port = Integer.parseInt(value.substring(idx + 1, length));
+					value = value.substring(0, idx);
+				}
 			}
+			super.addHeader(header, value);
 		}
 	}
 
 	public ByteBuffer getStream() {
-		String line = "";
-
-		// TODO: Fix query
-		String firstLine = super.getMethod() + " " + super.getUri() + " HTTP/"
-				+ super.getVersion()[0] + "." + super.getVersion()[1] + "\n";
-		String headersLine = "";
+		final StringBuilder builder = new StringBuilder();
+		builder.append(super.getMethod()).append(" ").append(super.getUri())
+				.append(" HTTP/").append(super.getVersion()[0]).append(".")
+				.append(super.getVersion()[1]).append("\n");
 		for (Entry<String, String> entry : super.getHeaders().entrySet()) {
 			if (!entry.getKey().contains("encoding")) {
+				builder.append(entry.getKey()).append(": ")
+						.append(entry.getValue());
 				if (entry.getKey().equals("host")) {
-					headersLine += entry.getKey() + ": " + entry.getValue()
-							+ ":" + port + "\n";
-				} else {
-					headersLine += entry.getKey() + ": " + entry.getValue()
-							+ "\n";
+					builder.append(":").append(port);
 				}
+				builder.append("\n");
 			}
 		}
-		line += firstLine + headersLine;
-		if (bodyEnable()) {
-			line += super.getBody();
-		}
-		line += "\n";
-		debugLogger.debug("Request: \n" + line);
-		ByteBuffer buff = ByteBuffer.allocate(line.getBytes().length);
-		buff.put(line.getBytes());
+		builder.append("\n");
+		final String head = builder.toString();
+		ByteBuffer body = super.getBody();
+		ByteBuffer buff = ByteBuffer.allocate(head.getBytes().length
+				+ body.position());
+		buff.put(head.getBytes());
+		body.flip();
+		buff.put(body);
 		return buff;
 	}
 

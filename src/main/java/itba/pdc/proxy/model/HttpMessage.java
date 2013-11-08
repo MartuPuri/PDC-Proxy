@@ -1,5 +1,6 @@
 package itba.pdc.proxy.model;
 
+import java.nio.ByteBuffer;
 import java.util.Map;
 
 public interface HttpMessage {
@@ -8,7 +9,7 @@ public interface HttpMessage {
 	public void setVersion(int[] version);
 	public void setMethod(String method);
 	public void setParams(Map<String, String> params);
-	public void setBody(String body);
+	public void setBody(ByteBuffer buffer);
 	public void setUri(String uri);
 	public boolean bodyEnable();
 	public boolean validVersion(int[] version);

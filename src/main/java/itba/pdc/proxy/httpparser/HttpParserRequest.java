@@ -65,41 +65,6 @@ public class HttpParserRequest implements HttpParser {
 		buffer = aux;
 	}
 
-	// /**
-	// *
-	// *
-	// * @deprecated use
-	// {HttpParserResponse.ManageByteBuffer.readLine(this.buffer);} instead.
-	// */
-	// @Deprecated
-	// private String ManageByteBuffer.readLine(this.buffer); {
-	// String s = new String(buffer.array());
-	// String match = "\r\n";
-	// int index = s.indexOf(match);
-	// int matchLength = match.length();
-	// if (index < 0) {
-	// match = "\n";
-	// index = s.indexOf(match);
-	// if (index < 0) {
-	// return null;
-	// }
-	// matchLength = match.length();
-	// }
-	// int length = s.length();
-	// String line = s.substring(0, index);
-	// if (index < length) {
-	// int c = buffer.capacity();
-	// String tail = s.substring(index + matchLength, length);
-	// buffer = ByteBuffer.allocate(tail.getBytes().length);
-	// buffer.put(tail.getBytes());
-	// // buffer.position(index + matchLength);
-	// // buffer.compact();
-	// } else if (index == length) {
-	// buffer = ByteBuffer.allocate(length - index);
-	// }
-	// return line;
-	// }
-
 	private ParserCode parseMethod() throws UnsupportedEncodingException {
 		String prms[], cmd[], temp[];
 		int idx, i, version[] = { 0, 0 };
@@ -115,7 +80,6 @@ public class HttpParserRequest implements HttpParser {
 
 		if (cmd.length != 3) {
 			request.setStatusRequest(StatusRequest.BAD_REQUEST);
-			// request.invalidRequestLine(response);
 			return ParserCode.INVALID;
 		}
 
@@ -125,16 +89,12 @@ public class HttpParserRequest implements HttpParser {
 				version[0] = Integer.parseInt(temp[0]);
 				version[1] = Integer.parseInt(temp[1]);
 				if (!request.validVersion(version)) {
-					// TODO: Add log
 					return ParserCode.INVALID;
 				}
 			} catch (NumberFormatException nfe) {
-				// TODO: Add Log
-				// request.invalidRequestLine(response);
 				return ParserCode.INVALID;
 			}
 		} else {
-			// request.invalidRequestLine(response);
 			return ParserCode.INVALID;
 		}
 
@@ -166,7 +126,6 @@ public class HttpParserRequest implements HttpParser {
 		} else {
 			return ParserCode.INVALID;
 		}
-		// TODO: Add Log
 		request.setMethod(cmd[0]);
 		request.setVersion(version);
 		this.state = ParserState.HEADERS;
@@ -179,21 +138,17 @@ public class HttpParserRequest implements HttpParser {
 		String line = ManageByteBuffer.readLine(this.buffer);
 		;
 		if (line == null) {
-			// TODO: Log
 			return ParserCode.LOOP;
 		}
 		while (!line.trim().equals("")) {
 			idx = line.indexOf(':');
 			if (idx < 0) {
 				request.setStatusRequest(StatusRequest.CONFLICT);
-				// TODO: request.invalidHeader(response);
-				// TODO: Add log
 				return ParserCode.INVALID;
 			} else {
 				String headerType = line.substring(0, idx).toLowerCase();
 				String headerValue = line.substring(idx + 1).trim();
 				request.addHeader(headerType, headerValue);
-				// TODO: Add log
 			}
 			line = ManageByteBuffer.readLine(this.buffer);
 			;
@@ -203,11 +158,9 @@ public class HttpParserRequest implements HttpParser {
 		}
 
 		if (!request.bodyEnable()) {
-			// TODO: Add Log
 			state = ParserState.END;
 			return ParserCode.VALID;
 		} else {
-			// TODO : Add log
 			state = ParserState.DATA;
 			return ParserCode.CONTINUE;
 		}
@@ -218,20 +171,19 @@ public class HttpParserRequest implements HttpParser {
 			return ParserCode.INVALID;
 		}
 		Integer bytes = Integer.parseInt(request.getHeader("content-length"));
-		String data = readBuffer(bytes);
-		if (data == null) {
+		if (!readBuffer(bytes)) {
 			return ParserCode.LOOP;
 		}
-		request.setBody(data);
+		request.setBody(this.buffer);
 		this.state = ParserState.END;
 		return ParserCode.VALID;
 	}
 
-	private String readBuffer(Integer contentLength) {
+	private boolean readBuffer(Integer contentLength) {
 		if (this.buffer.capacity() >= contentLength) {
-			return new String(this.buffer.array());
+			return true;
 		}
-		return null;
+		return false;
 	}
 
 	public String getState() {
