@@ -156,6 +156,7 @@ public class ConnectionManager {
 				}
 			}
 		}
-		return channel;	
+		return (channel != null)?channel:SocketChannel.open(new InetSocketAddress(
+				host, port));
 	}
 }
