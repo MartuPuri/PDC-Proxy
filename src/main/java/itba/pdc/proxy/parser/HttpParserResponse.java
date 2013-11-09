@@ -130,7 +130,6 @@ public class HttpParserResponse implements HttpParser {
 			} else {
 				String headerType = line.substring(0, idx).toLowerCase();
 				String headerValue = line.substring(idx + 1).trim();
-				System.out.println("Header llega: " + headerType + ": " + headerValue);
 				response.addHeader(headerType, headerValue);
 				// TODO: Add log
 			}
@@ -145,10 +144,8 @@ public class HttpParserResponse implements HttpParser {
 
 	private ParserCode parseData() {
 		String connectionHeader = response.getHeader("connection");
-		for (Entry<String, String> head : response.getHeaders().entrySet()) {
-			System.out.println(head.getKey() + ": "+ head.getValue());
-		}
-		if (!response.bodyEnable() && connectionHeader == null) {
+		String chuncked = response.getHeader("transfer-encoding");
+		if (!response.bodyEnable() && connectionHeader == null && chuncked != null) {
 			return ParserCode.INVALID;
 		} else if (response.bodyEnable()) {
 			Integer bytes = Integer.parseInt(response
