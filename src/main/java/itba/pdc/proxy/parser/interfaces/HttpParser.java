@@ -8,4 +8,5 @@ import java.nio.ByteBuffer;
 public interface HttpParser {
 	public ParserCode parseMessage(ByteBuffer _buff) throws IOException;
 	public String getState();
+	public ByteBuffer getBuffer();
 }

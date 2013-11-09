@@ -50,7 +50,7 @@ public class HttpHandler implements TCPProtocol {
 		metricManager.addAccess();
 	}
 
-	public void handleRead(SelectionKey key) throws IOException {
+	public void handleRead(final SelectionKey key) throws IOException {
 		AttachmentProxy att = (AttachmentProxy) key.attachment();
 		SocketChannel channel = (SocketChannel) key.channel();
 
@@ -70,11 +70,11 @@ public class HttpHandler implements TCPProtocol {
 						oppositeAtt.setBuff(response.getStream());
 					}
 				}
+			} else {
+				debugLog.error("Close conneciton");
 			}
-			accessLogger.info("Connection with " + att.getProcessID()
-					+ " close");
-			channel.close();
 			key.cancel();
+			channel.close();
 		} else if (bytesRead > 0) {
 			metricManager.addBytesRead(bytesRead);
 			switch (att.getProcessID()) {
@@ -91,6 +91,7 @@ public class HttpHandler implements TCPProtocol {
 			}
 
 		} else {
+			System.out.println("Entra por aqui");
 			System.out.println(new String(buf.array()));
 			buf.compact();
 		}
@@ -105,14 +106,9 @@ public class HttpHandler implements TCPProtocol {
 		AttachmentProxy att = (AttachmentProxy) key.attachment();
 		SocketChannel channel = (SocketChannel) key.channel();
 
-		if (att.getProcessID().equals(ProcessType.SERVER)) {
-			debugLog.debug("CONTANDO:");
-		}
 		ByteBuffer buf = att.getBuff();
+		debugLog.info("Write: " + new String(buf.array()));
 		buf.flip();
-		// debugLog.debug("Write to " + att.getProcessID() + ": \n"
-		// + new String(buf.array()));
-		// Prepare buffer for writing
 		do {
 			if (channel.isOpen() && channel.isConnected()) {
 				channel.write(buf);
@@ -122,7 +118,12 @@ public class HttpHandler implements TCPProtocol {
 		} while (buf.hasRemaining());
 		if (!buf.hasRemaining()) { // Buffer completely written?
 			// Nothing left, so no longer interested in writes
-			key.interestOps(SelectionKey.OP_READ);
+			if (att.getProcessID().equals(ProcessType.CLIENT)) {
+				channel.close();
+				key.cancel();
+			} else {
+				key.interestOps(SelectionKey.OP_READ);
+			}
 		}
 		buf.compact(); // Make room for more data to be read in
 	}
@@ -183,6 +184,7 @@ public class HttpHandler implements TCPProtocol {
 		AttachmentProxy att = (AttachmentProxy) key.attachment();
 		ReadingState responseFinished = ManageParser.parse(att.getParser(),
 				att.getBuff());
+//		debugLog.debug("Body: " + new String(att.getParser().getBuffer().array()));
 		switch (responseFinished) {
 		case FINISHED:
 			if (att.getOppositeKey().isValid()) {

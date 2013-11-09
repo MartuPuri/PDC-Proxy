@@ -190,4 +190,8 @@ public class HttpParserRequest implements HttpParser {
 		return this.state.toString();
 	}
 
+	public ByteBuffer getBuffer() {
+		return this.buffer;
+	}
+
 }

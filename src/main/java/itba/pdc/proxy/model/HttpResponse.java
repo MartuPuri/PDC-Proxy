@@ -125,7 +125,7 @@ public class HttpResponse {
 	public ByteBuffer getStream() {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("HTTP/").append(version[0]).append(".")
-				.append(version[1]).append(code).append(" ")
+				.append(version[1]).append(" ").append(code).append(" ")
 				.append(messageCode).append("\r\n");
 		for (Entry<String, String> entry : headers.entrySet()) {
 			builder.append(entry.getKey()).append(": ")
@@ -139,5 +139,9 @@ public class HttpResponse {
 		body.flip();
 		buff.put(body);
 		return buff;
+	}
+
+	public Map<String, String> getHeaders() {
+		return headers;
 	}
 }

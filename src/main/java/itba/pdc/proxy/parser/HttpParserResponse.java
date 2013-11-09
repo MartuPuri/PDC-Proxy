@@ -1,17 +1,15 @@
 package itba.pdc.proxy.parser;
 
 import itba.pdc.proxy.lib.ManageByteBuffer;
-import itba.pdc.proxy.lib.ReadConstantsConfiguration;
 import itba.pdc.proxy.model.HttpResponse;
 import itba.pdc.proxy.parser.enums.ParserCode;
 import itba.pdc.proxy.parser.enums.ParserState;
 import itba.pdc.proxy.parser.interfaces.HttpParser;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import java.util.Map.Entry;
 
 import javax.management.RuntimeErrorException;
 
@@ -132,6 +130,7 @@ public class HttpParserResponse implements HttpParser {
 			} else {
 				String headerType = line.substring(0, idx).toLowerCase();
 				String headerValue = line.substring(idx + 1).trim();
+				System.out.println("Header llega: " + headerType + ": " + headerValue);
 				response.addHeader(headerType, headerValue);
 				// TODO: Add log
 			}
@@ -146,6 +145,9 @@ public class HttpParserResponse implements HttpParser {
 
 	private ParserCode parseData() {
 		String connectionHeader = response.getHeader("connection");
+		for (Entry<String, String> head : response.getHeaders().entrySet()) {
+			System.out.println(head.getKey() + ": "+ head.getValue());
+		}
 		if (!response.bodyEnable() && connectionHeader == null) {
 			return ParserCode.INVALID;
 		} else if (response.bodyEnable()) {
@@ -164,7 +166,7 @@ public class HttpParserResponse implements HttpParser {
 	}
 
 	private boolean readBuffer(Integer contentLength) {
-		System.out.println("Limit: " + this.buffer.limit() + " Content-Length: " + contentLength);
+		System.out.println("Content-Length: " + contentLength + "  limit: " + this.buffer.limit());
 		if (this.buffer.limit() == contentLength) {
 			return true;
 		}
