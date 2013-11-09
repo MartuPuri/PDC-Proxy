@@ -4,6 +4,29 @@ import java.nio.ByteBuffer;
 
 
 public class TransformationParser {
+	
+	public static void main(String[] args) {
+		TransformationParser mp = new TransformationParser();
+		ByteBuffer testBuf = ByteBuffer.allocate(1024);
+		String s_multi = "--boundary42\r\n" +
+				"Content-Type: text/plain; charset=us-ascii\r\n" +
+				"\r\n" +
+				"...plain text version of message goes here....\r\n" +
+				"--boundary42\r\n" +
+				"Content-Type: text/richtext\r\n" +
+				"\r\n" +
+				".... richtext version of same message goes here ...\r\n" +
+				"--boundary42\r\n" +
+				"Content-Type: text/x-whatever\r\n" +
+				"\r\n" +
+				".... fanciest formatted version of same  message  goes  here..\r\n" +
+				"...\r\n" +
+				"--boundary42--\r\n";
+		testBuf.put(s_multi.getBytes());
+	
+		mp.transform(testBuf);
+		System.out.println(new String(testBuf.array()));
+	}
 		
 	public void transform(ByteBuffer buffer) {
 		byte b;
@@ -12,11 +35,11 @@ public class TransformationParser {
 		for(int i = 0; i < buffer.limit(); i++) {
 			b = buffer.get(i);
 			switch(b) {
-			case 97: buffer.put(i, new Byte("4"));
-			case 101: buffer.put(i, new Byte("3"));
-			case 105: buffer.put(i, new Byte("1"));
-			case 111: buffer.put(i, new Byte("0"));
-			case 99: buffer.put(i, new Byte("<"));
+			case 97: buffer.put(i, (byte) 52); break;
+			case 101: buffer.put(i, (byte) 51); break;
+			case 105: buffer.put(i, (byte) 49); break;
+			case 111: buffer.put(i, (byte) 48); break;
+			case 99: buffer.put(i, (byte) 60); break;
 			}
 		}
 		
