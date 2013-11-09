@@ -1,10 +1,10 @@
 package itba.pdc.proxy.data;
 
-import itba.pdc.proxy.httpparser.HttpParserRequest;
-import itba.pdc.proxy.httpparser.HttpParserResponse;
 import itba.pdc.proxy.httpparser.interfaces.HttpParser;
 import itba.pdc.proxy.model.HttpRequest;
 import itba.pdc.proxy.model.HttpResponse;
+import itba.pdc.proxy.parser.HttpParserRequest;
+import itba.pdc.proxy.parser.HttpParserResponse;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;

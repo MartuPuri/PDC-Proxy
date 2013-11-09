@@ -4,11 +4,11 @@ import itba.pdc.proxy.ConnectionManager;
 import itba.pdc.proxy.data.AttachmentProxy;
 import itba.pdc.proxy.data.ProcessType;
 import itba.pdc.proxy.data.ProxyType;
-import itba.pdc.proxy.httpparser.HttpParserResponse;
 import itba.pdc.proxy.lib.ManageParser;
 import itba.pdc.proxy.lib.ReadingState;
 import itba.pdc.proxy.model.HttpRequest;
 import itba.pdc.proxy.model.HttpResponse;
+import itba.pdc.proxy.parser.HttpParserResponse;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

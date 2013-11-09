@@ -92,8 +92,20 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 			}
 			uri = uri.substring(i - 1, n);
 		}
-		builder.append(super.getMethod()).append(" ").append(uri)
-				.append(" HTTP/").append(super.getVersion()[0]).append(".")
+		builder.append(super.getMethod()).append(" ").append(uri);
+		if (!super.getParams().isEmpty()) {
+			builder.append("?");
+		}
+		int n = super.getParams().size();
+		int paramsNumber = 1;
+		for (Entry<String, String> param : super.getParams().entrySet()) {
+			builder.append(param.getKey()).append("=").append(param.getValue());
+			if (paramsNumber != n) {
+				builder.append("&");
+			}
+		}
+		System.out.println("Builder: "  + builder.toString());
+		builder.append(" HTTP/").append(super.getVersion()[0]).append(".")
 				.append(super.getVersion()[1]).append("\n");
 		for (Entry<String, String> entry : super.getHeaders().entrySet()) {
 			if (!entry.getKey().contains("encoding")) {

@@ -1,4 +1,4 @@
-package itba.pdc.proxy.httpparser;
+package itba.pdc.proxy.parser;
 
 import itba.pdc.proxy.httpparser.enums.ParserCode;
 import itba.pdc.proxy.httpparser.enums.ParserState;
@@ -104,8 +104,10 @@ public class HttpParserRequest implements HttpParser {
 			idx = cmd[1].indexOf('?');
 			if (idx < 0) {
 				uri = cmd[1];
+				System.out.println("Real uri: " + uri);
 			} else {
 				uri = URLDecoder.decode(cmd[1].substring(0, idx), "ISO-8859-1");
+				System.out.println("Semi uri: " + uri);
 				prms = cmd[1].substring(idx + 1).split("&");
 				params = new HashMap<String, String>();
 				for (i = 0; i < prms.length; i++) {

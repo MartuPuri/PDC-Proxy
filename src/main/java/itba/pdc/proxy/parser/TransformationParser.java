@@ -1,4 +1,4 @@
-package itba.pdc.proxy.httpparser;
+package itba.pdc.proxy.parser;
 
 import java.nio.ByteBuffer;
 
