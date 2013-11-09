@@ -33,9 +33,9 @@ public class ConnectionManager {
 	private Integer chained_port;
 	private int max_conns;
 	private Map<String, Set<SocketChannel>> persistent_connections;
-	
-	//TODO: CONEXIONES PERSISTENTES VAN ACA LA PUTA MADRE!!!
-	
+
+	// TODO: CONEXIONES PERSISTENTES VAN ACA LA PUTA MADRE!!!
+
 	private ConnectionManager() throws FileNotFoundException, IOException {
 		if (instance != null) {
 			infoLogger
@@ -115,48 +115,55 @@ public class ConnectionManager {
 		listnChannel.register(selector, SelectionKey.OP_ACCEPT,
 				new AttachmentAdmin(ProxyType.ADMIN, bufferSize));
 	}
-	
+
 	@Deprecated
-	public SocketChannel getChannel(String host, Integer port) throws IOException{
-		if(chained_ip == null || chained_port == null){
+	public SocketChannel getChannel(String host, Integer port)
+			throws IOException {
+		if (chained_ip == null || chained_port == null) {
 			return persistentConnection(host, port);
 		}
 		return persistentConnection(chained_ip, chained_port);
 	}
-	
+
 	@Deprecated
-	public void close(String host, SocketChannel channel) throws IOException{
+	public void close(String host, SocketChannel channel) throws IOException {
 		Set<SocketChannel> channels = persistent_connections.get(host);
-		if(channels.size() == max_conns)
+		if (channels.size() == max_conns)
 			channel.close();
 		else
 			channels.add(channel);
 		persistent_connections.put(host, channels);
 	}
-	
+
 	@Deprecated
-	private SocketChannel persistentConnection(String host, Integer port) throws IOException{
-		Set<SocketChannel> opened_channels = persistent_connections.get(host);
+	private SocketChannel persistentConnection(String host, Integer port)
+			throws IOException {
+		Set<SocketChannel> opened_channels;
 		SocketChannel channel = null;
-		if(opened_channels == null){
+		if ((opened_channels =  this.persistent_connections.get(host)) == null) {
 			opened_channels = new HashSet<SocketChannel>();
+			this.persistent_connections.put(host, opened_channels);
 		}
-		if(opened_channels.size() == 0){
-			channel = SocketChannel.open(new InetSocketAddress(
-					host, port));
-		}else{
+		System.out.println("hay abiertos:" + opened_channels.size());
+		if (opened_channels.size() == 0) {
+			{
+				channel = SocketChannel.open(new InetSocketAddress(host, port));
+				System.out.println("abro uno nuevo");
+			}
+		} else {
 			Iterator<SocketChannel> it = opened_channels.iterator();
 			boolean found = false;
 			while (it.hasNext() && !found) {
 				channel = it.next();
-				if(channel.isOpen() && channel.isConnected()){
+				if (channel.isOpen() && channel.isConnected()) {
+					System.out.println("hay uno libre");
 					found = true;
 				} else {
 					it.remove();
 				}
 			}
 		}
-		return (channel != null)?channel:SocketChannel.open(new InetSocketAddress(
-				host, port));
+		return (channel != null) ? channel : SocketChannel
+				.open(new InetSocketAddress(host, port));
 	}
 }
