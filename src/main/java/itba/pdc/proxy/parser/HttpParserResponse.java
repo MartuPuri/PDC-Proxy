@@ -166,7 +166,6 @@ public class HttpParserResponse implements HttpParser {
 	}
 
 	private boolean readBuffer(Integer contentLength) {
-		System.out.println("Content-Length: " + contentLength + "  limit: " + this.buffer.limit());
 		if (this.buffer.limit() == contentLength) {
 			return true;
 		}
