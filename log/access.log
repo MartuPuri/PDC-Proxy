@@ -1,0 +1,596 @@
+2013-11-06 11:04:39,913 INFO  - Accept new connection 
+2013-11-06 11:04:39,913 INFO  - Accept new connection 
+2013-11-06 11:04:39,913 INFO  - Accept new connection 
+2013-11-06 11:04:39,914 INFO  - Accept new connection 
+2013-11-06 11:04:55,431 INFO  - Accept new connection 
+2013-11-06 11:04:59,915 INFO  - Connection with CLIENT close 
+2013-11-06 11:04:59,916 INFO  - Connection with CLIENT close 
+2013-11-06 11:04:59,917 INFO  - Connection with CLIENT close 
+2013-11-06 11:05:48,197 INFO  - Accept new connection 
+2013-11-06 11:05:48,197 INFO  - Accept new connection 
+2013-11-06 11:05:48,197 INFO  - Accept new connection 
+2013-11-06 11:05:58,199 INFO  - Connection with CLIENT close 
+2013-11-06 11:05:58,201 INFO  - Connection with CLIENT close 
+2013-11-06 11:06:26,471 INFO  - Accept new connection 
+2013-11-06 11:06:33,858 INFO  - Connection with CLIENT close 
+2013-11-06 11:06:46,178 INFO  - Accept new connection 
+2013-11-06 11:06:46,178 INFO  - Accept new connection 
+2013-11-06 11:06:46,179 INFO  - Accept new connection 
+2013-11-06 11:06:49,095 INFO  - Connection with CLIENT close 
+2013-11-06 11:06:56,180 INFO  - Connection with CLIENT close 
+2013-11-06 11:06:56,181 INFO  - Connection with CLIENT close 
+2013-11-06 11:06:56,473 INFO  - Accept new connection 
+2013-11-06 11:06:56,474 INFO  - Connection with CLIENT close 
+2013-11-06 11:06:59,156 INFO  - Accept new connection 
+2013-11-06 11:16:46,050 INFO  - Accept new connection 
+2013-11-06 11:16:51,051 INFO  - Connection with CLIENT close 
+2013-11-06 11:17:06,299 INFO  - Accept new connection 
+2013-11-06 11:17:14,123 INFO  - Connection with CLIENT close 
+2013-11-06 11:17:14,125 INFO  - Accept new connection 
+2013-11-06 11:17:17,114 INFO  - Connection with CLIENT close 
+2013-11-06 11:17:19,953 INFO  - Accept new connection 
+2013-11-06 11:17:20,128 INFO  - Accept new connection 
+2013-11-06 11:17:25,131 INFO  - Connection with CLIENT close 
+2013-11-06 11:17:26,314 INFO  - Accept new connection 
+2013-11-06 11:17:32,813 INFO  - Accept new connection 
+2013-11-06 11:17:44,284 INFO  - Accept new connection 
+2013-11-06 11:17:49,286 INFO  - Connection with CLIENT close 
+2013-11-06 11:17:49,955 INFO  - Connection with CLIENT close 
+2013-11-06 11:17:52,062 INFO  - Accept new connection 
+2013-11-06 11:17:57,063 INFO  - Connection with CLIENT close 
+2013-11-06 11:18:02,811 INFO  - Connection with CLIENT close 
+2013-11-06 11:18:10,325 INFO  - Accept new connection 
+2013-11-06 11:18:15,326 INFO  - Connection with CLIENT close 
+2013-11-06 11:18:16,143 INFO  - Accept new connection 
+2013-11-06 11:18:21,146 INFO  - Connection with CLIENT close 
+2013-11-06 11:18:25,468 INFO  - Accept new connection 
+2013-11-06 11:18:31,245 INFO  - Accept new connection 
+2013-11-06 11:18:39,240 INFO  - Accept new connection 
+2013-11-06 11:18:51,537 INFO  - Accept new connection 
+2013-11-06 11:18:55,468 INFO  - Connection with CLIENT close 
+2013-11-06 11:18:55,527 INFO  - Accept new connection 
+2013-11-06 11:18:55,530 INFO  - Accept new connection 
+2013-11-06 11:18:56,539 INFO  - Connection with CLIENT close 
+2013-11-06 11:19:01,245 INFO  - Connection with CLIENT close 
+2013-11-06 11:19:01,248 INFO  - Accept new connection 
+2013-11-06 11:19:01,249 INFO  - Accept new connection 
+2013-11-06 11:19:09,239 INFO  - Connection with CLIENT close 
+2013-11-06 11:19:09,239 INFO  - Accept new connection 
+2013-11-06 11:19:25,527 INFO  - Connection with CLIENT close 
+2013-11-06 11:19:25,529 INFO  - Accept new connection 
+2013-11-06 11:19:25,530 INFO  - Accept new connection 
+2013-11-06 11:19:25,531 INFO  - Connection with CLIENT close 
+2013-11-06 11:19:25,532 INFO  - Accept new connection 
+2013-11-06 11:19:31,251 INFO  - Connection with CLIENT close 
+2013-11-06 11:19:31,252 INFO  - Connection with CLIENT close 
+2013-11-06 11:19:39,239 INFO  - Connection with CLIENT close 
+2013-11-06 11:19:52,846 INFO  - Accept new connection 
+2013-11-06 11:19:53,340 INFO  - Connection with SERVER close 
+2013-11-06 11:19:55,533 INFO  - Connection with CLIENT close 
+2013-11-06 11:19:55,534 INFO  - Connection with CLIENT close 
+2013-11-06 11:19:55,535 INFO  - Connection with CLIENT close 
+2013-11-06 11:20:02,859 INFO  - Connection with CLIENT close 
+2013-11-06 11:20:49,178 INFO  - Accept new connection 
+2013-11-06 11:20:51,435 ERROR - Trying to connect to an invalid host or invalid port: googlecom, 80 
+2013-11-06 11:20:54,036 INFO  - Accept new connection 
+2013-11-06 11:20:54,371 INFO  - Connection with SERVER close 
+2013-11-06 11:20:55,357 INFO  - Connection with CLIENT close 
+2013-11-06 11:20:55,358 INFO  - Accept new connection 
+2013-11-06 11:21:01,038 INFO  - Connection with CLIENT close 
+2013-11-06 11:21:04,048 INFO  - Connection with CLIENT close 
+2013-11-06 11:21:06,500 INFO  - Connection with SERVER close 
+2013-11-06 11:21:14,350 INFO  - Connection with SERVER close 
+2013-11-06 11:21:21,885 INFO  - Accept new connection 
+2013-11-06 11:21:26,388 INFO  - Connection with SERVER close 
+2013-11-06 11:21:28,309 INFO  - Connection with CLIENT close 
+2013-11-06 11:21:28,310 INFO  - Accept new connection 
+2013-11-06 11:21:29,187 INFO  - Connection with CLIENT close 
+2013-11-06 11:21:29,200 INFO  - Accept new connection 
+2013-11-06 11:21:29,504 INFO  - Accept new connection 
+2013-11-06 11:21:33,386 INFO  - Accept new connection 
+2013-11-06 11:21:33,684 INFO  - Connection with SERVER close 
+2013-11-06 11:21:39,496 INFO  - Connection with CLIENT close 
+2013-11-06 11:21:39,930 INFO  - Accept new connection 
+2013-11-06 11:21:39,951 INFO  - Accept new connection 
+2013-11-06 11:21:39,951 INFO  - Accept new connection 
+2013-11-06 11:21:40,239 INFO  - Accept new connection 
+2013-11-06 11:21:43,396 INFO  - Connection with CLIENT close 
+2013-11-06 11:21:49,866 INFO  - Connection with CLIENT close 
+2013-11-06 11:21:49,896 INFO  - Connection with CLIENT close 
+2013-11-06 11:21:49,927 INFO  - Connection with CLIENT close 
+2013-11-06 11:21:50,077 INFO  - Accept new connection 
+2013-11-06 11:21:50,147 INFO  - Accept new connection 
+2013-11-06 11:21:50,249 INFO  - Connection with CLIENT close 
+2013-11-06 11:21:52,899 INFO  - Accept new connection 
+2013-11-06 11:21:53,153 INFO  - Accept new connection 
+2013-11-06 11:21:53,386 INFO  - Connection with SERVER close 
+2013-11-06 11:21:53,620 INFO  - Connection with SERVER close 
+2013-11-06 11:22:00,072 INFO  - Connection with CLIENT close 
+2013-11-06 11:22:00,168 INFO  - Connection with CLIENT close 
+2013-11-06 11:22:00,230 INFO  - Accept new connection 
+2013-11-06 11:22:02,917 INFO  - Connection with CLIENT close 
+2013-11-06 11:22:02,955 INFO  - Connection with CLIENT close 
+2013-11-06 11:22:04,487 INFO  - Accept new connection 
+2013-11-06 11:22:10,247 INFO  - Connection with CLIENT close 
+2013-11-06 11:22:10,248 INFO  - Accept new connection 
+2013-11-06 11:22:18,243 INFO  - Accept new connection 
+2013-11-06 11:22:28,523 INFO  - Connection with SERVER close 
+2013-11-06 11:22:28,721 INFO  - Connection with SERVER close 
+2013-11-06 11:22:28,747 INFO  - Connection with SERVER close 
+2013-11-06 11:22:28,971 INFO  - Connection with SERVER close 
+2013-11-06 11:22:28,986 INFO  - Connection with SERVER close 
+2013-11-06 11:22:29,184 INFO  - Connection with SERVER close 
+2013-11-06 11:22:29,188 INFO  - Connection with SERVER close 
+2013-11-06 11:22:29,413 INFO  - Connection with SERVER close 
+2013-11-06 11:22:34,486 INFO  - Connection with CLIENT close 
+2013-11-06 11:22:34,535 INFO  - Accept new connection 
+2013-11-06 11:22:34,538 INFO  - Accept new connection 
+2013-11-06 11:22:40,247 INFO  - Connection with CLIENT close 
+2013-11-06 11:22:40,249 INFO  - Accept new connection 
+2013-11-06 11:22:40,250 INFO  - Accept new connection 
+2013-11-06 11:22:48,244 INFO  - Connection with CLIENT close 
+2013-11-06 11:22:48,245 INFO  - Accept new connection 
+2013-11-06 11:23:04,534 INFO  - Connection with CLIENT close 
+2013-11-06 11:23:04,534 INFO  - Accept new connection 
+2013-11-06 11:23:04,535 INFO  - Accept new connection 
+2013-11-06 11:23:04,537 INFO  - Connection with CLIENT close 
+2013-11-06 11:23:04,537 INFO  - Accept new connection 
+2013-11-06 11:23:10,251 INFO  - Connection with CLIENT close 
+2013-11-06 11:23:10,252 INFO  - Connection with CLIENT close 
+2013-11-06 11:23:18,245 INFO  - Connection with CLIENT close 
+2013-11-06 11:23:25,212 INFO  - Connection with CLIENT close 
+2013-11-06 11:23:34,537 INFO  - Connection with CLIENT close 
+2013-11-06 11:23:34,538 INFO  - Connection with CLIENT close 
+2013-11-06 11:23:34,538 INFO  - Connection with CLIENT close 
+2013-11-06 11:23:52,881 INFO  - Accept new connection 
+2013-11-06 11:23:53,164 INFO  - Connection with SERVER close 
+2013-11-06 11:24:02,891 INFO  - Connection with CLIENT close 
+2013-11-06 11:24:02,894 INFO  - Accept new connection 
+2013-11-06 11:24:12,908 INFO  - Connection with CLIENT close 
+2013-11-06 11:24:12,911 INFO  - Accept new connection 
+2013-11-06 11:24:18,311 INFO  - Connection with SERVER close 
+2013-11-06 11:24:22,928 INFO  - Connection with CLIENT close 
+2013-11-06 11:24:22,934 INFO  - Accept new connection 
+2013-11-06 11:24:23,128 INFO  - Connection with SERVER close 
+2013-11-06 11:24:23,273 INFO  - Connection with SERVER close 
+2013-11-06 11:24:32,951 INFO  - Connection with CLIENT close 
+2013-11-06 11:25:19,960 INFO  - Accept new connection 
+2013-11-06 11:25:27,067 INFO  - Connection with SERVER close 
+2013-11-06 11:25:27,286 INFO  - Connection with SERVER close 
+2013-11-06 11:25:27,286 INFO  - Connection with SERVER close 
+2013-11-06 11:25:27,506 INFO  - Connection with SERVER close 
+2013-11-06 11:25:27,585 INFO  - Connection with SERVER close 
+2013-11-06 11:25:27,727 INFO  - Connection with SERVER close 
+2013-11-06 11:25:27,745 INFO  - Connection with SERVER close 
+2013-11-06 11:25:27,790 INFO  - Connection with SERVER close 
+2013-11-06 11:25:27,799 INFO  - Connection with SERVER close 
+2013-11-06 11:25:27,970 INFO  - Connection with SERVER close 
+2013-11-06 11:25:28,000 INFO  - Connection with SERVER close 
+2013-11-06 11:25:28,011 INFO  - Connection with SERVER close 
+2013-11-06 11:25:28,027 INFO  - Connection with SERVER close 
+2013-11-06 11:25:28,028 INFO  - Connection with SERVER close 
+2013-11-06 11:25:28,035 INFO  - Connection with SERVER close 
+2013-11-06 11:25:28,205 INFO  - Connection with SERVER close 
+2013-11-06 11:25:28,218 INFO  - Connection with SERVER close 
+2013-11-06 11:25:28,245 INFO  - Connection with SERVER close 
+2013-11-06 11:25:28,277 INFO  - Connection with SERVER close 
+2013-11-06 11:25:28,278 INFO  - Connection with SERVER close 
+2013-11-06 11:25:28,287 INFO  - Connection with SERVER close 
+2013-11-06 11:25:28,445 INFO  - Connection with SERVER close 
+2013-11-06 11:25:28,486 INFO  - Connection with SERVER close 
+2013-11-06 11:25:28,490 INFO  - Connection with SERVER close 
+2013-11-06 11:25:29,476 INFO  - Connection with SERVER close 
+2013-11-06 11:25:29,554 INFO  - Connection with SERVER close 
+2013-11-06 11:25:39,980 INFO  - Connection with SERVER close 
+2013-11-06 11:25:39,999 INFO  - Connection with SERVER close 
+2013-11-06 11:25:40,033 INFO  - Connection with SERVER close 
+2013-11-06 11:25:40,289 INFO  - Connection with SERVER close 
+2013-11-06 11:25:49,960 INFO  - Connection with CLIENT close 
+2013-11-06 11:25:50,126 INFO  - Connection with SERVER close 
+2013-11-06 11:25:50,186 INFO  - Connection with SERVER close 
+2013-11-06 11:26:00,263 INFO  - Connection with SERVER close 
+2013-11-06 11:26:12,446 INFO  - Accept new connection 
+2013-11-06 11:26:17,446 INFO  - Connection with CLIENT close 
+2013-11-06 11:26:17,563 INFO  - Accept new connection 
+2013-11-06 11:26:22,564 INFO  - Connection with CLIENT close 
+2013-11-06 11:26:23,762 INFO  - Accept new connection 
+2013-11-06 11:26:24,242 INFO  - Connection with CLIENT close 
+2013-11-06 11:26:24,243 INFO  - Accept new connection 
+2013-11-06 11:26:24,595 INFO  - Accept new connection 
+2013-11-06 11:26:34,607 INFO  - Connection with CLIENT close 
+2013-11-06 11:26:38,675 INFO  - Accept new connection 
+2013-11-06 11:26:48,680 INFO  - Accept new connection 
+2013-11-06 11:26:58,501 INFO  - Connection with CLIENT close 
+2013-11-06 11:26:58,518 INFO  - Connection with CLIENT close 
+2013-11-06 11:26:58,695 INFO  - Connection with CLIENT close 
+2013-11-06 11:26:58,696 INFO  - Connection with CLIENT close 
+2013-11-06 11:26:58,705 INFO  - Accept new connection 
+2013-11-06 11:27:08,710 INFO  - Accept new connection 
+2013-11-06 11:27:18,710 INFO  - Connection with CLIENT close 
+2013-11-06 11:27:23,974 INFO  - Connection with SERVER close 
+2013-11-06 11:27:24,222 INFO  - Connection with SERVER close 
+2013-11-06 11:27:24,242 INFO  - Connection with SERVER close 
+2013-11-06 11:27:24,490 INFO  - Connection with SERVER close 
+2013-11-06 11:27:32,816 INFO  - Accept new connection 
+2013-11-06 11:27:33,714 INFO  - Accept new connection 
+2013-11-06 11:27:34,855 INFO  - Connection with SERVER close 
+2013-11-06 11:27:34,863 INFO  - Connection with CLIENT close 
+2013-11-06 11:27:34,874 INFO  - Accept new connection 
+2013-11-07 16:23:09,656 INFO  - Accept new connection 
+2013-11-07 16:23:09,691 ERROR - Trying to connect to an invalid host or invalid port: notify9.dropbox.com:80, 80 
+2013-11-07 16:23:20,850 INFO  - Accept new connection 
+2013-11-07 16:23:20,851 INFO  - Accept new connection 
+2013-11-07 16:23:20,851 INFO  - Accept new connection 
+2013-11-07 16:23:20,851 INFO  - Accept new connection 
+2013-11-07 16:23:20,852 INFO  - Accept new connection 
+2013-11-07 16:23:20,852 INFO  - Accept new connection 
+2013-11-07 16:23:20,853 INFO  - Accept new connection 
+2013-11-07 16:23:30,855 INFO  - Connection with CLIENT close 
+2013-11-07 16:23:30,856 INFO  - Connection with CLIENT close 
+2013-11-07 16:23:30,866 INFO  - Connection with CLIENT close 
+2013-11-07 16:23:30,866 INFO  - Connection with CLIENT close 
+2013-11-07 16:23:30,867 INFO  - Connection with CLIENT close 
+2013-11-07 16:23:30,868 INFO  - Connection with CLIENT close 
+2013-11-07 16:23:32,352 INFO  - Accept new connection 
+2013-11-07 16:23:37,640 INFO  - Accept new connection 
+2013-11-07 16:23:37,640 INFO  - Accept new connection 
+2013-11-07 16:23:37,641 INFO  - Accept new connection 
+2013-11-07 16:23:37,641 INFO  - Accept new connection 
+2013-11-07 16:23:37,641 INFO  - Accept new connection 
+2013-11-07 16:23:37,642 INFO  - Accept new connection 
+2013-11-07 16:23:38,235 INFO  - Accept new connection 
+2013-11-07 16:23:38,925 INFO  - Accept new connection 
+2013-11-07 16:23:38,925 INFO  - Accept new connection 
+2013-11-07 16:23:38,926 INFO  - Accept new connection 
+2013-11-07 16:23:38,926 INFO  - Accept new connection 
+2013-11-07 16:23:50,854 INFO  - Connection with CLIENT close 
+2013-11-07 16:23:50,855 INFO  - Connection with CLIENT close 
+2013-11-07 16:23:50,856 INFO  - Connection with CLIENT close 
+2013-11-07 16:23:50,857 INFO  - Connection with CLIENT close 
+2013-11-07 16:23:56,242 INFO  - Accept new connection 
+2013-11-07 16:23:56,938 INFO  - Connection with SERVER close 
+2013-11-07 16:23:56,957 INFO  - Connection with CLIENT close 
+2013-11-07 16:24:02,353 INFO  - Connection with CLIENT close 
+2013-11-07 16:24:03,828 INFO  - Accept new connection 
+2013-11-07 16:24:07,644 INFO  - Connection with CLIENT close 
+2013-11-07 16:24:07,646 INFO  - Accept new connection 
+2013-11-07 16:24:07,647 INFO  - Connection with CLIENT close 
+2013-11-07 16:24:07,648 INFO  - Connection with CLIENT close 
+2013-11-07 16:24:07,649 INFO  - Connection with CLIENT close 
+2013-11-07 16:24:07,650 INFO  - Connection with CLIENT close 
+2013-11-07 16:24:07,651 INFO  - Connection with CLIENT close 
+2013-11-07 16:24:08,236 INFO  - Connection with CLIENT close 
+2013-11-07 16:32:04,008 INFO  - Accept new connection 
+2013-11-07 16:32:04,009 INFO  - Accept new connection 
+2013-11-07 16:32:04,010 INFO  - Accept new connection 
+2013-11-07 16:32:04,012 INFO  - Accept new connection 
+2013-11-07 16:32:04,013 INFO  - Accept new connection 
+2013-11-07 16:32:06,550 INFO  - Accept new connection 
+2013-11-07 16:32:14,017 INFO  - Connection with CLIENT close 
+2013-11-07 16:32:14,018 INFO  - Connection with CLIENT close 
+2013-11-07 16:32:14,019 INFO  - Connection with CLIENT close 
+2013-11-07 16:32:14,020 INFO  - Connection with CLIENT close 
+2013-11-07 16:32:32,270 INFO  - Accept new connection 
+2013-11-07 16:33:02,270 INFO  - Connection with CLIENT close 
+2013-11-07 16:34:08,723 INFO  - Connection with CLIENT close 
+2013-11-07 17:58:18,310 INFO  - Accept new connection 
+2013-11-07 17:58:26,316 INFO  - Accept new connection 
+2013-11-07 17:58:27,418 INFO  - Accept new connection 
+2013-11-07 17:58:39,459 INFO  - Accept new connection 
+2013-11-07 17:58:46,270 INFO  - Accept new connection 
+2013-11-07 17:58:48,309 INFO  - Connection with CLIENT close 
+2013-11-07 17:58:48,311 INFO  - Accept new connection 
+2013-11-07 17:58:56,317 INFO  - Connection with CLIENT close 
+2013-11-07 17:58:57,418 INFO  - Connection with CLIENT close 
+2013-11-07 17:59:09,459 INFO  - Connection with CLIENT close 
+2013-11-07 17:59:12,415 INFO  - Accept new connection 
+2013-11-07 17:59:14,419 INFO  - Accept new connection 
+2013-11-07 17:59:16,271 INFO  - Connection with CLIENT close 
+2013-11-07 17:59:18,310 INFO  - Connection with CLIENT close 
+2013-11-07 17:59:19,810 INFO  - Accept new connection 
+2013-11-07 17:59:19,811 INFO  - Accept new connection 
+2013-11-07 17:59:19,811 INFO  - Accept new connection 
+2013-11-07 17:59:19,812 INFO  - Accept new connection 
+2013-11-07 17:59:19,812 INFO  - Accept new connection 
+2013-11-07 17:59:19,812 INFO  - Accept new connection 
+2013-11-07 17:59:19,813 INFO  - Accept new connection 
+2013-11-07 17:59:19,813 INFO  - Accept new connection 
+2013-11-07 17:59:19,814 INFO  - Accept new connection 
+2013-11-07 17:59:25,407 INFO  - Accept new connection 
+2013-11-07 17:59:34,421 INFO  - Accept new connection 
+2013-11-07 17:59:42,416 INFO  - Connection with CLIENT close 
+2013-11-07 17:59:42,426 INFO  - Accept new connection 
+2013-11-07 17:59:44,421 INFO  - Connection with CLIENT close 
+2013-11-07 17:59:44,423 INFO  - Accept new connection 
+2013-11-07 17:59:44,424 INFO  - Accept new connection 
+2013-11-07 17:59:48,420 INFO  - Accept new connection 
+2013-11-07 17:59:48,421 INFO  - Accept new connection 
+2013-11-07 17:59:55,410 INFO  - Accept new connection 
+2013-11-07 17:59:55,633 INFO  - Accept new connection 
+2013-11-07 17:59:55,633 INFO  - Accept new connection 
+2013-11-07 17:59:55,633 INFO  - Accept new connection 
+2013-11-07 17:59:55,633 INFO  - Accept new connection 
+2013-11-07 17:59:55,634 INFO  - Accept new connection 
+2013-11-07 17:59:55,634 INFO  - Accept new connection 
+2013-11-07 17:59:55,634 INFO  - Accept new connection 
+2013-11-07 18:00:04,421 INFO  - Accept new connection 
+2013-11-07 18:00:14,427 INFO  - Accept new connection 
+2013-11-07 18:00:14,437 INFO  - Accept new connection 
+2013-11-07 18:00:18,421 INFO  - Connection with CLIENT close 
+2013-11-07 18:00:18,422 INFO  - Connection with CLIENT close 
+2013-11-07 18:00:25,408 INFO  - Connection with CLIENT close 
+2013-11-07 18:00:25,635 INFO  - Connection with CLIENT close 
+2013-11-07 18:00:25,637 INFO  - Connection with CLIENT close 
+2013-11-07 18:00:25,638 INFO  - Connection with CLIENT close 
+2013-11-07 18:00:25,638 INFO  - Connection with CLIENT close 
+2013-11-07 18:00:25,639 INFO  - Connection with CLIENT close 
+2013-11-07 18:00:25,640 INFO  - Connection with CLIENT close 
+2013-11-07 18:00:25,640 INFO  - Connection with CLIENT close 
+2013-11-07 18:00:37,360 INFO  - Accept new connection 
+2013-11-07 18:00:37,361 INFO  - Accept new connection 
+2013-11-07 18:00:37,361 INFO  - Accept new connection 
+2013-11-07 18:00:37,361 INFO  - Accept new connection 
+2013-11-07 18:00:37,361 INFO  - Accept new connection 
+2013-11-07 18:00:37,362 INFO  - Accept new connection 
+2013-11-07 18:00:37,362 INFO  - Accept new connection 
+2013-11-07 18:00:43,411 INFO  - Accept new connection 
+2013-11-07 18:00:44,496 INFO  - Accept new connection 
+2013-11-07 18:01:03,408 INFO  - Accept new connection 
+2013-11-07 18:01:07,364 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:07,366 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:07,367 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:07,367 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:07,368 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:07,369 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:07,370 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:11,408 INFO  - Accept new connection 
+2013-11-07 18:01:13,410 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:13,412 INFO  - Accept new connection 
+2013-11-07 18:01:13,413 INFO  - Accept new connection 
+2013-11-07 18:01:14,497 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:14,499 INFO  - Accept new connection 
+2013-11-07 18:01:14,509 INFO  - Accept new connection 
+2013-11-07 18:01:33,408 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:41,175 INFO  - Accept new connection 
+2013-11-07 18:01:41,175 INFO  - Accept new connection 
+2013-11-07 18:01:41,175 INFO  - Accept new connection 
+2013-11-07 18:01:41,176 INFO  - Accept new connection 
+2013-11-07 18:01:41,176 INFO  - Accept new connection 
+2013-11-07 18:01:41,408 INFO  - Accept new connection 
+2013-11-07 18:01:41,409 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:42,878 INFO  - Accept new connection 
+2013-11-07 18:01:42,878 INFO  - Accept new connection 
+2013-11-07 18:01:42,878 INFO  - Accept new connection 
+2013-11-07 18:01:42,879 INFO  - Accept new connection 
+2013-11-07 18:01:42,879 INFO  - Accept new connection 
+2013-11-07 18:01:42,879 INFO  - Accept new connection 
+2013-11-07 18:01:42,880 INFO  - Accept new connection 
+2013-11-07 18:01:42,880 INFO  - Accept new connection 
+2013-11-07 18:01:42,880 INFO  - Accept new connection 
+2013-11-07 18:01:42,881 INFO  - Accept new connection 
+2013-11-07 18:01:42,881 INFO  - Accept new connection 
+2013-11-07 18:01:42,881 INFO  - Accept new connection 
+2013-11-07 18:01:42,882 INFO  - Accept new connection 
+2013-11-07 18:01:42,883 INFO  - Accept new connection 
+2013-11-07 18:01:42,883 INFO  - Accept new connection 
+2013-11-07 18:01:42,883 INFO  - Accept new connection 
+2013-11-07 18:01:42,884 INFO  - Accept new connection 
+2013-11-07 18:01:42,884 INFO  - Accept new connection 
+2013-11-07 18:01:42,885 INFO  - Accept new connection 
+2013-11-07 18:01:42,885 INFO  - Accept new connection 
+2013-11-07 18:01:42,885 INFO  - Accept new connection 
+2013-11-07 18:01:42,886 INFO  - Accept new connection 
+2013-11-07 18:01:43,414 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:43,416 INFO  - Accept new connection 
+2013-11-07 18:01:43,417 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:43,418 INFO  - Accept new connection 
+2013-11-07 18:01:44,499 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:44,499 INFO  - Accept new connection 
+2013-11-07 18:01:44,509 INFO  - Connection with CLIENT close 
+2013-11-07 18:01:44,509 INFO  - Accept new connection 
+2013-11-07 18:02:26,477 INFO  - Accept new connection 
+2013-11-07 18:02:26,885 INFO  - Accept new connection 
+2013-11-07 18:02:33,419 INFO  - Accept new connection 
+2013-11-07 18:02:35,061 INFO  - Accept new connection 
+2013-11-07 18:02:35,962 INFO  - Accept new connection 
+2013-11-07 18:02:36,485 INFO  - Accept new connection 
+2013-11-07 18:02:38,530 INFO  - Accept new connection 
+2013-11-07 18:02:38,530 INFO  - Accept new connection 
+2013-11-07 18:02:38,530 INFO  - Accept new connection 
+2013-11-07 18:02:38,530 INFO  - Accept new connection 
+2013-11-07 18:02:38,531 INFO  - Accept new connection 
+2013-11-07 18:02:39,845 INFO  - Accept new connection 
+2013-11-07 18:02:39,846 INFO  - Accept new connection 
+2013-11-07 18:02:54,316 INFO  - Accept new connection 
+2013-11-07 18:02:55,202 INFO  - Accept new connection 
+2013-11-07 18:02:56,477 INFO  - Connection with CLIENT close 
+2013-11-07 18:02:56,478 INFO  - Accept new connection 
+2013-11-07 18:02:56,479 INFO  - Accept new connection 
+2013-11-07 18:02:56,885 INFO  - Connection with CLIENT close 
+2013-11-07 18:02:58,534 INFO  - Accept new connection 
+2013-11-07 18:03:00,404 INFO  - Accept new connection 
+2013-11-07 18:03:03,419 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:03,421 INFO  - Accept new connection 
+2013-11-07 18:03:03,423 INFO  - Accept new connection 
+2013-11-07 18:03:04,416 INFO  - Accept new connection 
+2013-11-07 18:03:05,062 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:05,063 INFO  - Accept new connection 
+2013-11-07 18:03:05,964 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:05,966 INFO  - Accept new connection 
+2013-11-07 18:03:05,967 INFO  - Accept new connection 
+2013-11-07 18:03:06,485 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:06,485 INFO  - Accept new connection 
+2013-11-07 18:03:08,534 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:08,535 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:08,536 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:08,536 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:08,537 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:08,539 INFO  - Accept new connection 
+2013-11-07 18:03:09,846 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:09,848 INFO  - Accept new connection 
+2013-11-07 18:03:09,849 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:09,852 INFO  - Accept new connection 
+2013-11-07 18:03:14,410 INFO  - Accept new connection 
+2013-11-07 18:03:24,315 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:24,317 INFO  - Accept new connection 
+2013-11-07 18:03:24,421 INFO  - Accept new connection 
+2013-11-07 18:03:25,203 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:25,205 INFO  - Accept new connection 
+2013-11-07 18:03:26,480 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:26,480 INFO  - Accept new connection 
+2013-11-07 18:03:26,481 INFO  - Accept new connection 
+2013-11-07 18:03:26,481 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:26,481 INFO  - Accept new connection 
+2013-11-07 18:03:28,535 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:30,404 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:30,406 INFO  - Accept new connection 
+2013-11-07 18:03:33,424 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:33,426 INFO  - Accept new connection 
+2013-11-07 18:03:33,427 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:33,428 INFO  - Accept new connection 
+2013-11-07 18:03:34,416 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:34,418 INFO  - Accept new connection 
+2013-11-07 18:03:35,062 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:35,065 INFO  - Accept new connection 
+2013-11-07 18:03:35,966 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:35,967 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:36,486 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:36,486 INFO  - Accept new connection 
+2013-11-07 18:03:38,535 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:39,849 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:39,851 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:44,409 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:54,317 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:54,320 INFO  - Accept new connection 
+2013-11-07 18:03:54,421 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:55,205 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:56,482 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:56,484 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:56,484 INFO  - Connection with CLIENT close 
+2013-11-07 18:03:59,410 INFO  - Accept new connection 
+2013-11-07 18:04:00,405 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:00,407 INFO  - Accept new connection 
+2013-11-07 18:04:03,426 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:03,429 INFO  - Accept new connection 
+2013-11-07 18:04:03,429 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:03,430 INFO  - Accept new connection 
+2013-11-07 18:04:04,418 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:05,064 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:06,486 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:06,497 INFO  - Accept new connection 
+2013-11-07 18:04:29,410 INFO  - Accept new connection 
+2013-11-07 18:04:29,528 INFO  - Accept new connection 
+2013-11-07 18:04:29,529 INFO  - Accept new connection 
+2013-11-07 18:04:29,529 INFO  - Accept new connection 
+2013-11-07 18:04:29,530 INFO  - Accept new connection 
+2013-11-07 18:04:29,530 INFO  - Accept new connection 
+2013-11-07 18:04:29,530 INFO  - Accept new connection 
+2013-11-07 18:04:29,531 INFO  - Accept new connection 
+2013-11-07 18:04:29,531 INFO  - Accept new connection 
+2013-11-07 18:04:29,532 INFO  - Accept new connection 
+2013-11-07 18:04:29,532 INFO  - Accept new connection 
+2013-11-07 18:04:29,532 INFO  - Accept new connection 
+2013-11-07 18:04:29,533 INFO  - Accept new connection 
+2013-11-07 18:04:29,533 INFO  - Accept new connection 
+2013-11-07 18:04:29,534 INFO  - Accept new connection 
+2013-11-07 18:04:29,534 INFO  - Accept new connection 
+2013-11-07 18:04:29,535 INFO  - Accept new connection 
+2013-11-07 18:04:29,535 INFO  - Accept new connection 
+2013-11-07 18:04:29,535 INFO  - Accept new connection 
+2013-11-07 18:04:29,535 INFO  - Accept new connection 
+2013-11-07 18:04:29,537 INFO  - Accept new connection 
+2013-11-07 18:04:29,537 INFO  - Accept new connection 
+2013-11-07 18:04:29,574 INFO  - Accept new connection 
+2013-11-07 18:04:30,409 INFO  - Accept new connection 
+2013-11-07 18:04:33,868 INFO  - Accept new connection 
+2013-11-07 18:04:36,498 INFO  - Accept new connection 
+2013-11-07 18:04:42,262 INFO  - Accept new connection 
+2013-11-07 18:04:42,262 INFO  - Accept new connection 
+2013-11-07 18:04:52,263 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,409 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,536 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,538 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,539 INFO  - Accept new connection 
+2013-11-07 18:04:59,540 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,540 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,541 INFO  - Accept new connection 
+2013-11-07 18:04:59,542 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,543 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,543 INFO  - Accept new connection 
+2013-11-07 18:04:59,544 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,544 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,546 INFO  - Accept new connection 
+2013-11-07 18:04:59,546 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,547 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,548 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,549 INFO  - Accept new connection 
+2013-11-07 18:04:59,549 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,551 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,552 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,553 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,554 INFO  - Accept new connection 
+2013-11-07 18:04:59,554 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,555 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,555 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,556 INFO  - Accept new connection 
+2013-11-07 18:04:59,557 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,557 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,558 INFO  - Accept new connection 
+2013-11-07 18:04:59,559 INFO  - Accept new connection 
+2013-11-07 18:04:59,560 INFO  - Accept new connection 
+2013-11-07 18:04:59,561 INFO  - Accept new connection 
+2013-11-07 18:04:59,562 INFO  - Connection with CLIENT close 
+2013-11-07 18:04:59,574 INFO  - Connection with CLIENT close 
+2013-11-07 18:05:00,410 INFO  - Connection with CLIENT close 
+2013-11-07 18:05:03,871 INFO  - Connection with CLIENT close 
+2013-11-07 18:05:06,498 INFO  - Connection with CLIENT close 
+2013-11-07 18:05:29,544 INFO  - Connection with CLIENT close 
+2013-11-07 18:05:29,555 INFO  - Connection with CLIENT close 
+2013-11-07 18:05:29,556 INFO  - Connection with CLIENT close 
+2013-11-07 18:05:29,557 INFO  - Connection with CLIENT close 
+2013-11-07 18:05:29,558 INFO  - Connection with CLIENT close 
+2013-11-07 18:05:29,558 INFO  - Connection with CLIENT close 
+2013-11-07 18:05:29,559 INFO  - Connection with CLIENT close 
+2013-11-07 18:05:29,560 INFO  - Connection with CLIENT close 
+2013-11-07 18:05:29,560 INFO  - Connection with CLIENT close 
+2013-11-07 18:05:29,561 INFO  - Connection with CLIENT close 
+2013-11-07 18:05:29,561 INFO  - Connection with CLIENT close 
+2013-11-07 18:06:06,185 INFO  - Connection with SERVER close 
+2013-11-07 18:06:51,837 INFO  - Accept new connection 
+2013-11-07 18:06:53,093 INFO  - Accept new connection 
+2013-11-07 18:06:53,093 INFO  - Accept new connection 
+2013-11-07 18:07:21,839 INFO  - Connection with CLIENT close 
+2013-11-07 18:07:23,094 INFO  - Connection with CLIENT close 
+2013-11-07 18:07:23,095 INFO  - Accept new connection 
+2013-11-07 18:07:23,096 INFO  - Connection with CLIENT close 
+2013-11-07 18:07:23,097 INFO  - Accept new connection 
+2013-11-07 18:07:32,247 INFO  - Accept new connection 
+2013-11-07 18:07:53,095 INFO  - Connection with CLIENT close 
+2013-11-07 18:07:53,096 INFO  - Connection with CLIENT close 
+2013-11-07 18:08:02,247 INFO  - Connection with CLIENT close 
+2013-11-07 18:08:58,755 INFO  - Accept new connection 
+2013-11-07 18:08:58,757 INFO  - Accept new connection 
+2013-11-07 18:08:58,758 INFO  - Accept new connection 
+2013-11-07 18:08:58,759 INFO  - Accept new connection 
+2013-11-07 18:08:59,294 INFO  - Accept new connection 
+2013-11-07 18:08:59,295 INFO  - Accept new connection 
+2013-11-07 18:09:00,573 INFO  - Connection with CLIENT close 
+2013-11-07 18:09:00,801 INFO  - Connection with CLIENT close 
+2013-11-07 18:09:00,807 INFO  - Connection with CLIENT close 
+2013-11-07 18:09:00,808 INFO  - Accept new connection 
+2013-11-07 18:09:00,925 INFO  - Connection with CLIENT close 
+2013-11-07 18:09:00,925 INFO  - Accept new connection 
+2013-11-07 18:09:01,010 INFO  - Connection with CLIENT close 
+2013-11-07 18:09:01,011 INFO  - Accept new connection 
+2013-11-07 18:09:01,460 INFO  - Connection with CLIENT close 
+2013-11-07 18:09:01,461 INFO  - Accept new connection 
+2013-11-07 18:09:01,461 INFO  - Connection with CLIENT close 
+2013-11-07 18:09:01,462 INFO  - Accept new connection 
+2013-11-07 18:09:01,492 INFO  - Connection with CLIENT close 
+2013-11-07 18:09:01,493 INFO  - Accept new connection 
+2013-11-07 18:09:01,856 INFO  - Connection with CLIENT close 
+2013-11-07 18:09:01,857 INFO  - Accept new connection 
+2013-11-07 18:09:02,320 INFO  - Connection with CLIENT close 
+2013-11-07 18:09:02,320 INFO  - Connection with CLIENT close 
+2013-11-07 18:09:02,322 INFO  - Connection with CLIENT close 
+2013-11-07 18:09:02,323 INFO  - Connection with CLIENT close 

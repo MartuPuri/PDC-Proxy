@@ -1,5 +1,6 @@
 package itba.pdc.proxy.handler;
 
+import itba.pdc.admin.MetricManager;
 import itba.pdc.proxy.ConnectionManager;
 import itba.pdc.proxy.data.AttachmentProxy;
 import itba.pdc.proxy.data.ProcessType;
@@ -27,7 +28,8 @@ public class HttpHandler implements TCPProtocol {
 	private Logger accessLogger = (Logger) LoggerFactory
 			.getLogger("access.log");
 	private Logger debugLog = (Logger) LoggerFactory.getLogger("debug.log");
-
+	private static final MetricManager metricManager = MetricManager.getInstance();
+	
 	public HttpHandler(int bufferSize) {
 		this.bufferSize = bufferSize;
 	}
@@ -43,6 +45,7 @@ public class HttpHandler implements TCPProtocol {
 				att.getProxyType(), this.bufferSize);
 		clientKey.attach(clientAtt);
 		accessLogger.info("Accept new connection");
+		metricManager.addAccess();
 	}
 
 	public void handleRead(SelectionKey key) throws IOException {
@@ -71,6 +74,7 @@ public class HttpHandler implements TCPProtocol {
 			channel.close();
 			key.cancel();
 		} else if (bytesRead > 0) {
+			metricManager.addBytesRead(bytesRead);
 			switch (att.getProcessID()) {
 			case CLIENT:
 				handleClient(key);
@@ -179,6 +183,9 @@ public class HttpHandler implements TCPProtocol {
 						.getOppositeKey().attachment();
 				HttpResponse response = att.getResponse();
 				oppositeAtt.setBuff(response.getStream());
+				
+				metricManager.addStatusCode(response.getStatusCode());
+				// att.getBuff().compact();
 				att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
 			}
 			break;
