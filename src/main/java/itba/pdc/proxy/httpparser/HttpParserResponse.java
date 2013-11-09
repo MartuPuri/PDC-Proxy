@@ -154,25 +154,6 @@ public class HttpParserResponse implements HttpParser {
 			if (!readBuffer(bytes)) {
 				return ParserCode.LOOP;
 			}
-			// try {
-			//
-			// FileOutputStream fo = new FileOutputStream("ole.txt", true);
-			// FileChannel wChannel = fo.getChannel();
-			//
-			// // Write the ByteBuffer contents; the bytes between the
-			// ByteBuffer's
-			// // position and the limit is written to the file
-			// buffer.flip();
-			// wChannel.write(buffer);
-			// wChannel.close();
-			// fo.close();
-			//
-			// // Close the file
-			// } catch (IOException e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// }
-
 			response.setBody(this.buffer);
 			this.state = ParserState.END;
 			return ParserCode.VALID;
@@ -183,6 +164,7 @@ public class HttpParserResponse implements HttpParser {
 	}
 
 	private boolean readBuffer(Integer contentLength) {
+		System.out.println("Limit: " + this.buffer.limit() + " Content-Length: " + contentLength);
 		if (this.buffer.limit() == contentLength) {
 			return true;
 		}

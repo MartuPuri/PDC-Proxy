@@ -24,9 +24,9 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 		headers.add("accept-Language");
 		// headers.add("Accept-Datetime");
 		// headers.add("Authorization");
-		// headers.add("Cache-Control");
+		headers.add("cache-control");
 		headers.add("connection");
-		// headers.add("Cookie");
+		headers.add("cookie");
 		headers.add("content-length");
 		// headers.add("Content-MD5");
 		headers.add("content-Type");
@@ -42,10 +42,10 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 		// headers.add("Max-Forwards");
 		// headers.add("If-Unmodified-Since");
 		// headers.add("Origin");
-		// headers.add("Pragma");
+		headers.add("pragma");
 		// headers.add("Proxy-Authorization");
 		// headers.add("Range");
-		 headers.add("referer");
+		headers.add("referer");
 		// headers.add("TE");
 		// headers.add("Upgrade");
 		headers.add("user-Agent");
@@ -80,14 +80,26 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 
 	public ByteBuffer getStream() {
 		final StringBuilder builder = new StringBuilder();
-		builder.append(super.getMethod()).append(" ").append(super.getUri())
+		String uri = super.getUri();
+		if (uri.charAt(0) == 'h') {
+			int j = 0;
+			int n = uri.length();
+			int i;
+			for (i = 0; i < n && j != 3; i++) {
+				if (uri.charAt(i) == '/') {
+					j++;
+				}
+			}
+			uri = uri.substring(i - 1, n);
+		}
+		builder.append(super.getMethod()).append(" ").append(uri)
 				.append(" HTTP/").append(super.getVersion()[0]).append(".")
 				.append(super.getVersion()[1]).append("\n");
 		for (Entry<String, String> entry : super.getHeaders().entrySet()) {
 			if (!entry.getKey().contains("encoding")) {
 				builder.append(entry.getKey()).append(": ")
 						.append(entry.getValue());
-				if (entry.getKey().equals("host")) {
+				if (entry.getKey().equals("host") && port != 80) {
 					builder.append(":").append(port);
 				}
 				builder.append("\n");
