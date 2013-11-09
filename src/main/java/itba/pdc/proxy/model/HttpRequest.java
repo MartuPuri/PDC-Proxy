@@ -29,7 +29,7 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 		headers.add("cookie");
 		headers.add("content-length");
 		// headers.add("Content-MD5");
-		headers.add("content-Type");
+		headers.add("content-type");
 		headers.add("date");
 		headers.add("expect");
 		headers.add("from");
