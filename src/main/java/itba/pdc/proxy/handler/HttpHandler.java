@@ -101,7 +101,8 @@ public class HttpHandler implements TCPProtocol {
 
 		ByteBuffer buf = att.getBuff();
 		buf.flip();
-		debugLog.debug("Write to " + att.getProcessID() + ": \n" + new String(buf.array()));
+		debugLog.debug("Write to " + att.getProcessID() + ": \n"
+				+ new String(buf.array()));
 		// Prepare buffer for writing
 		do {
 			if (channel.isOpen() && channel.isConnected()) {
@@ -174,12 +175,11 @@ public class HttpHandler implements TCPProtocol {
 		switch (responseFinished) {
 		case FINISHED:
 			if (att.getOppositeKey().isValid()) {
-				att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
 				AttachmentProxy oppositeAtt = (AttachmentProxy) (AttachmentProxy) att
 						.getOppositeKey().attachment();
 				HttpResponse response = att.getResponse();
 				oppositeAtt.setBuff(response.getStream());
-				// att.getBuff().compact();
+				att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
 			}
 			break;
 		case UNFINISHED:
