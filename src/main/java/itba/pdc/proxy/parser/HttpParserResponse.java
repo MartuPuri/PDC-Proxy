@@ -1,11 +1,11 @@
 package itba.pdc.proxy.parser;
 
-import itba.pdc.proxy.httpparser.enums.ParserCode;
-import itba.pdc.proxy.httpparser.enums.ParserState;
-import itba.pdc.proxy.httpparser.interfaces.HttpParser;
 import itba.pdc.proxy.lib.ManageByteBuffer;
 import itba.pdc.proxy.lib.ReadConstantsConfiguration;
 import itba.pdc.proxy.model.HttpResponse;
+import itba.pdc.proxy.parser.enums.ParserCode;
+import itba.pdc.proxy.parser.enums.ParserState;
+import itba.pdc.proxy.parser.interfaces.HttpParser;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

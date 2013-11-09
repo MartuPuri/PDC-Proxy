@@ -1,6 +1,6 @@
-package itba.pdc.proxy.httpparser.interfaces;
+package itba.pdc.proxy.parser.interfaces;
 
-import itba.pdc.proxy.httpparser.enums.ParserCode;
+import itba.pdc.proxy.parser.enums.ParserCode;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
