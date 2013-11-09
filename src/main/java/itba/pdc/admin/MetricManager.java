@@ -37,6 +37,8 @@ public final class MetricManager {
 	public void addBytesRead(long qty) {
 		bytesRead += qty;
 	}
+	
+	@Deprecated
 	public void addBytesWrite(long qty) {
 		bytesWrite += qty;
 	}
