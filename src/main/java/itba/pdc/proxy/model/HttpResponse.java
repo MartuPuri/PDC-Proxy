@@ -88,6 +88,10 @@ public class HttpResponse {
 		this.messageCode = httpReplies.get(code);
 	}
 
+	public Integer getStatusCode(){
+		return this.code;
+	}
+	
 	public void setBody(ByteBuffer buffer) {
 		if (!headers.containsKey("content-length")) {
 			System.out.println("Missing content-length");
