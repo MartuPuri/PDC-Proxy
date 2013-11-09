@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public final class MetricManager {
 	private static final MetricManager instance = new MetricManager();
@@ -16,12 +18,12 @@ public final class MetricManager {
 	private int accesses;
 	private long bytesRead = 0;
 	private long bytesWrite = 0;
-	private Map<Integer, List<Date>> to_histogram;
+	private ConcurrentMap<Integer, List<Date>> to_histogram;
 
 	private MetricManager() {
 		if (instance != null)
 			throw new IllegalStateException();
-		to_histogram = new HashMap<Integer, List<Date>>();
+		to_histogram = new ConcurrentHashMap<Integer, List<Date>>();
 	}
 
 	public static MetricManager getInstance() {
