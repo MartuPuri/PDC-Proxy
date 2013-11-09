@@ -88,10 +88,10 @@ public class HttpResponse {
 		this.messageCode = httpReplies.get(code);
 	}
 
-	public Integer getStatusCode(){
+	public Integer getStatusCode() {
 		return this.code;
 	}
-	
+
 	public void setBody(ByteBuffer buffer) {
 		if (!headers.containsKey("content-length")) {
 			System.out.println("Missing content-length");
@@ -124,10 +124,12 @@ public class HttpResponse {
 
 	public ByteBuffer getStream() {
 		final StringBuilder builder = new StringBuilder();
-		builder.append("HTTP/1.1 ").append(code)
-				.append(" ").append(messageCode).append("\r\n");
+		builder.append("HTTP/").append(version[0]).append(".")
+				.append(version[1]).append(code).append(" ")
+				.append(messageCode).append("\r\n");
 		for (Entry<String, String> entry : headers.entrySet()) {
-			builder.append(entry.getKey()).append(": ").append(entry.getValue()).append("\r\n");
+			builder.append(entry.getKey()).append(": ")
+					.append(entry.getValue()).append("\r\n");
 		}
 		builder.append("\n");
 		final String head = builder.toString();

@@ -12,6 +12,7 @@ import itba.pdc.proxy.model.HttpResponse;
 import itba.pdc.proxy.parser.HttpParserResponse;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
@@ -28,8 +29,9 @@ public class HttpHandler implements TCPProtocol {
 	private Logger accessLogger = (Logger) LoggerFactory
 			.getLogger("access.log");
 	private Logger debugLog = (Logger) LoggerFactory.getLogger("debug.log");
-	private static final MetricManager metricManager = MetricManager.getInstance();
-	
+	private static final MetricManager metricManager = MetricManager
+			.getInstance();
+
 	public HttpHandler(int bufferSize) {
 		this.bufferSize = bufferSize;
 	}
@@ -103,10 +105,13 @@ public class HttpHandler implements TCPProtocol {
 		AttachmentProxy att = (AttachmentProxy) key.attachment();
 		SocketChannel channel = (SocketChannel) key.channel();
 
+		if (att.getProcessID().equals(ProcessType.SERVER)) {
+			debugLog.debug("CONTANDO:");
+		}
 		ByteBuffer buf = att.getBuff();
 		buf.flip();
-		debugLog.debug("Write to " + att.getProcessID() + ": \n"
-				+ new String(buf.array()));
+		// debugLog.debug("Write to " + att.getProcessID() + ": \n"
+		// + new String(buf.array()));
 		// Prepare buffer for writing
 		do {
 			if (channel.isOpen() && channel.isConnected()) {
@@ -132,8 +137,10 @@ public class HttpHandler implements TCPProtocol {
 			SocketChannel oppositeChannel = null;
 			SelectionKey oppositeKey = null;
 			try {
-				oppositeChannel = ConnectionManager.getInstance().getChannel(
-						request.getHost(), request.getPort());
+				// oppositeChannel = ConnectionManager.getInstance().getChannel(
+				// request.getHost(), request.getPort());
+				oppositeChannel = SocketChannel.open(new InetSocketAddress(
+						request.getHost(), request.getPort()));
 				oppositeChannel.configureBlocking(false);
 			} catch (Exception e) {
 				accessLogger
@@ -183,7 +190,7 @@ public class HttpHandler implements TCPProtocol {
 						.getOppositeKey().attachment();
 				HttpResponse response = att.getResponse();
 				oppositeAtt.setBuff(response.getStream());
-				
+
 				metricManager.addStatusCode(response.getStatusCode());
 				// att.getBuff().compact();
 				att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
