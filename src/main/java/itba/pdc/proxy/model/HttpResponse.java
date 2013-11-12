@@ -1,12 +1,8 @@
 package itba.pdc.proxy.model;
 
 import itba.pdc.admin.MetricManager;
-import itba.pdc.proxy.lib.ManageByteBuffer;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
