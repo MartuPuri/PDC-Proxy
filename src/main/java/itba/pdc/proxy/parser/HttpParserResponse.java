@@ -66,8 +66,8 @@ public class HttpParserResponse implements HttpParser {
 	}
 
 	private void concatBuffer(ByteBuffer _buff) {
-//		System.out.println("buff: " + new String(buffer.array()));
-//		System.out.println("buff2: " + new String(_buff.array()));
+		// System.out.println("buff: " + new String(buffer.array()));
+		// System.out.println("buff2: " + new String(_buff.array()));
 		ByteBuffer aux = ByteBuffer.allocate(buffer.position()
 				+ _buff.position());
 		_buff.flip();
@@ -147,7 +147,7 @@ public class HttpParserResponse implements HttpParser {
 	private ParserCode parseData() {
 		String chunked = response.getHeader("transfer-encoding");
 		if (chunked != null) {
-			//TODO: Manage chunked
+			// TODO: Manage chunked
 			return manageChunked();
 		} else if (response.bodyEnable()) {
 			Integer bytes = Integer.parseInt(response
@@ -166,27 +166,16 @@ public class HttpParserResponse implements HttpParser {
 
 	private ParserCode manageChunked() {
 		Integer chunkedSize = response.getChunkSize();
-//		System.out.println("Buffer: " + new String(buffer.array()));
+		// System.out.println("Buffer: " + new String(buffer.array()));
 		if (chunkedSize == null) {
 			String hexa = ManageByteBuffer.readLine(buffer);
+			if (hexa == null) {
+				return ParserCode.LOOP;
+			}
 			System.out.println("Hexa: " + hexa);
 			Integer size = Integer.parseInt(hexa, 16);
-			System.out.println("Size: " + size);
-			response.setChunkedSize(size);
-			response.addChunkedBuffer(buffer);
-			return ParserCode.LOOP;
-		} else {
-			if (response.isChunkComplete()) {
-				String hexa = ManageByteBuffer.readLine(buffer);
-				System.out.println("Hexa: " + hexa);
-				Integer size = Integer.parseInt(hexa, 16);
-				if (size == 0) {
-					System.out.println("entra");
-				}
-				System.out.println("Size: " + size);
-				response.setChunkedSize(size);
-			}
-			if (response.addChunkedBuffer(buffer)) {
+			if (size == 0) {
+				System.out.println("entra");
 				System.out.println("Termina");
 				response.setBody(response.getChunkedBuffer());
 				System.out.println("Length: " + response.getLength());
@@ -195,8 +184,41 @@ public class HttpParserResponse implements HttpParser {
 				state = ParserState.END;
 				return ParserCode.VALID;
 			}
-			return ParserCode.LOOP;
+			System.out.println("Size: " + size);
+			response.setChunkedSize(size);
 		}
+		return readChunck(buffer);
+	}
+
+	private ParserCode readChunck(ByteBuffer buffer) {
+		boolean completed;
+		do {
+			if (response.isChunkComplete()) {
+				String hexa = ManageByteBuffer.readLine(buffer);
+				System.out.println("Hexa: " + hexa);
+				if (hexa == null) {
+					return ParserCode.LOOP;
+				}
+				if (!hexa.trim().equals("")) {
+					Integer size = Integer.parseInt(hexa, 16);
+					if (size == 0) {
+						System.out.println("entra");
+						System.out.println("Termina");
+						response.setBody(response.getChunkedBuffer());
+						System.out.println("Length: " + response.getLength());
+						response.addHeader("content-length",
+								response.getLength());
+						response.removeHeader("transfer-encoding");
+						state = ParserState.END;
+						return ParserCode.VALID;
+					}
+					System.out.println("Size: " + size);
+					response.setChunkedSize(size);
+				}
+			}
+			completed = response.addChunkedBuffer(buffer);
+		} while (completed);
+		return ParserCode.LOOP;
 	}
 
 	private boolean readBuffer(Integer contentLength) {

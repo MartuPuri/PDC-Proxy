@@ -22,7 +22,7 @@ public class HttpResponse {
 	private String messageCode;
 	private Integer code;
 	private Integer chunkSize = null;
-	private ByteBuffer chunkBuffer = null;
+	private ByteBuffer chunkBuffer = ByteBuffer.allocate(0);
 	private ByteBuffer body;
 	private Map<String, String> headers;
 
@@ -153,102 +153,130 @@ public class HttpResponse {
 		this.chunkSize = size;
 		this.currentChunkedSize = 0;
 	}
-
+	
 	public boolean addChunkedBuffer(ByteBuffer buffer) {
+		buffer.flip();
 		byte[] array = new byte[buffer.limit()];
 		int i = 0;
-		buffer.flip();
-		boolean flag = false;
-		boolean flag2 = false;
-		try {
-			FileOutputStream fo = new FileOutputStream("myChunk2.txt", true);
-			FileChannel wChannel = fo.getChannel();
-
-			// Write the ByteBuffer contents; the bytes between the ByteBuffer's
-			// position and the limit is written to the file
-			wChannel.write(buffer);
-			wChannel.close();
-			fo.close();
-
-			// Close the file
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		while (buffer.hasRemaining() && currentChunkedSize != chunkSize) {
+			array[i++] = buffer.get();
+			currentChunkedSize++;
+			content_length++;
 		}
-		System.out.println("Buff: " + buffer);
-		buffer.flip();
-		do {
-			byte c = buffer.get();
-			if (c == 13) {
-				c = buffer.get();
-				if (c == 10) {
-					buffer.compact();
-					int position = buffer.position();
-					buffer.limit(position);
-					ByteBuffer reaux = ByteBuffer.allocate(buffer.position());
-					buffer.flip();
-					reaux.put(buffer);
-					buffer = reaux;
-					System.out.println("Buff2:" + buffer);
-					String text = ManageByteBuffer.readLine(buffer);
-					try {
-						Integer.parseInt(text, 16);
-					} catch (NumberFormatException nfe) {
-						flag2 = true;
-						array[i++] = 13;
-						array[i++] = 10;
-					}
-						
-					System.out.println("text: " + text);
-					if (text != null && text.equals("0")) {
-						flag = true;
-					}
-					// System.out.println("Manage: " +
-					// ManageByteBuffer.readLine(buffer));
-					// System.out.println("Array: " + new String(array));
-					if (!flag2) {
-						System.out.println("Break;");
-						break;
-					}
-				}
-			} else {
-				array[i++] = c;
-			}
-		} while (buffer.hasRemaining());
-		// System.out.println("Array: " + new String(array));
-		ByteBuffer aux = ByteBuffer.allocate(i);
-		for (int j = 0; j < i; j++) {
-			aux.put(array[j]);
-		}
-		try {
-			aux.flip();
-			FileOutputStream fo = new FileOutputStream("myChunk.txt", true);
-			FileChannel wChannel = fo.getChannel();
-
-			// Write the ByteBuffer contents; the bytes between the ByteBuffer's
-			// position and the limit is written to the file
-			buffer.flip();
-			wChannel.write(aux);
-			wChannel.close();
-			fo.close();
-
-			// Close the file
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// buffer.limit(buffer.capacity());
-		System.out.println("i: " + i);
-		currentChunkedSize += i;
-		content_length += i;
+		buffer.compact();
+		int position = buffer.position();
+		buffer.limit(position);
 		updateChunkedBuffer(array, i);
-		return flag;
+		return currentChunkedSize == chunkSize;
 	}
 
+//	
+//	public boolean addChunkedBuffer(ByteBuffer buffer) {
+//		byte[] array = new byte[buffer.limit()];
+//		int i = 0;
+//		buffer.flip();
+//		boolean flag = false;
+//		boolean flag2 = false;
+////		System.out.println("BUFER TEXT: " + new String(buffer.array()));
+//		// try {
+//		// FileOutputStream fo = new FileOutputStream("myChunk2.txt", true);
+//		// FileChannel wChannel = fo.getChannel();
+//		//
+//		// // Write the ByteBuffer contents; the bytes between the ByteBuffer's
+//		// // position and the limit is written to the file
+//		// wChannel.write(buffer);
+//		// wChannel.close();
+//		// fo.close();
+//		//
+//		// // Close the file
+//		// } catch (IOException e) {
+//		// // TODO Auto-generated catch block
+//		// e.printStackTrace();
+//		// }
+//		// System.out.println("Buff: " + buffer);
+//		// buffer.flip();
+//		do {
+//			byte c = buffer.get();
+//			if (c == 13) {
+//				c = buffer.get();
+//				if (c == 10) {
+//					buffer.compact();
+//					int position = buffer.position();
+//					buffer.limit(position);
+//					ByteBuffer reaux = ByteBuffer.allocate(buffer.position());
+//					buffer.flip();
+//					reaux.put(buffer);
+//					buffer = reaux;
+//					System.out.println("Buff2:" + buffer);
+//					String text = ManageByteBuffer.readLine(buffer);
+//					try {
+//						Integer textSize = Integer.parseInt(text, 16);
+//						System.out.println("text: " + textSize);
+//						if (text != null && textSize == 0) {
+//							flag = true;
+//							break;
+//						}
+//					} catch (NumberFormatException nfe) {
+//						flag2 = true;
+//						array[i++] = 13;
+//						array[i++] = 10;
+//						// for (int j = 0; j < text.length(); j++) {
+//						// array[i++] = text.getBytes()[j];
+//						// currentChunkedSize++;
+//						// }
+//						// buffer.flip();
+//						 currentChunkedSize += 2;
+//					}
+//
+//					if (currentChunkedSize == chunkSize) {
+//						System.out.println("Sale");
+//						break;
+//					}
+//				} else {
+//					 array[i++] = 13;
+//					 currentChunkedSize++;
+//				}
+//			} else {
+//				array[i++] = c;
+//				currentChunkedSize++;
+//			}
+//		} while (buffer.hasRemaining());
+//		// System.out.println("Array: " + new String(array));
+//		ByteBuffer aux = ByteBuffer.allocate(i);
+//		for (int j = 0; j < i; j++) {
+//			aux.put(array[j]);
+//		}
+//		try {
+//			aux.flip();
+//			FileOutputStream fo = new FileOutputStream("myChunk.txt", true);
+//			FileChannel wChannel = fo.getChannel();
+//
+//			// Write the ByteBuffer contents; the bytes between the ByteBuffer's
+//			// position and the limit is written to the file
+//
+//			int write = wChannel.write(aux);
+//			System.out.println("Write: " + write);
+//			wChannel.close();
+//			fo.close();
+//
+//			// Close the file
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		buffer.flip();
+//		// buffer.limit(buffer.capacity());
+//		System.out.println("i: " + i);
+//		// currentChunkedSize += i;
+//		content_length += i;
+//		updateChunkedBuffer(array, i);
+//		return flag;
+//	}
+
 	private void updateChunkedBuffer(byte[] array, int length) {
-		if (chunkBuffer == null) {
-			chunkBuffer = ByteBuffer.allocate(0);
-		}
+//		if (chunkBuffer == null) {
+//			chunkBuffer = ByteBuffer.allocate(0);
+//		}
 		ByteBuffer aux = ByteBuffer.allocate(chunkBuffer.position() + length);
 		chunkBuffer.flip();
 		aux.put(chunkBuffer);
