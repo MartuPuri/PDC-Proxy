@@ -107,7 +107,7 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 			paramsNumber++;
 		}
 		builder.append(" HTTP/").append(super.getVersion()[0]).append(".")
-				.append(0).append("\n");
+				.append(super.getVersion()[1]).append("\n");
 
 		for (Entry<String, String> entry : super.getHeaders().entrySet()) {
 			if (!entry.getKey().contains("encoding")) {

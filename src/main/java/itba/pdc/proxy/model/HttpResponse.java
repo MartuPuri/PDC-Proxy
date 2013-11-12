@@ -1,26 +1,30 @@
 package itba.pdc.proxy.model;
 
 import itba.pdc.admin.MetricManager;
+import itba.pdc.proxy.lib.ManageByteBuffer;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Logger;
-
 public class HttpResponse {
 
-	private Integer code;
-	private String messageCode;
-	private ByteBuffer body;
-	private int[] version;
-	private Map<String, String> headers;
 	private static Map<Integer, String> httpReplies = createHttpReplies();
-	private Logger debugLogger = (Logger) LoggerFactory.getLogger("debug.log");
+
+	private int[] version;
+	private int content_length = 0;
+	private int currentChunkedSize = 0;
+	private String messageCode;
+	private Integer code;
+	private Integer chunkSize = null;
+	private ByteBuffer chunkBuffer = null;
+	private ByteBuffer body;
+	private Map<String, String> headers;
 
 	private static Map<Integer, String> createHttpReplies() {
 		Map<Integer, String> result = new HashMap<Integer, String>();
@@ -143,5 +147,136 @@ public class HttpResponse {
 
 	public Map<String, String> getHeaders() {
 		return headers;
+	}
+
+	public void setChunkedSize(Integer size) {
+		this.chunkSize = size;
+		this.currentChunkedSize = 0;
+	}
+
+	public boolean addChunkedBuffer(ByteBuffer buffer) {
+		byte[] array = new byte[buffer.limit()];
+		int i = 0;
+		buffer.flip();
+		boolean flag = false;
+		boolean flag2 = false;
+		try {
+			FileOutputStream fo = new FileOutputStream("myChunk2.txt", true);
+			FileChannel wChannel = fo.getChannel();
+
+			// Write the ByteBuffer contents; the bytes between the ByteBuffer's
+			// position and the limit is written to the file
+			wChannel.write(buffer);
+			wChannel.close();
+			fo.close();
+
+			// Close the file
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Buff: " + buffer);
+		buffer.flip();
+		do {
+			byte c = buffer.get();
+			if (c == 13) {
+				c = buffer.get();
+				if (c == 10) {
+					buffer.compact();
+					int position = buffer.position();
+					buffer.limit(position);
+					ByteBuffer reaux = ByteBuffer.allocate(buffer.position());
+					buffer.flip();
+					reaux.put(buffer);
+					buffer = reaux;
+					System.out.println("Buff2:" + buffer);
+					String text = ManageByteBuffer.readLine(buffer);
+					try {
+						Integer.parseInt(text, 16);
+					} catch (NumberFormatException nfe) {
+						flag2 = true;
+						array[i++] = 13;
+						array[i++] = 10;
+					}
+						
+					System.out.println("text: " + text);
+					if (text != null && text.equals("0")) {
+						flag = true;
+					}
+					// System.out.println("Manage: " +
+					// ManageByteBuffer.readLine(buffer));
+					// System.out.println("Array: " + new String(array));
+					if (!flag2) {
+						System.out.println("Break;");
+						break;
+					}
+				}
+			} else {
+				array[i++] = c;
+			}
+		} while (buffer.hasRemaining());
+		// System.out.println("Array: " + new String(array));
+		ByteBuffer aux = ByteBuffer.allocate(i);
+		for (int j = 0; j < i; j++) {
+			aux.put(array[j]);
+		}
+		try {
+			aux.flip();
+			FileOutputStream fo = new FileOutputStream("myChunk.txt", true);
+			FileChannel wChannel = fo.getChannel();
+
+			// Write the ByteBuffer contents; the bytes between the ByteBuffer's
+			// position and the limit is written to the file
+			buffer.flip();
+			wChannel.write(aux);
+			wChannel.close();
+			fo.close();
+
+			// Close the file
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// buffer.limit(buffer.capacity());
+		System.out.println("i: " + i);
+		currentChunkedSize += i;
+		content_length += i;
+		updateChunkedBuffer(array, i);
+		return flag;
+	}
+
+	private void updateChunkedBuffer(byte[] array, int length) {
+		if (chunkBuffer == null) {
+			chunkBuffer = ByteBuffer.allocate(0);
+		}
+		ByteBuffer aux = ByteBuffer.allocate(chunkBuffer.position() + length);
+		chunkBuffer.flip();
+		aux.put(chunkBuffer);
+		for (int j = 0; j < length; j++) {
+			aux.put(array[j]);
+		}
+		this.chunkBuffer = aux;
+	}
+
+	public Integer getChunkSize() {
+		return chunkSize;
+	}
+
+	public boolean isChunkComplete() {
+		System.out.println("ChunckSize: " + chunkSize);
+		System.out.println("CurrentSize: " + currentChunkedSize);
+		return this.chunkSize == currentChunkedSize;
+	}
+
+	public ByteBuffer getChunkedBuffer() {
+		return chunkBuffer;
+	}
+
+	public String getLength() {
+		return String.valueOf(content_length);
+	}
+
+	public void removeHeader(String key) {
+		headers.remove(key);
 	}
 }
