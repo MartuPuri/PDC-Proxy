@@ -24,7 +24,7 @@ public final class MetricManager {
 	private long bytesWritten = 0;
 	private long bytesChanged = 0;
 	private ConcurrentMap<Integer, List<Date>> to_histogram;
-	
+
 	private MetricManager() {
 		if (instance != null)
 			throw new IllegalStateException();
@@ -42,11 +42,11 @@ public final class MetricManager {
 	public void addBytesRead(long qty) {
 		bytesRead += qty;
 	}
-	
+
 	public void addBytesWritten(long qty) {
 		bytesWritten += qty;
 	}
-	
+
 	public void addBytesChanged(long qty) {
 		bytesChanged += qty;
 	}
@@ -63,7 +63,7 @@ public final class MetricManager {
 			GroupMetrics groupby) {
 		List<Date> list = this.to_histogram.get(code);
 		if (list == null || list.isEmpty()) {
-			return "There is no histogram for the code: " + code;
+			return "{ \"0\" : \"0\", \"1\" : \"0\", \"2\" : \"0\", \"3\" : \"0\", \"4\" : \"0\", \"5\" : \"0\", \"6\" : \"0\", \"7\" : \"0\", \"8\" : \"0\", \"9\" : \"0\", \"10\" : \"0\", \"11\" : \"0\", \"12\" : \"0\", \"13\" : \"0\", \"14\" : \"0\", \"15\" : \"0\", \"16\" : \"0\", \"17\" : \"0\", \"18\" : \"0\", \"19\" : \"0\", \"20\" : \"0\", \"21\" : \"0\", \"22\" : \"0\", \"23\" : \"0\" }\n";
 		}
 		Map<String, String> to_format = groupby.group(this.to_histogram
 				.get(code));
@@ -74,7 +74,8 @@ public final class MetricManager {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("Bytes read", String.valueOf(bytesRead));
 		data.put("Bytes written", String.valueOf(bytesWritten));
-		data.put("Bytes total tranfered", String.valueOf(bytesRead + bytesWritten));
+		data.put("Bytes total tranfered",
+				String.valueOf(bytesRead + bytesWritten));
 		data.put("Bytes changed", String.valueOf(bytesChanged));
 		return format.format(data);
 	}
@@ -89,7 +90,7 @@ public final class MetricManager {
 		}
 		return format.format(data);
 	}
-	
+
 	public String generateAccesses(Formatter format) {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("Accesses", String.valueOf(accesses));

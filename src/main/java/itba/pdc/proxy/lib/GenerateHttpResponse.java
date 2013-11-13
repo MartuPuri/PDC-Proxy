@@ -191,6 +191,26 @@ public final class GenerateHttpResponse {
 		Map<String, String> headers = new HashMap<String, String>();
 		generateDefaultHeaders(headers);
 		headers.put("Content-Length", String.valueOf(contentLength));
+		switch (status) {
+		case HISTOGRAM:
+			headers.put("Content-Type", "application/vnd.ehttp-histogram");
+			break;
+		case FILTER:
+			headers.put("Content-Type", "application/vnd.ehttp-transformer");
+			break;
+		case STATUS:
+			headers.put("Content-Type", "application/vnd.ehttp-status");
+			break;
+		case BYTES:
+			headers.put("Content-Type", "application/vnd.ehttp-bytes");
+			break;
+		case ACCESSES:
+			headers.put("Content-Type", "application/vnd.ehttp-accesses");
+			break;
+
+		default:
+			break;
+		}
 		String headersLine = "";
 		for (Entry<String, String> mapElement : headers.entrySet()) {
 			headersLine += mapElement.getKey() + ": " + mapElement.getValue()
