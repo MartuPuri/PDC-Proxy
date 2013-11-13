@@ -40,7 +40,7 @@ public class AttachmentAdmin implements Attachment {
 
 	public void setBuff(ByteBuffer buff) {
 		this.buff = ByteBuffer.allocate(buff.capacity());
-//		buff.flip();
+		buff.flip();
 		this.buff.put(buff);
 	}
 

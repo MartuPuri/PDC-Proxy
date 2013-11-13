@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class JsonFormatter implements HistogramFormatter {
+public class JsonFormatter implements Formatter {
 
 	public static void main(String args[]){
 		Map<String,Integer> data = new HashMap<String, Integer>();
@@ -14,7 +14,7 @@ public class JsonFormatter implements HistogramFormatter {
 		data.put("3", 10);
 	}
 	
-	public String format(Map<String, Integer> data) {
+	public String format(Map<String, String> data) {
 		final StringBuilder builder = new StringBuilder();
 		String to_send = "{ ";
 		String end = " }";
@@ -29,7 +29,6 @@ public class JsonFormatter implements HistogramFormatter {
 				builder.append(", ");
 		}
 		builder.append(end);
-		return builder.toString();
+		return builder.append("\n").toString();
 	}
-	
 }

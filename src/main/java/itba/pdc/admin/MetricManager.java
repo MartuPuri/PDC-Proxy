@@ -4,11 +4,15 @@
 
 package itba.pdc.admin;
 
+import itba.pdc.admin.filter.FilterStatus;
+import itba.pdc.admin.filter.ManageFilter;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -37,7 +41,7 @@ public final class MetricManager {
 	public void addBytesRead(long qty) {
 		bytesRead += qty;
 	}
-	
+
 	@Deprecated
 	public void addBytesWrite(long qty) {
 		bytesWrite += qty;
@@ -50,20 +54,32 @@ public final class MetricManager {
 		events.add(new Date());
 	}
 
-	public String generateHistogram(Integer code, HistogramFormatter format,
+	public String generateHistogram(Integer code, Formatter format,
 			GroupMetrics groupby) {
 		List<Date> list = this.to_histogram.get(code);
 		if (list == null || list.isEmpty()) {
 			return "There is no histogram for the code: " + code;
 		}
-		Map<String, Integer> to_format = groupby.group(this.to_histogram
+		Map<String, String> to_format = groupby.group(this.to_histogram
 				.get(code));
 		return format.format(to_format);
 	}
-	
+
 	public String getBytes() {
 		String bytes = "";
-		bytes += "Bytes received: " + bytesRead + "\nBytes sended: " + bytesWrite + "\n";
+		bytes += "Bytes received: " + bytesRead + "\nBytes sended: "
+				+ bytesWrite + "\n";
 		return bytes;
+	}
+
+	public String generateStatus(Formatter format) {
+		Map<String, String> data = new HashMap<String, String>();
+		Set<String> set = ManageFilter.getInstace().getSet();
+		if (set.contains(FilterStatus.TRANSFORMER.toString())) {
+			data.put(FilterStatus.TRANSFORMER.toString(), "Enabled");
+		} else {
+			data.put(FilterStatus.TRANSFORMER.toString(), "Disabled");
+		}
+		return format.format(data);
 	}
 }

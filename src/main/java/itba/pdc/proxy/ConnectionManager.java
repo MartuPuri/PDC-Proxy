@@ -32,7 +32,7 @@ public class ConnectionManager {
 			.getLogger("connection.log");
 	private String chained_ip;
 	private Integer chained_port;
-	private int max_conns;
+	private int max_conns = 2;
 	private Map<String, Set<SocketChannel>> persistent_connections;
 
 	// TODO: CONEXIONES PERSISTENTES VAN ACA LA PUTA MADRE!!!

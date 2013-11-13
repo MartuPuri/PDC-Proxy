@@ -124,6 +124,7 @@ public class HttpParserRequest implements HttpParser {
 		}
 
 		if (request.validMethod(cmd[0])) {
+			request.setMethod(cmd[0]);
 			String uri;
 			idx = cmd[1].indexOf('?');
 			if (idx < 0) {
@@ -154,7 +155,6 @@ public class HttpParserRequest implements HttpParser {
 		} else {
 			return ParserCode.INVALID;
 		}
-		request.setMethod(cmd[0]);
 		request.setVersion(version);
 		this.state = ParserState.HEADERS;
 		return ParserCode.CONTINUE;

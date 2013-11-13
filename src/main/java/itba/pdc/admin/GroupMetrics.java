@@ -5,5 +5,5 @@ import java.util.List;
 import java.util.Map;
 
 public interface GroupMetrics {
-	public Map<String, Integer> group(List<Date> data);
+	public Map<String, String> group(List<Date> data);
 }

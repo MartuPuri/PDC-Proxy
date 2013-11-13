@@ -1,7 +1,9 @@
 package itba.pdc.proxy.handler;
 
 import itba.pdc.admin.MetricManager;
+import itba.pdc.admin.filter.ManageFilter;
 import itba.pdc.proxy.data.AttachmentAdmin;
+import itba.pdc.proxy.data.AttachmentProxy;
 import itba.pdc.proxy.lib.GenerateHttpResponse;
 import itba.pdc.proxy.lib.ManageByteBuffer;
 import itba.pdc.proxy.lib.ManageParser;
@@ -86,16 +88,17 @@ public class EHttpHandler implements TCPProtocol {
 		EHttpRequest request = att.getRequest();
 		switch (requestFinished) {
 		case FINISHED:
+			ManageFilter.getInstace().addOrRemoveFilter(request.getFilterStatus());
 			if (request.getHeader("authorization") == null) {
-				
+				//TODO: authorization
 			}
 			ByteBuffer responseBuffer;
 			try {
 				responseBuffer = ManageByteBuffer.encode(GenerateHttpResponse.generateAdminResponse(request));
+				int limit = responseBuffer.limit();
+				responseBuffer.position(limit);
 				att.setBuff(responseBuffer);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
 			}
 			key.interestOps(SelectionKey.OP_WRITE);
 			break;
@@ -104,7 +107,16 @@ public class EHttpHandler implements TCPProtocol {
 			break;
 		case ERROR:
 			try {
-				GenerateHttpResponse.generateResponseError(request.getStatus());
+				String responseMessage = GenerateHttpResponse.generateResponseError(att
+						.getRequest().getStatus());
+				att = new AttachmentAdmin(att.getProxyType(),
+						this.bufferSize);
+				key.attach(att);
+				ByteBuffer buffResponse = ByteBuffer.allocate(responseMessage
+						.getBytes().length);
+				buffResponse.put(responseMessage.getBytes());
+				att.setBuff(buffResponse);
+				key.interestOps(SelectionKey.OP_WRITE);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 			}

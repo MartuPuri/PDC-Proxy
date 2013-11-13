@@ -92,10 +92,14 @@ public final class GenerateHttpResponse {
 		return supportedVersions;
 	}
 
-	private static void generateDefaultHeaders(Map<String, String> headers) {
+	private static void generateDefaultHeaders(Map<String, String> headers, boolean flag) {
 		headers.put("Date",
 				new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-		headers.put("Connection", "close");
+		if (flag) {
+			headers.put("Connection", "close");
+		} else {
+			headers.put("Connection", "keep-alive");
+		}
 		headers.put("Cache-Control", "no-cache");
 	}
 
@@ -103,6 +107,9 @@ public final class GenerateHttpResponse {
 			throws IOException {
 		StatusRequest statusRequest = request.getStatus();
 		String firstLine = generateFirstLine(statusRequest);
+		if (firstLine == null) {
+			firstLine = "\nHTTP/1.1 200 OK";
+		}
 		String dataLine = "";
 		MetricManager metric = MetricManager.getInstance();
 		switch (statusRequest) {
@@ -118,26 +125,28 @@ public final class GenerateHttpResponse {
 			// TODO: getAccesses
 			break;
 		case STATUS:
-			// TODO: getStatus
+		case FILTER:
+			dataLine = metric.generateStatus(new JsonFormatter());
 			break;
 		default:
 			return generateResponseError(statusRequest);
 		}
 		String headersLine = generateHeadersLine(statusRequest,
-				dataLine.getBytes().length);
+				dataLine.getBytes().length, false);
 
-		return firstLine + "\n" + headersLine + "\n" + dataLine;
+		StringBuilder builder = new StringBuilder();
+		return builder.append(firstLine).append("\n").append(headersLine).append("\n").append(dataLine).toString();
 	}
 
 	public static String generateResponseError(StatusRequest status)
 			throws IOException {
 		String firstLine = generateFirstLine(status);
 		if (firstLine == null) {
-			firstLine = "HTTP/1.0 400 Bad Request";
+			firstLine = "\nHTTP/1.1 400 Bad Request";
 		}
 		String dataLine = generateDataFromFile(status);
 		String headersLine = generateHeadersLine(status,
-				dataLine.getBytes().length);
+				dataLine.getBytes().length, true);
 
 		StringBuilder builder = new StringBuilder();
 		return builder.append(firstLine).append("\n").append(headersLine)
@@ -185,9 +194,9 @@ public final class GenerateHttpResponse {
 	}
 
 	private static String generateHeadersLine(StatusRequest status,
-			int contentLength) {
+			int contentLength, boolean flag) {
 		Map<String, String> headers = new HashMap<String, String>();
-		generateDefaultHeaders(headers);
+		generateDefaultHeaders(headers, flag);
 		headers.put("Content-Length", String.valueOf(contentLength));
 		String headersLine = "";
 		for (Entry<String, String> mapElement : headers.entrySet()) {

@@ -27,8 +27,6 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 		headers.add("authorization");
 		headers.add("date");
 		headers.add("host");
-//		headers.add("histogram");
-		headers.add("filter");
 		return headers;
 	}
 
@@ -43,8 +41,9 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 			super.setStatus(StatusRequest.STATUS);
 		} else if (uri.equals("/accesses")) {
 			super.setStatus(StatusRequest.ACCESSES);
-		} else if (uri.equals("/filter")) {
+		} else if (uri.equals("/transformer") && super.getMethod().equals("POST")) {
 			super.setStatus(StatusRequest.FILTER);
+			filterStatus = FilterStatus.TRANSFORMER;
 		}
 	}
 
@@ -57,12 +56,13 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 				if (p.getKey().equals("code")) {
 					addHeader("histogram", p.getValue());
 				}
-			} else if (status.equals(StatusRequest.FILTER)) {
-				if (p.getKey().equals("transformer")) {
-					addHeader("filter", p.getValue());
-					filterStatus = FilterStatus.TRANSFORMER;
-				}
-			}
+			} 
+//			else if (status.equals(StatusRequest.FILTER)) {
+//				if (p.getKey().equals("transformer")) {
+//					addHeader("filter", p.getValue());
+//					filterStatus = FilterStatus.TRANSFORMER;
+//				}
+//			}
 		}
 	}
 
@@ -74,11 +74,14 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 				int length = value.length();
 				if (idx > 0) {
 					port = Integer.parseInt(value.substring(idx + 1, length));
-					super.addHeader(header, value.substring(0, idx));
-				} else {
-					super.addHeader(header, value);
-				}
+					value = value.substring(0, idx);
+//					super.addHeader(header, value.substring(0, idx));
+				} 
+//				else {
+//					super.addHeader(header, value);
+//				}
 			}
+			super.addHeader(header, value);
 		}
 	}
 
@@ -96,7 +99,10 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 	}
 
 	public Integer getPort() {
-		// TODO Auto-generated method stub
-		return null;
+		return port;
+	}
+	
+	public FilterStatus getFilterStatus() {
+		return filterStatus;
 	}
 }

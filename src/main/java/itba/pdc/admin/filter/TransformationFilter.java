@@ -47,7 +47,6 @@ public class TransformationFilter implements Filter {
 			b = buffer.get(i);
 			Integer byteChanged = bytesTransformations.get(new Integer(b));
 			if (byteChanged != null) {
-				System.out.println("Value: " + byteChanged.byteValue());
 				buffer.put(i, byteChanged.byteValue());
 			}
 //			switch (b) {

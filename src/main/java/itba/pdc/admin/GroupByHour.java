@@ -8,8 +8,8 @@ import java.util.TreeMap;
 
 public class GroupByHour implements GroupMetrics {
 
-	public Map<String, Integer> group(List<Date> data) {
-		Map<String, Integer> map_data = new TreeMap<String, Integer>(
+	public Map<String, String> group(List<Date> data) {
+		Map<String, String> map_data = new TreeMap<String, String>(
 				new Comparator<String>() {
 					public int compare(String o1, String o2) {
 						Integer i1 = null;
@@ -28,12 +28,12 @@ public class GroupByHour implements GroupMetrics {
 				"20", "21", "22", "23" };
 		
 		for (String k : keys) {
-			map_data.put(k,0);
+			map_data.put(k,"0");
 		}
 		
 		for (Date d : data) {
 			int h = d.getHours();
-			map_data.put(keys[h], map_data.get(keys[h] + 1));
+			map_data.put(keys[h], String.valueOf(map_data.get(keys[h] + 1)));
 		}
 		
 		return map_data;

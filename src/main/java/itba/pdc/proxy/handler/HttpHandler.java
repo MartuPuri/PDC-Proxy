@@ -26,7 +26,6 @@ import ch.qos.logback.classic.Logger;
 
 public class HttpHandler implements TCPProtocol {
 	private int bufferSize; // Size of I/O buffer
-	private int bytes = 0;
 	private Logger accessLogger = (Logger) LoggerFactory
 			.getLogger("access.log");
 	private Logger debugLog = (Logger) LoggerFactory.getLogger("debug.log");
@@ -63,15 +62,6 @@ public class HttpHandler implements TCPProtocol {
 					HttpParserResponse parser = (HttpParserResponse) att
 							.getParser();
 					if (parser.isConnectionClose()) {
-						// if (att.getOppositeKey().isValid()) {
-						// att.getResponse().setBody(parser.getBuffer());
-						// att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
-						// AttachmentProxy oppositeAtt = (AttachmentProxy)
-						// (AttachmentProxy) att
-						// .getOppositeKey().attachment();
-						// HttpResponse response = att.getResponse();
-						// oppositeAtt.setBuff(response.getStream());
-						// }
 						sendMessageToClient(att);
 					}
 				}
@@ -87,7 +77,6 @@ public class HttpHandler implements TCPProtocol {
 					handleClient(key);
 					break;
 				case SERVER:
-					bytes += bytesRead;
 					handleServer(key);
 					break;
 				default:
@@ -122,6 +111,7 @@ public class HttpHandler implements TCPProtocol {
 		if (!buf.hasRemaining()) { // Buffer completely written?
 			// Nothing left, so no longer interested in writes
 			if (att.getProcessID().equals(ProcessType.CLIENT)) {
+//				ConnectionManager.getInstance().close(att.getRequest().getHost(), att.getOppositeChannel());
 				channel.close();
 				key.cancel();
 			} else {
@@ -141,11 +131,11 @@ public class HttpHandler implements TCPProtocol {
 			SocketChannel oppositeChannel = null;
 			SelectionKey oppositeKey = null;
 			try {
-				// TODO: Persisteng connection
-				// oppositeChannel = ConnectionManager.getInstance().getChannel(
-				// request.getHost(), request.getPort());
-				oppositeChannel = SocketChannel.open(new InetSocketAddress(
-						request.getHost(), request.getPort()));
+				// TODO: conexiones persistente
+//				oppositeChannel = ConnectionManager.getInstance().getChannel(
+//						request.getHost(), request.getPort());
+				 oppositeChannel = SocketChannel.open(new InetSocketAddress(
+				 request.getHost(), request.getPort()));
 				oppositeChannel.configureBlocking(false);
 			} catch (Exception e) {
 				accessLogger
@@ -218,23 +208,12 @@ public class HttpHandler implements TCPProtocol {
 				att.getBuff());
 		switch (responseFinished) {
 		case FINISHED:
-			// if (att.getOppositeKey().isValid()) {
-			// AttachmentProxy oppositeAtt = (AttachmentProxy) (AttachmentProxy)
-			// att
-			// .getOppositeKey().attachment();
-			// HttpResponse response = att.getResponse();
-			// oppositeAtt.setBuff(response.getStream());
-			//
-			// metricManager.addStatusCode(response.getStatusCode());
-			// att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
-			// }
 			sendMessageToClient(att);
 			break;
 		case UNFINISHED:
 			key.interestOps(SelectionKey.OP_READ);
 			break;
 		case ERROR:
-			// HttpResponse.generateResponse(att.getStatusRequest());
 			break;
 		}
 	}
@@ -244,8 +223,8 @@ public class HttpHandler implements TCPProtocol {
 			AttachmentProxy oppositeAtt = (AttachmentProxy) (AttachmentProxy) att
 					.getOppositeKey().attachment();
 			HttpResponse response = att.getResponse();
+			response.setBody(att.getParser().getBuffer());
 			oppositeAtt.setBuff(response.getStream());
-
 			metricManager.addStatusCode(response.getStatusCode());
 			att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
 		}
