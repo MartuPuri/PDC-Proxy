@@ -14,6 +14,10 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
+
 /**
  * Parse with a state machine the full request. This parser use ByteBuffer
  * instead of String
@@ -22,6 +26,8 @@ import java.util.Map;
  * 
  */
 public class HttpParserRequest implements HttpParser {
+	private Logger parserLogger = (Logger) LoggerFactory
+			.getLogger("parser.log");
 	private HttpMessage request;
 	private ParserState state;
 	private ByteBuffer buffer;
@@ -37,18 +43,21 @@ public class HttpParserRequest implements HttpParser {
 		concatBuffer(buff);
 		switch (state) {
 		case METHOD:
+			parserLogger.debug("Request: Parse the first line");
 			code = parseMethod();
 			if (code.equals(ParserCode.LOOP)
 					|| !code.equals(ParserCode.CONTINUE)) {
 				return code;
 			}
 		case HEADERS:
+			parserLogger.debug("Request: Parse headers");
 			code = parseHeaders();
 			if (code.equals(ParserCode.LOOP)
 					|| !code.equals(ParserCode.CONTINUE)) {
 				return code;
 			}
 		case DATA:
+			parserLogger.debug("Request: Parse body");
 			code = parseData();
 			if (code.equals(ParserCode.LOOP)
 					|| !code.equals(ParserCode.CONTINUE)) {
@@ -62,13 +71,15 @@ public class HttpParserRequest implements HttpParser {
 		}
 	}
 
-	private void concatBuffer(ByteBuffer _buff) {
+	private void concatBuffer(ByteBuffer buff) {
+		parserLogger
+		.debug("Request: Concatenate the parser bufffer and the buffer that the socket read");
 		ByteBuffer aux = ByteBuffer.allocate(buffer.position()
-				+ _buff.position());
-		_buff.flip();
+				+ buff.position());
+		buff.flip();
 		buffer.flip();
 		aux.put(buffer);
-		aux.put(_buff);
+		aux.put(buff);
 		buffer = aux;
 	}
 
@@ -97,23 +108,31 @@ public class HttpParserRequest implements HttpParser {
 				version[0] = Integer.parseInt(temp[0]);
 				version[1] = Integer.parseInt(temp[1]);
 				if (!request.validVersion(version)) {
+					parserLogger.error("Request: Invalid http version");
 					return ParserCode.INVALID;
 				}
 			} catch (NumberFormatException nfe) {
+				request.setStatusRequest(StatusRequest.BAD_REQUEST);
+				parserLogger.error("Request: The version of http must be a number");
 				return ParserCode.INVALID;
 			}
 		} else {
+			parserLogger
+			.error("Request: The protocol name mas be HTTP/ and the version (HTTP/1.1, HTTP/1.0)");
 			request.setStatusRequest(StatusRequest.BAD_REQUEST);
 			return ParserCode.INVALID;
 		}
 
 		if (request.validMethod(cmd[0])) {
-			String method = cmd[0];
 			String uri;
 			idx = cmd[1].indexOf('?');
 			if (idx < 0) {
 				uri = cmd[1];
+				parserLogger
+				.error("Request: Parse uri without query string");
 			} else {
+				parserLogger
+				.error("Request: Parse uri with query string");
 				uri = URLDecoder.decode(cmd[1].substring(0, idx), "ISO-8859-1");
 				prms = cmd[1].substring(idx + 1).split("&");
 				params = new HashMap<String, String>();
@@ -152,6 +171,7 @@ public class HttpParserRequest implements HttpParser {
 		while (!line.trim().equals("")) {
 			idx = line.indexOf(':');
 			if (idx < 0) {
+				parserLogger.error("Request: The header field is not well formed");
 				request.setStatusRequest(StatusRequest.CONFLICT);
 				return ParserCode.INVALID;
 			} else {
@@ -180,10 +200,6 @@ public class HttpParserRequest implements HttpParser {
 	}
 
 	private ParserCode parseData() {
-		// if (!request.bodyEnable()) {
-		// request.setStatusRequest(StatusRequest.LENGTH_REQUIRED);
-		// return ParserCode.INVALID;
-		// }
 		Integer bytes = Integer.parseInt(request.getHeader("content-length"));
 		if (!readBuffer(bytes)) {
 			return ParserCode.LOOP;
