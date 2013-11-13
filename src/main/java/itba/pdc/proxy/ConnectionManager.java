@@ -45,7 +45,7 @@ public class ConnectionManager {
 		chained_ip = pconf.getChainedIp();
 		chained_port = pconf.getChainedPort();
 		persistent_connections = new HashMap<String, Set<SocketChannel>>();
-		max_conns = 3;
+		max_conns = ReadProxyConfiguration.getInstance().getMaxConns();
 	}
 
 	public static synchronized ConnectionManager getInstance()

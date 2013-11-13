@@ -54,6 +54,10 @@ public class ReadProxyConfiguration {
 		return this.getInteger("chained-port");
 	}
 	
+	public Integer getMaxConns() {
+		return this.getInteger("max-cons");
+	}
+	
 	private String getString(String s) {
 		String str = data.get(s);
 		if(str == null){
