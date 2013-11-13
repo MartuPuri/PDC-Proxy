@@ -5,14 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class JsonFormatter implements Formatter {
-
-	public static void main(String args[]){
-		Map<String,Integer> data = new HashMap<String, Integer>();
-		data.put("0", 10);
-		data.put("1",15);
-		data.put("5", 40);
-		data.put("3", 10);
-	}
 	
 	public String format(Map<String, String> data) {
 		final StringBuilder builder = new StringBuilder();
