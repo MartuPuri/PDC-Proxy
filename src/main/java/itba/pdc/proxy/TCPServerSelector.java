@@ -27,10 +27,8 @@ public class TCPServerSelector {
 		// Create a selector to multiplex listening sockets and connections
 		Selector selector = Selector.open();
 		ConnectionManager connectionManager = ConnectionManager.getInstance();
-		ServerSocketChannel serverChannel = connectionManager
-				.registerServerSocket(selector);
-		ServerSocketChannel adminChannel = connectionManager
-				.registerAdminSocket(selector);
+		ServerSocketChannel serverChannel = connectionManager.registerServerSocket(selector);
+		ServerSocketChannel adminChannel = connectionManager.registerAdminSocket(selector);
 		TCPProtocol http = new HttpHandler(BUFSIZE);
 		TCPProtocol ehttp = new EHttpHandler(BUFSIZE);
 		TCPProtocol protocol = http;
@@ -60,28 +58,16 @@ public class TCPServerSelector {
 					continue;
 				}
 				if (key.isAcceptable()) {
-					try {
-						protocol.handleAccept(key);
-					} catch (Exception e) {
-
-					}
+					protocol.handleAccept(key);
 				}
 				// Client socket channel has pending data?
 				if (key.isReadable()) {
-					try {
-						protocol.handleRead(key);
-					} catch (Exception e) {
-
-					}
+					protocol.handleRead(key);
 				}
 				// Client socket channel is available for writing and
 				// key is valid (i.e., channel not closed)?
 				if (key.isValid() && key.isWritable()) {
-					try {
-						protocol.handleWrite(key);
-					} catch (Exception e) {
-
-					}
+					protocol.handleWrite(key);
 				}
 				keyIter.remove(); // remove from set of selected keys
 			}
