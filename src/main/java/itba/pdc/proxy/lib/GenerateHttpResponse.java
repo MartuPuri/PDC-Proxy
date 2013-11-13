@@ -92,14 +92,10 @@ public final class GenerateHttpResponse {
 		return supportedVersions;
 	}
 
-	private static void generateDefaultHeaders(Map<String, String> headers, boolean flag) {
+	private static void generateDefaultHeaders(Map<String, String> headers) {
 		headers.put("Date",
 				new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-		if (flag) {
-			headers.put("Connection", "close");
-		} else {
-			headers.put("Connection", "keep-alive");
-		}
+		headers.put("Connection", "close");
 		headers.put("Cache-Control", "no-cache");
 	}
 
@@ -119,7 +115,7 @@ public final class GenerateHttpResponse {
 					new JsonFormatter(), new GroupByHour());
 			break;
 		case BYTES:
-			dataLine = metric.getBytes();
+			dataLine = metric.getBytes(new JsonFormatter());
 			break;
 		case ACCESSES:
 			// TODO: getAccesses
@@ -135,7 +131,8 @@ public final class GenerateHttpResponse {
 				dataLine.getBytes().length, false);
 
 		StringBuilder builder = new StringBuilder();
-		return builder.append(firstLine).append("\n").append(headersLine).append("\n").append(dataLine).toString();
+		return builder.append(firstLine).append("\n").append(headersLine)
+				.append("\n").append(dataLine).toString();
 	}
 
 	public static String generateResponseError(StatusRequest status)
@@ -196,7 +193,7 @@ public final class GenerateHttpResponse {
 	private static String generateHeadersLine(StatusRequest status,
 			int contentLength, boolean flag) {
 		Map<String, String> headers = new HashMap<String, String>();
-		generateDefaultHeaders(headers, flag);
+		generateDefaultHeaders(headers);
 		headers.put("Content-Length", String.valueOf(contentLength));
 		String headersLine = "";
 		for (Entry<String, String> mapElement : headers.entrySet()) {

@@ -1,5 +1,6 @@
 package itba.pdc.admin.filter;
 
+import itba.pdc.admin.MetricManager;
 import itba.pdc.proxy.lib.ReadConstantsConfiguration;
 
 import java.nio.ByteBuffer;
@@ -18,6 +19,7 @@ public class TransformationFilter implements Filter {
 	private static TransformationFilter instance = null;
 	private String id = "transformer";
 	private Map<Integer, Integer> bytesTransformations = null;
+	private MetricManager metricManager = MetricManager.getInstance();
 
 	private TransformationFilter() {
 		if (instance != null) {
@@ -47,6 +49,7 @@ public class TransformationFilter implements Filter {
 			b = buffer.get(i);
 			Integer byteChanged = bytesTransformations.get(new Integer(b));
 			if (byteChanged != null) {
+				metricManager.addBytesChanged(1);
 				buffer.put(i, byteChanged.byteValue());
 			}
 //			switch (b) {

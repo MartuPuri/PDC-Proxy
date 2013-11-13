@@ -63,6 +63,7 @@ public class HttpHandler implements TCPProtocol {
 					HttpParserResponse parser = (HttpParserResponse) att
 							.getParser();
 					if (parser.isConnectionClose()) {
+						MetricManager.getInstance().addStatusCode(att.getResponse().getStatusCode());
 						sendMessageToClient(att);
 					}
 				}
@@ -104,7 +105,8 @@ public class HttpHandler implements TCPProtocol {
 		buf.flip();
 		do {
 			if (channel.isOpen() && channel.isConnected()) {
-				channel.write(buf);
+				int bytesWritten = channel.write(buf);
+				metricManager.addBytesWritten(bytesWritten);
 			} else {
 				break;
 			}
@@ -112,7 +114,8 @@ public class HttpHandler implements TCPProtocol {
 		if (!buf.hasRemaining()) { // Buffer completely written?
 			// Nothing left, so no longer interested in writes
 			if (att.getProcessID().equals(ProcessType.CLIENT)) {
-//				ConnectionManager.getInstance().close(att.getRequest().getHost(), att.getOppositeChannel());
+				// ConnectionManager.getInstance().close(att.getRequest().getHost(),
+				// att.getOppositeChannel());
 				channel.close();
 				key.cancel();
 			} else {
@@ -132,11 +135,8 @@ public class HttpHandler implements TCPProtocol {
 			SocketChannel oppositeChannel = null;
 			SelectionKey oppositeKey = null;
 			try {
-				// TODO: Persisteng connection
-			 oppositeChannel = ConnectionManager.getInstance().getChannel(
-				 request.getHost(), request.getPort());
-//				oppositeChannel = SocketChannel.open(new InetSocketAddress(
-//						request.getHost(), request.getPort()));
+				oppositeChannel = ConnectionManager.getInstance().getChannel(
+						request.getHost(), request.getPort());
 				oppositeChannel.configureBlocking(false);
 			} catch (Exception e) {
 				accessLogger
@@ -199,7 +199,8 @@ public class HttpHandler implements TCPProtocol {
 		key.interestOps(SelectionKey.OP_WRITE);
 	}
 
-	private void handleServer(SelectionKey key) throws FileNotFoundException, IOException {
+	private void handleServer(SelectionKey key) throws FileNotFoundException,
+			IOException {
 		AttachmentProxy att = (AttachmentProxy) key.attachment();
 		AttachmentProxy otherAtt = (AttachmentProxy) att.getOppositeKey()
 				.attachment();
@@ -209,7 +210,10 @@ public class HttpHandler implements TCPProtocol {
 				att.getBuff());
 		switch (responseFinished) {
 		case FINISHED:
-			ConnectionManager.getInstance().close(otherAtt.getRequest().getHost(), (SocketChannel) key.channel());
+			MetricManager.getInstance().addStatusCode(att.getResponse().getStatusCode());
+			ConnectionManager.getInstance().close(
+					otherAtt.getRequest().getHost(),
+					(SocketChannel) key.channel());
 			sendMessageToClient(att);
 			break;
 		case UNFINISHED:

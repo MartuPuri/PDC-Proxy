@@ -19,9 +19,10 @@ import java.util.concurrent.ConcurrentMap;
 public final class MetricManager {
 	private static final MetricManager instance = new MetricManager();
 
-	private int accesses;
+	private int accesses = 0;
 	private long bytesRead = 0;
-	private long bytesWrite = 0;
+	private long bytesWritten = 0;
+	private long bytesChanged = 0;
 	private ConcurrentMap<Integer, List<Date>> to_histogram;
 
 	private MetricManager() {
@@ -41,10 +42,13 @@ public final class MetricManager {
 	public void addBytesRead(long qty) {
 		bytesRead += qty;
 	}
-
-	@Deprecated
-	public void addBytesWrite(long qty) {
-		bytesWrite += qty;
+	
+	public void addBytesWritten(long qty) {
+		bytesWritten += qty;
+	}
+	
+	public void addBytesChanged(long qty) {
+		bytesChanged += qty;
 	}
 
 	public void addStatusCode(Integer code) {
@@ -52,6 +56,7 @@ public final class MetricManager {
 		if (events == null)
 			events = new ArrayList<Date>();
 		events.add(new Date());
+		this.to_histogram.put(code, events);
 	}
 
 	public String generateHistogram(Integer code, Formatter format,
@@ -65,11 +70,13 @@ public final class MetricManager {
 		return format.format(to_format);
 	}
 
-	public String getBytes() {
-		String bytes = "";
-		bytes += "Bytes received: " + bytesRead + "\nBytes sended: "
-				+ bytesWrite + "\n";
-		return bytes;
+	public String getBytes(Formatter format) {
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("Bytes read", String.valueOf(bytesRead));
+		data.put("Bytes written", String.valueOf(bytesWritten));
+		data.put("Bytes total tranfered", String.valueOf(bytesRead + bytesWritten));
+		data.put("Bytes changed", String.valueOf(bytesChanged));
+		return format.format(data);
 	}
 
 	public String generateStatus(Formatter format) {

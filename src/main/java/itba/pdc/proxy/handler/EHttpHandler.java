@@ -46,16 +46,16 @@ public class EHttpHandler implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
-		final long bytesRead = channel.read(buf);
-		MetricManager.getInstance().addBytesRead(bytesRead);
-		MetricManager.getInstance().addBytesWrite(808);
-		if (bytesRead == -1) {
-			channel.close();
-			key.cancel();
-		} else if (bytesRead > 0) {
-			handleAdmin(key);
-		} else {
-			buf.compact();
+		if (channel.isOpen() && channel.isConnected()) {
+			final long bytesRead = channel.read(buf);
+			if (bytesRead == -1) {
+				channel.close();
+				key.cancel();
+			} else if (bytesRead > 0) {
+				handleAdmin(key);
+			} else {
+				buf.compact();
+			}
 		}
 	}
 
@@ -77,7 +77,8 @@ public class EHttpHandler implements TCPProtocol {
 				break;
 			}
 		} while (buf.hasRemaining());
-		key.interestOps(SelectionKey.OP_READ);
+		key.cancel();
+		channel.close();
 		buf.compact(); // Make room for more data to be read in
 	}
 
@@ -88,13 +89,15 @@ public class EHttpHandler implements TCPProtocol {
 		EHttpRequest request = att.getRequest();
 		switch (requestFinished) {
 		case FINISHED:
-			ManageFilter.getInstace().addOrRemoveFilter(request.getFilterStatus());
+			ManageFilter.getInstace().addOrRemoveFilter(
+					request.getFilterStatus());
 			if (request.getHeader("authorization") == null) {
-				//TODO: authorization
+				// TODO: authorization
 			}
 			ByteBuffer responseBuffer;
 			try {
-				responseBuffer = ManageByteBuffer.encode(GenerateHttpResponse.generateAdminResponse(request));
+				responseBuffer = ManageByteBuffer.encode(GenerateHttpResponse
+						.generateAdminResponse(request));
 				int limit = responseBuffer.limit();
 				responseBuffer.position(limit);
 				att.setBuff(responseBuffer);
@@ -107,10 +110,9 @@ public class EHttpHandler implements TCPProtocol {
 			break;
 		case ERROR:
 			try {
-				String responseMessage = GenerateHttpResponse.generateResponseError(att
-						.getRequest().getStatus());
-				att = new AttachmentAdmin(att.getProxyType(),
-						this.bufferSize);
+				String responseMessage = GenerateHttpResponse
+						.generateResponseError(att.getRequest().getStatus());
+				att = new AttachmentAdmin(att.getProxyType(), this.bufferSize);
 				key.attach(att);
 				ByteBuffer buffResponse = ByteBuffer.allocate(responseMessage
 						.getBytes().length);

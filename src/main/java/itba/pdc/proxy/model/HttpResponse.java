@@ -91,7 +91,6 @@ public class HttpResponse {
 	}
 
 	public void setCode(Integer code) {
-		MetricManager.getInstance().addStatusCode(code);
 		this.code = code;
 		this.messageCode = httpReplies.get(code);
 	}
