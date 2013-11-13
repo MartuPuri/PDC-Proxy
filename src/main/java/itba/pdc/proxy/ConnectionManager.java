@@ -117,7 +117,7 @@ public class ConnectionManager {
 				.info(builder
 						.append("The proxy will listen at my ip for admin clients at port ")
 						.append(port).toString());
-		listnChannel.socket().bind(new InetSocketAddress(port));
+		listnChannel.socket().bind(new InetSocketAddress("127.0.0.1", port));
 		listnChannel.configureBlocking(false);
 		Integer bufferSize = constantsConfiguration.getBufferSize();
 		if (bufferSize == null) {
