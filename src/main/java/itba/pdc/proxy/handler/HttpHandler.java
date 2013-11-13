@@ -57,24 +57,25 @@ public class HttpHandler implements TCPProtocol {
 
 		ByteBuffer buf = att.getBuff();
 		final long bytesRead = channel.read(buf);
-		System.out.println("Bytes read: " + bytesRead);
 		if (bytesRead == -1) {
 			if (att.getProcessID().equals(ProcessType.SERVER)) {
 				HttpParserResponse parser = (HttpParserResponse) att
 						.getParser();
 				if (parser.isConnectionClose()) {
-					if (att.getOppositeKey().isValid()) {
-						att.getResponse().setBody(parser.getBuffer());
-						att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
-						AttachmentProxy oppositeAtt = (AttachmentProxy) (AttachmentProxy) att
-								.getOppositeKey().attachment();
-						HttpResponse response = att.getResponse();
-						oppositeAtt.setBuff(response.getStream());
-					}
+//					if (att.getOppositeKey().isValid()) {
+//						att.getResponse().setBody(parser.getBuffer());
+//						att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
+//						AttachmentProxy oppositeAtt = (AttachmentProxy) (AttachmentProxy) att
+//								.getOppositeKey().attachment();
+//						HttpResponse response = att.getResponse();
+//						oppositeAtt.setBuff(response.getStream());
+//					}
+					sendMessageToClient(att);
 				}
-			} else {
-				debugLog.error("Close conneciton");
 			}
+			StringBuilder builder = new StringBuilder();
+			accessLogger.info(builder.append("Close conneciton with ")
+					.append(channel.getRemoteAddress()).toString());
 			key.cancel();
 			channel.close();
 		} else if (bytesRead > 0) {
@@ -92,11 +93,10 @@ public class HttpHandler implements TCPProtocol {
 				break;
 			}
 
-		} else {
-			System.out.println("Entra por aqui");
-			System.out.println(new String(buf.array()));
-			buf.compact();
 		}
+		// else {
+		// buf.compact();
+		// }
 	}
 
 	public void handleWrite(SelectionKey key) throws IOException {
@@ -109,7 +109,6 @@ public class HttpHandler implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
-		debugLog.info("Write: " + new String(buf.array()));
 		buf.flip();
 		do {
 			if (channel.isOpen() && channel.isConnected()) {
@@ -140,6 +139,7 @@ public class HttpHandler implements TCPProtocol {
 			SocketChannel oppositeChannel = null;
 			SelectionKey oppositeKey = null;
 			try {
+				// TODO: Persisteng connection
 				// oppositeChannel = ConnectionManager.getInstance().getChannel(
 				// request.getHost(), request.getPort());
 				oppositeChannel = SocketChannel.open(new InetSocketAddress(
@@ -149,12 +149,10 @@ public class HttpHandler implements TCPProtocol {
 				accessLogger
 						.error("Trying to connect to an invalid host or invalid port: "
 								+ request.getHost() + ", " + request.getPort());
-//				e.printStackTrace();
 				try {
 					request.setStatus(StatusRequest.INVALID_HOST_PORT);
 					sendError(key);
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 				}
 				return;
 			}
@@ -163,12 +161,10 @@ public class HttpHandler implements TCPProtocol {
 						SelectionKey.OP_WRITE);
 			} catch (ClosedChannelException e) {
 				debugLog.error("Trying to register a key in a closed channel");
-//				e.printStackTrace();
 				try {
 					request.setStatus(StatusRequest.CLOSED_CHANNEL);
 					sendError(key);
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 				}
 				return;
 			}
@@ -191,22 +187,20 @@ public class HttpHandler implements TCPProtocol {
 			try {
 				sendError(key);
 			} catch (IOException e) {
-				// TODO:
 			}
 			break;
 		}
-		// att.getBuff().compact();
 	}
-	
+
 	private void sendError(SelectionKey key) throws IOException {
 		AttachmentProxy att = (AttachmentProxy) key.attachment();
-		String responseMessage = GenerateHttpResponse.generateResponseError(att.getRequest()
-				.getStatus());
-		System.out.println("Response: " + responseMessage);
-		att = new AttachmentProxy(
-				att.getProcessID(), att.getProxyType(), this.bufferSize);
+		String responseMessage = GenerateHttpResponse.generateResponseError(att
+				.getRequest().getStatus());
+		att = new AttachmentProxy(att.getProcessID(), att.getProxyType(),
+				this.bufferSize);
 		key.attach(att);
-		ByteBuffer buffResponse = ByteBuffer.allocate(responseMessage.getBytes().length);
+		ByteBuffer buffResponse = ByteBuffer.allocate(responseMessage
+				.getBytes().length);
 		buffResponse.put(responseMessage.getBytes());
 		att.setBuff(buffResponse);
 		key.interestOps(SelectionKey.OP_WRITE);
@@ -220,20 +214,18 @@ public class HttpHandler implements TCPProtocol {
 		parser.setMethod(otherAtt.getRequest().getMethod());
 		ReadingState responseFinished = ManageParser.parse(parser,
 				att.getBuff());
-		// debugLog.debug("Body: " + new
-		// String(att.getParser().getBuffer().array()));
 		switch (responseFinished) {
 		case FINISHED:
-			if (att.getOppositeKey().isValid()) {
-				AttachmentProxy oppositeAtt = (AttachmentProxy) (AttachmentProxy) att
-						.getOppositeKey().attachment();
-				HttpResponse response = att.getResponse();
-				oppositeAtt.setBuff(response.getStream());
-
-				metricManager.addStatusCode(response.getStatusCode());
-				// att.getBuff().compact();
-				att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
-			}
+//			if (att.getOppositeKey().isValid()) {
+//				AttachmentProxy oppositeAtt = (AttachmentProxy) (AttachmentProxy) att
+//						.getOppositeKey().attachment();
+//				HttpResponse response = att.getResponse();
+//				oppositeAtt.setBuff(response.getStream());
+//
+//				metricManager.addStatusCode(response.getStatusCode());
+//				att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
+//			}
+			sendMessageToClient(att);
 			break;
 		case UNFINISHED:
 			key.interestOps(SelectionKey.OP_READ);
@@ -241,6 +233,18 @@ public class HttpHandler implements TCPProtocol {
 		case ERROR:
 			// HttpResponse.generateResponse(att.getStatusRequest());
 			break;
+		}
+	}
+
+	private void sendMessageToClient(AttachmentProxy att) {
+		if (att.getOppositeKey().isValid()) {
+			AttachmentProxy oppositeAtt = (AttachmentProxy) (AttachmentProxy) att
+					.getOppositeKey().attachment();
+			HttpResponse response = att.getResponse();
+			oppositeAtt.setBuff(response.getStream());
+
+			metricManager.addStatusCode(response.getStatusCode());
+			att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
 		}
 	}
 }

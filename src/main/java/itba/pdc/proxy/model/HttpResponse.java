@@ -9,6 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
+
 public class HttpResponse {
 
 	private static Map<Integer, String> httpReplies = createHttpReplies();
@@ -22,6 +26,8 @@ public class HttpResponse {
 	private ByteBuffer chunkBuffer = ByteBuffer.allocate(0);
 	private ByteBuffer body = ByteBuffer.allocate(0);
 	private Map<String, String> headers;
+	private Logger accessLogger = (Logger) LoggerFactory
+			.getLogger("access.log");
 
 	private static Map<Integer, String> createHttpReplies() {
 		Map<Integer, String> result = new HashMap<Integer, String>();
@@ -94,12 +100,7 @@ public class HttpResponse {
 	}
 
 	public void setBody(ByteBuffer buffer) {
-		if (!headers.containsKey("content-length")) {
-			System.out.println("Missing content-length");
-			// TODO: VER QUE HACEMOS
-		}
 		this.body = ByteBuffer.allocate(buffer.limit());
-//		TransformationFilter.getInstace().transform(buffer); //TODO: REMOVE
 		buffer.flip();
 		this.body.put(buffer);
 	}
@@ -113,8 +114,6 @@ public class HttpResponse {
 
 	public boolean validVersion(int[] version) {
 		if (version[0] != 1 && !(version[1] == 1 || version[1] == 0)) {
-			System.out.println("Invalid version");
-			// TODO: VER QUE HACER
 			return false;
 		}
 		return true;
@@ -135,6 +134,9 @@ public class HttpResponse {
 		}
 		builder.append("\n");
 		final String head = builder.toString();
+		StringBuilder build = new StringBuilder();
+		accessLogger.info(build.append("Send to client: ").append(head)
+				.toString());
 		ByteBuffer buff = ByteBuffer.allocate(head.getBytes().length
 				+ body.position());
 		buff.put(head.getBytes());
@@ -151,7 +153,7 @@ public class HttpResponse {
 		this.chunkSize = size;
 		this.currentChunkedSize = 0;
 	}
-	
+
 	public boolean addChunkedBuffer(ByteBuffer buffer) {
 		buffer.flip();
 		byte[] array = new byte[buffer.limit()];
@@ -168,113 +170,7 @@ public class HttpResponse {
 		return currentChunkedSize == chunkSize;
 	}
 
-//	
-//	public boolean addChunkedBuffer(ByteBuffer buffer) {
-//		byte[] array = new byte[buffer.limit()];
-//		int i = 0;
-//		buffer.flip();
-//		boolean flag = false;
-//		boolean flag2 = false;
-////		System.out.println("BUFER TEXT: " + new String(buffer.array()));
-//		// try {
-//		// FileOutputStream fo = new FileOutputStream("myChunk2.txt", true);
-//		// FileChannel wChannel = fo.getChannel();
-//		//
-//		// // Write the ByteBuffer contents; the bytes between the ByteBuffer's
-//		// // position and the limit is written to the file
-//		// wChannel.write(buffer);
-//		// wChannel.close();
-//		// fo.close();
-//		//
-//		// // Close the file
-//		// } catch (IOException e) {
-//		// // TODO Auto-generated catch block
-//		// e.printStackTrace();
-//		// }
-//		// System.out.println("Buff: " + buffer);
-//		// buffer.flip();
-//		do {
-//			byte c = buffer.get();
-//			if (c == 13) {
-//				c = buffer.get();
-//				if (c == 10) {
-//					buffer.compact();
-//					int position = buffer.position();
-//					buffer.limit(position);
-//					ByteBuffer reaux = ByteBuffer.allocate(buffer.position());
-//					buffer.flip();
-//					reaux.put(buffer);
-//					buffer = reaux;
-//					System.out.println("Buff2:" + buffer);
-//					String text = ManageByteBuffer.readLine(buffer);
-//					try {
-//						Integer textSize = Integer.parseInt(text, 16);
-//						System.out.println("text: " + textSize);
-//						if (text != null && textSize == 0) {
-//							flag = true;
-//							break;
-//						}
-//					} catch (NumberFormatException nfe) {
-//						flag2 = true;
-//						array[i++] = 13;
-//						array[i++] = 10;
-//						// for (int j = 0; j < text.length(); j++) {
-//						// array[i++] = text.getBytes()[j];
-//						// currentChunkedSize++;
-//						// }
-//						// buffer.flip();
-//						 currentChunkedSize += 2;
-//					}
-//
-//					if (currentChunkedSize == chunkSize) {
-//						System.out.println("Sale");
-//						break;
-//					}
-//				} else {
-//					 array[i++] = 13;
-//					 currentChunkedSize++;
-//				}
-//			} else {
-//				array[i++] = c;
-//				currentChunkedSize++;
-//			}
-//		} while (buffer.hasRemaining());
-//		// System.out.println("Array: " + new String(array));
-//		ByteBuffer aux = ByteBuffer.allocate(i);
-//		for (int j = 0; j < i; j++) {
-//			aux.put(array[j]);
-//		}
-//		try {
-//			aux.flip();
-//			FileOutputStream fo = new FileOutputStream("myChunk.txt", true);
-//			FileChannel wChannel = fo.getChannel();
-//
-//			// Write the ByteBuffer contents; the bytes between the ByteBuffer's
-//			// position and the limit is written to the file
-//
-//			int write = wChannel.write(aux);
-//			System.out.println("Write: " + write);
-//			wChannel.close();
-//			fo.close();
-//
-//			// Close the file
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		buffer.flip();
-//		// buffer.limit(buffer.capacity());
-//		System.out.println("i: " + i);
-//		// currentChunkedSize += i;
-//		content_length += i;
-//		updateChunkedBuffer(array, i);
-//		return flag;
-//	}
-
 	private void updateChunkedBuffer(byte[] array, int length) {
-//		if (chunkBuffer == null) {
-//			chunkBuffer = ByteBuffer.allocate(0);
-//		}
 		ByteBuffer aux = ByteBuffer.allocate(chunkBuffer.position() + length);
 		chunkBuffer.flip();
 		aux.put(chunkBuffer);
@@ -289,8 +185,6 @@ public class HttpResponse {
 	}
 
 	public boolean isChunkComplete() {
-		System.out.println("ChunckSize: " + chunkSize);
-		System.out.println("CurrentSize: " + currentChunkedSize);
 		return this.chunkSize == currentChunkedSize;
 	}
 

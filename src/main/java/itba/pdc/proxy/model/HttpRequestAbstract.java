@@ -13,9 +13,6 @@ public abstract class HttpRequestAbstract {
 	private Map<String, String> params = new HashMap<String, String>();
 	private Map<String, String> headers = new HashMap<String, String>();
 
-	// private static final Set<String> supportedMethods = createMethods();
-	// private static final Set<String> supportedHeaders = createHeaders();
-
 	public void addHeader(String header, String value) {
 		headers.put(header, value);
 	}

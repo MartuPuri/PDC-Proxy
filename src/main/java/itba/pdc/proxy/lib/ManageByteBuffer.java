@@ -6,7 +6,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 
-import javax.management.RuntimeErrorException;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
 
 public final class ManageByteBuffer {
 	private static Charset charset = Charset.forName("UTF-8");
@@ -16,8 +18,10 @@ public final class ManageByteBuffer {
 			.getCR();
 	private static Integer lf = ReadConstantsConfiguration.getInstance()
 			.getLF();
+	private static Logger parserLogger = (Logger) LoggerFactory.getLogger("parser.log");
 
 	private ManageByteBuffer() {
+		parserLogger.error("The class ManageByteBuffer cannot be instantiated");
 		throw new IllegalAccessError("This class cannot be instantiated");
 	}
 
@@ -25,7 +29,7 @@ public final class ManageByteBuffer {
 		try {
 			return encoder.encode(CharBuffer.wrap(message));
 		} catch (Exception e) {
-			// e.printStackTrace();
+			parserLogger.error("Problem encoding a string message into bytebuffer");
 		}
 		return null;
 	}
@@ -35,10 +39,9 @@ public final class ManageByteBuffer {
 		try {
 			int old_position = buffer.position();
 			data = decoder.decode(buffer).toString();
-			// reset buffer's position to its original so it is not altered:
 			buffer.position(old_position);
 		} catch (Exception e) {
-			// e.printStackTrace();
+			parserLogger.error("Problem decoding a bytebuffer into string message");
 			return "";
 		}
 		return data;

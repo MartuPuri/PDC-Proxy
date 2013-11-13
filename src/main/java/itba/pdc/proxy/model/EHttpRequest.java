@@ -1,5 +1,7 @@
 package itba.pdc.proxy.model;
 
+import itba.pdc.admin.filter.FilterStatus;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;

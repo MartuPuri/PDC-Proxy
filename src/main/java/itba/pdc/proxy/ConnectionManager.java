@@ -115,7 +115,7 @@ public class ConnectionManager {
 		StringBuilder builder = new StringBuilder();
 		connectionLogger
 				.info(builder
-						.append("The proxy will lister at my ip for admin clients at port ")
+						.append("The proxy will listen at my ip for admin clients at port ")
 						.append(port).toString());
 		listnChannel.socket().bind(new InetSocketAddress(port));
 		listnChannel.configureBlocking(false);

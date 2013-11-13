@@ -21,7 +21,6 @@ public final class ManageParser {
 			buff.compact();
 			code = parser.parseMessage(preparedBuffer);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			return ReadingState.ERROR;
 		}
 		switch (code) {

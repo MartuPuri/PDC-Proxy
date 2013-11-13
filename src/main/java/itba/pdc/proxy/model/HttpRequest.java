@@ -13,7 +13,7 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 
 	private static final Set<String> supportedMethods = createMethods();
 	private static final Set<String> supportedHeaders = createHeaders();
-	private Logger debugLogger = (Logger) LoggerFactory.getLogger("debug.log");
+	private Logger accessLogger = (Logger) LoggerFactory.getLogger("access.log");
 	private int port = 80;
 
 	protected static Set<String> createHeaders() {
@@ -121,6 +121,8 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 		}
 		builder.append("\n");
 		final String head = builder.toString();
+		StringBuilder build = new StringBuilder();
+		accessLogger.info(build.append("Send to origin server: ").append(head).toString());
 		ByteBuffer body = super.getBody();
 		ByteBuffer buff = ByteBuffer.allocate(head.getBytes().length
 				+ body.position());
@@ -135,7 +137,6 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 			return true;
 		}
 		super.setStatus(StatusRequest.METHOD_NOT_ALLOWED);
-		// status = StatusRequest.METHOD_NOT_ALLOWED;
 		return false;
 	}
 

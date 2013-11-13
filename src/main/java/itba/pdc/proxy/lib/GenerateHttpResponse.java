@@ -23,55 +23,10 @@ import java.util.Set;
 
 public final class GenerateHttpResponse {
 
-	private static int status;
-	private static String body;
 	private static Map<Integer, String> httpReplies = createHttpReplies();
-	private static Set<String> supportedHeaders = createHeaders();
 	private static List<String> supportedVersions = createVersions();
 
 	private GenerateHttpResponse() {
-	}
-
-	private static Set<String> createHeaders() {
-		Set<String> headers = new HashSet<String>();
-		headers.add("Access-Control-Allow-Origin");
-		headers.add("Accept-Ranges");
-		headers.add("Age");
-		headers.add("Allow");
-		headers.add("Cache-Control");
-		headers.add("Connection");
-		headers.add("Content-Encoding");
-		headers.add("Content-Language");
-		headers.add("Content-Length");
-		headers.add("Content-Location");
-		headers.add("Content-MD5");
-		headers.add("Content-Type");
-		headers.add("Content-Disposition");
-		headers.add("Content-Range");
-		headers.add("Content-Type");
-		headers.add("Date");
-		headers.add("ETag");
-		headers.add("Expires");
-		headers.add("Last-Modified");
-		headers.add("Link");
-		headers.add("Location");
-		headers.add("P3P");
-		headers.add("Pragma");
-		headers.add("Proxy-Authenticate");
-		headers.add("Refresh");
-		headers.add("Retry-After");
-		headers.add("Server");
-		headers.add("Set-Cookie");
-		headers.add("Status");
-		headers.add("Strict-Transport-Security");
-		headers.add("Trailer");
-		headers.add("Transfer-Encoding");
-		headers.add("Vary");
-		headers.add("Via");
-		headers.add("Warning");
-		headers.add("WWW-Authenticate");
-
-		return headers;
 	}
 
 	private static Map<Integer, String> createHttpReplies() {
@@ -127,7 +82,6 @@ public final class GenerateHttpResponse {
 
 	private static List<String> createVersions() {
 		supportedVersions = new ArrayList<String>();
-		// TODO: Add 1.0
 		supportedVersions.add("HTTP/1.0");
 		Collections.sort(supportedVersions, new Comparator<String>() {
 
@@ -224,6 +178,8 @@ public final class GenerateHttpResponse {
 			return readFile("responseHtml/invalid_host_port.html");
 		case CLOSED_CHANNEL:
 			return readFile("responseHtml/closed_channel.html");
+		default:
+			break;
 		}
 		return "";
 	}
@@ -233,28 +189,6 @@ public final class GenerateHttpResponse {
 		Map<String, String> headers = new HashMap<String, String>();
 		generateDefaultHeaders(headers);
 		headers.put("Content-Length", String.valueOf(contentLength));
-		switch (status) {
-		// TODO: Add specific headers
-		case BAD_REQUEST:
-			break;
-		case CONFLICT:
-			break;
-		case LENGTH_REQUIRED:
-			break;
-		case METHOD_NOT_ALLOWED:
-			break;
-		case VERSION_NOT_SUPPORTED:
-			break;
-		case MISSING_HOST:
-			break;
-		case INVALID_HOST_PORT:
-			break;
-		case CLOSED_CHANNEL:
-			break;
-		// default:
-		// throw new
-		// IllegalAccessError("Response not implemented for this error");
-		}
 		String headersLine = "";
 		for (Entry<String, String> mapElement : headers.entrySet()) {
 			headersLine += mapElement.getKey() + ": " + mapElement.getValue()
@@ -273,6 +207,7 @@ public final class GenerateHttpResponse {
 			stringBuilder.append(line);
 			stringBuilder.append(ls);
 		}
+		reader.close();
 
 		return stringBuilder.toString();
 	}
