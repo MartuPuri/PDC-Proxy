@@ -87,7 +87,6 @@ public class HttpParserRequest implements HttpParser {
 		String prms[], cmd[], temp[];
 		int idx, i, version[] = { 0, 0 };
 		String line = ManageByteBuffer.readLine(this.buffer);
-		;
 		Map<String, String> params = null;
 
 		if (line == null) {

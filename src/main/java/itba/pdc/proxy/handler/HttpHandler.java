@@ -15,6 +15,7 @@ import itba.pdc.proxy.parser.HttpParserResponse;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
@@ -63,7 +64,8 @@ public class HttpHandler implements TCPProtocol {
 					HttpParserResponse parser = (HttpParserResponse) att
 							.getParser();
 					if (parser.isConnectionClose()) {
-						MetricManager.getInstance().addStatusCode(att.getResponse().getStatusCode());
+						MetricManager.getInstance().addStatusCode(
+								att.getResponse().getStatusCode());
 						sendMessageToClient(att);
 					}
 				}
@@ -86,10 +88,9 @@ public class HttpHandler implements TCPProtocol {
 					break;
 				}
 			}
+		} else {
+			buf.compact();
 		}
-		// else {
-		// buf.compact();
-		// }
 	}
 
 	public void handleWrite(SelectionKey key) throws IOException {
@@ -114,8 +115,6 @@ public class HttpHandler implements TCPProtocol {
 		if (!buf.hasRemaining()) { // Buffer completely written?
 			// Nothing left, so no longer interested in writes
 			if (att.getProcessID().equals(ProcessType.CLIENT)) {
-				// ConnectionManager.getInstance().close(att.getRequest().getHost(),
-				// att.getOppositeChannel());
 				channel.close();
 				key.cancel();
 			} else {
@@ -135,8 +134,8 @@ public class HttpHandler implements TCPProtocol {
 			SocketChannel oppositeChannel = null;
 			SelectionKey oppositeKey = null;
 			try {
-				oppositeChannel = ConnectionManager.getInstance().getChannel(
-						request.getHost(), request.getPort());
+				 oppositeChannel = ConnectionManager.getInstance().getChannel(
+				 request.getHost(), request.getPort());
 				oppositeChannel.configureBlocking(false);
 			} catch (Exception e) {
 				accessLogger
@@ -210,10 +209,11 @@ public class HttpHandler implements TCPProtocol {
 				att.getBuff());
 		switch (responseFinished) {
 		case FINISHED:
-			MetricManager.getInstance().addStatusCode(att.getResponse().getStatusCode());
-			ConnectionManager.getInstance().close(
-					otherAtt.getRequest().getHost(),
-					(SocketChannel) key.channel());
+			MetricManager.getInstance().addStatusCode(
+					att.getResponse().getStatusCode());
+			 ConnectionManager.getInstance().close(
+			 otherAtt.getRequest().getHost(),
+			 (SocketChannel) key.channel());
 			sendMessageToClient(att);
 			break;
 		case UNFINISHED:
@@ -229,7 +229,7 @@ public class HttpHandler implements TCPProtocol {
 			AttachmentProxy oppositeAtt = (AttachmentProxy) (AttachmentProxy) att
 					.getOppositeKey().attachment();
 			HttpResponse response = att.getResponse();
-			response.setBody(att.getParser().getBuffer());
+//			response.setBody(att.getParser().getBuffer());
 			oppositeAtt.setBuff(response.getStream());
 			metricManager.addStatusCode(response.getStatusCode());
 			att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);
