@@ -57,7 +57,7 @@ public class ConnectionManager {
 		return instance;
 	}
 
-	public void registerServerSocket(Selector selector) throws IOException {
+	public ServerSocketChannel registerServerSocket(Selector selector) throws IOException {
 		ReadProxyConfiguration proxyConfiguration = ReadProxyConfiguration
 				.getInstance();
 		ReadConstantsConfiguration constantsConfiguration = ReadConstantsConfiguration
@@ -94,9 +94,10 @@ public class ConnectionManager {
 		listnChannel.register(selector, SelectionKey.OP_ACCEPT,
 				new AttachmentProxy(ProcessType.CLIENT, ProxyType.PROXY,
 						bufferSize));
+		return listnChannel;
 	}
 
-	public void registerAdminSocket(Selector selector) throws IOException {
+	public ServerSocketChannel registerAdminSocket(Selector selector) throws IOException {
 		ReadProxyConfiguration proxyConfiguration = ReadProxyConfiguration
 				.getInstance();
 		ReadConstantsConfiguration constantsConfiguration = ReadConstantsConfiguration
@@ -126,6 +127,7 @@ public class ConnectionManager {
 		}
 		listnChannel.register(selector, SelectionKey.OP_ACCEPT,
 				new AttachmentAdmin(ProxyType.ADMIN, bufferSize));
+		return listnChannel;
 	}
 
 	public SocketChannel getChannel(String host, Integer port)

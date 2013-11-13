@@ -10,6 +10,7 @@ import itba.pdc.proxy.lib.ReadConstantsConfiguration;
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
 import java.util.Iterator;
 
 public class TCPServerSelector {
@@ -26,8 +27,8 @@ public class TCPServerSelector {
 		// Create a selector to multiplex listening sockets and connections
 		Selector selector = Selector.open();
 		ConnectionManager connectionManager = ConnectionManager.getInstance();
-		connectionManager.registerServerSocket(selector);
-		connectionManager.registerAdminSocket(selector);
+		ServerSocketChannel serverChannel = connectionManager.registerServerSocket(selector);
+		ServerSocketChannel adminChannel = connectionManager.registerAdminSocket(selector);
 		TCPProtocol http = new HttpHandler(BUFSIZE);
 		TCPProtocol ehttp = new EHttpHandler(BUFSIZE);
 		TCPProtocol protocol = http;
