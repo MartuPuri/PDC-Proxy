@@ -144,4 +144,24 @@ public class ReadConstantsConfiguration {
 		return Integer.parseInt((String) prop.get("<-byte"));
 	}
 
+	public Integer getTimeout() {
+		String bufferSize = (String) prop.get("timeout");
+		if (bufferSize.isEmpty()) {
+			infoLogger.error("The timeout can not be empty");
+			return null;
+		}
+		try {
+			Integer size = Integer.parseInt(bufferSize);
+			if (size <= 0) {
+				infoLogger
+						.error("The timeout size must be a number greater than 0");
+				return null;
+			}
+			return size;
+		} catch (NumberFormatException e) {
+			infoLogger.error("The timeout size must be a number");
+			return null;
+		}
+	}
+
 }

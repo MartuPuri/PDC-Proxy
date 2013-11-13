@@ -38,6 +38,15 @@
 			</pattern>
 		</encoder>
 	</appender>
+	<appender name="CONNECTION-FILE" class="ch.qos.logback.core.FileAppender">
+		<file>log/connection.log</file>
+		<level>INFO</level>
+		<append>true</append>
+		<encoder>
+			<pattern>${DEFAULT_PATTERN}
+			</pattern>
+		</encoder>
+	</appender>
 	<!-- additivity=false ensures analytics data only goes to the analytics 
 		log -->
 	<logger name="info.log">
@@ -52,4 +61,8 @@
 	<logger name="parser.log">
 		<appender-ref ref="PARSER-FILE" />
 	</logger>
+	<logger name="connection.log">
+		<appender-ref ref="CONNECTION-FILE" />
+	</logger>
+	
 </configuration>

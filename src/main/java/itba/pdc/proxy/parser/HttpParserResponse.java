@@ -9,18 +9,21 @@ import itba.pdc.proxy.parser.interfaces.HttpParser;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.Map.Entry;
 
-import javax.management.RuntimeErrorException;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
 
 public class HttpParserResponse implements HttpParser {
-	private final HttpResponse response;
+	private Logger parserLogger = (Logger) LoggerFactory
+			.getLogger("parser.log");
+	private HttpResponse response;
 	private ParserState state;
 	private ByteBuffer buffer;
 	private boolean connectionClose = false;
 	private String method;
 
-	public HttpParserResponse(final HttpResponse response) {
+	public HttpParserResponse(HttpResponse response) {
 		this.response = response;
 		this.state = ParserState.METHOD;
 		this.buffer = ByteBuffer.allocate(0);
@@ -30,10 +33,13 @@ public class HttpParserResponse implements HttpParser {
 	 * 
 	 * @author mpurita
 	 * 
-	 * @param Receive the buffer that the socket read
+	 * @param Receive
+	 *            the buffer that the socket read
 	 * 
 	 * @return A code that indicate if the parser is valid or invalid when the
-	 *         request is finished or continue in the other case
+	 *         request is finished or loop in case the parser need more data
+	 *         from the socket or continue if finish one state and the need to
+	 *         go to the next state and the buffer still have data
 	 * 
 	 */
 	public ParserCode parseMessage(ByteBuffer buff) throws IOException {
@@ -41,12 +47,14 @@ public class HttpParserResponse implements HttpParser {
 		concatBuffer(buff);
 		switch (state) {
 		case METHOD:
+			parserLogger.info("Parse the first line of the response");
 			code = parseMethod();
 			if (code.equals(ParserCode.LOOP)
 					|| !code.equals(ParserCode.CONTINUE)) {
 				return code;
 			}
 		case HEADERS:
+			parserLogger.info("Parse response headers");
 			code = parseHeaders();
 			if (code.equals(ParserCode.LOOP)
 					|| !code.equals(ParserCode.CONTINUE)) {
@@ -66,7 +74,9 @@ public class HttpParserResponse implements HttpParser {
 	}
 
 	private void concatBuffer(ByteBuffer buff) {
-		final ByteBuffer aux = ByteBuffer.allocate(buffer.position()
+		parserLogger
+				.debug("Concatenate the parser bufffer and the buffer that the socket read");
+		ByteBuffer aux = ByteBuffer.allocate(buffer.position()
 				+ buff.position());
 		buff.flip();
 		buffer.flip();
@@ -76,8 +86,8 @@ public class HttpParserResponse implements HttpParser {
 	}
 
 	private ParserCode parseMethod() throws UnsupportedEncodingException {
-		String prms[], cmd[], temp[];
-		int idx, i, version[] = { 0, 0 };
+		String cmd[], temp[];
+		int version[] = { 0, 0 };
 		String line = ManageByteBuffer.readLine(this.buffer);
 
 		if (line == null) {
@@ -92,21 +102,20 @@ public class HttpParserResponse implements HttpParser {
 				version[0] = Integer.parseInt(temp[0]);
 				version[1] = Integer.parseInt(temp[1]);
 				if (!response.validVersion(version)) {
-					// TODO: Add log
+					parserLogger.error("Invalid http version");
 					return ParserCode.INVALID;
 				}
 			} catch (NumberFormatException nfe) {
-				// TODO: Add Log
-				// request.invalidRequestLine(response);
+				parserLogger.error("The version of http must be a number");
 				return ParserCode.INVALID;
 			}
 		} else {
-			// request.invalidRequestLine(response);
+			parserLogger
+					.error("The protocol name mas be HTTP/ and the version (HTTP/1.1, HTTP/1.0");
 			return ParserCode.INVALID;
 		}
 
 		Integer code = Integer.parseInt(cmd[1]);
-		// TODO: Add Log
 		response.setVersion(version);
 		response.setCode(code);
 		this.state = ParserState.HEADERS;
@@ -118,20 +127,17 @@ public class HttpParserResponse implements HttpParser {
 
 		String line = ManageByteBuffer.readLine(this.buffer);
 		if (line == null) {
-			// TODO: Log
 			return ParserCode.LOOP;
 		}
 		while (!line.trim().equals("")) {
 			idx = line.indexOf(':');
 			if (idx < 0) {
-				// TODO: request.invalidHeader(response);
-				// TODO: Add log
+				parserLogger.error("The header field is not well formed");
 				return ParserCode.INVALID;
 			} else {
 				String headerType = line.substring(0, idx).toLowerCase();
 				String headerValue = line.substring(idx + 1).trim();
 				response.addHeader(headerType, headerValue);
-				// TODO: Add log
 			}
 			line = ManageByteBuffer.readLine(this.buffer);
 			if (line == null) {
@@ -144,12 +150,13 @@ public class HttpParserResponse implements HttpParser {
 
 	private ParserCode parseData() {
 		if (method.equals("HEAD")) {
+			parserLogger.info("The client ask for head method in the request");
 			state = ParserState.END;
 			return ParserCode.VALID;
 		}
 		String chunked = response.getHeader("transfer-encoding");
 		if (chunked != null) {
-			// TODO: Manage chunked
+			parserLogger.info("The response has chunked body");
 			return manageChunked();
 		} else if (response.bodyEnable()) {
 			Integer bytes = Integer.parseInt(response
@@ -161,6 +168,7 @@ public class HttpParserResponse implements HttpParser {
 			this.state = ParserState.END;
 			return ParserCode.VALID;
 		} else {
+			parserLogger.info("Read until the connection is closed");
 			connectionClose = true;
 			return ParserCode.LOOP;
 		}
@@ -168,25 +176,19 @@ public class HttpParserResponse implements HttpParser {
 
 	private ParserCode manageChunked() {
 		Integer chunkedSize = response.getChunkSize();
-		// System.out.println("Buffer: " + new String(buffer.array()));
 		if (chunkedSize == null) {
 			String hexa = ManageByteBuffer.readLine(buffer);
 			if (hexa == null) {
 				return ParserCode.LOOP;
 			}
-			System.out.println("Hexa: " + hexa);
 			Integer size = Integer.parseInt(hexa, 16);
 			if (size == 0) {
-				System.out.println("entra");
-				System.out.println("Termina");
 				response.setBody(response.getChunkedBuffer());
-				System.out.println("Length: " + response.getLength());
 				response.addHeader("content-length", response.getLength());
 				response.removeHeader("transfer-encoding");
 				state = ParserState.END;
 				return ParserCode.VALID;
 			}
-			System.out.println("Size: " + size);
 			response.setChunkedSize(size);
 		}
 		return readChunck(buffer);
@@ -197,24 +199,19 @@ public class HttpParserResponse implements HttpParser {
 		do {
 			if (response.isChunkComplete()) {
 				String hexa = ManageByteBuffer.readLine(buffer);
-				System.out.println("Hexa: " + hexa);
 				if (hexa == null) {
 					return ParserCode.LOOP;
 				}
 				if (!hexa.trim().equals("")) {
 					Integer size = Integer.parseInt(hexa, 16);
 					if (size == 0) {
-						System.out.println("entra");
-						System.out.println("Termina");
 						response.setBody(response.getChunkedBuffer());
-						System.out.println("Length: " + response.getLength());
 						response.addHeader("content-length",
 								response.getLength());
 						response.removeHeader("transfer-encoding");
 						state = ParserState.END;
 						return ParserCode.VALID;
 					}
-					System.out.println("Size: " + size);
 					response.setChunkedSize(size);
 				}
 			}

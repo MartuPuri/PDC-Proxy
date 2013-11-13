@@ -5,6 +5,7 @@ import itba.pdc.proxy.data.ProxyType;
 import itba.pdc.proxy.handler.EHttpHandler;
 import itba.pdc.proxy.handler.HttpHandler;
 import itba.pdc.proxy.handler.TCPProtocol;
+import itba.pdc.proxy.lib.ReadConstantsConfiguration;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -12,8 +13,10 @@ import java.nio.channels.Selector;
 import java.util.Iterator;
 
 public class TCPServerSelector {
-	private static final int BUFSIZE = 1500; // Buffer size (bytes)
-	private static final int TIMEOUT = 3000; // Wait timeout (milliseconds)
+	private static final int BUFSIZE = ReadConstantsConfiguration.getInstance()
+			.getBufferSize(); // Buffer size (bytes)
+	private static final int TIMEOUT = ReadConstantsConfiguration.getInstance()
+			.getTimeout(); // Wait timeout (milliseconds)
 
 	public static void main(String[] args) throws IOException {
 		if (args.length != 0) { // Test for correct # of args
