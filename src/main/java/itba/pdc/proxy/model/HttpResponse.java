@@ -140,7 +140,10 @@ public class HttpResponse {
 		ByteBuffer buff = ByteBuffer.allocate(head.getBytes().length
 				+ body.position());
 		buff.put(head.getBytes());
-		ManageFilter.getInstace().doFilters(body);
+		String contentType = headers.get("content-type");
+		if (contentType != null && contentType.contains("text/plain")) {
+			ManageFilter.getInstace().doFilters(body);
+		}
 		body.flip();
 		buff.put(body);
 		return buff;

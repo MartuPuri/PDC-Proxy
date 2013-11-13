@@ -71,11 +71,6 @@ public final class GenerateHttpResponse {
 		result.put(503, "Service Unavailable");
 		result.put(504, "Gateway Timeout");
 		result.put(505, "Http Version Not Supported");
-		result.put(601, "Received and sended bytes");
-		result.put(602, "Amount of access to the proxy");
-		result.put(603, "Histogram for specific status code");
-		result.put(604, "Status of the proxy");
-		result.put(605, "Activate or deactivate filter");
 
 		return Collections.unmodifiableMap(result);
 	}
@@ -122,6 +117,7 @@ public final class GenerateHttpResponse {
 			break;
 		case STATUS:
 		case FILTER:
+			firstLine = "\nHTTP/1.0 200 OK";
 			dataLine = metric.generateStatus(new JsonFormatter());
 			break;
 		default:
