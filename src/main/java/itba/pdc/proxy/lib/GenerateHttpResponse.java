@@ -104,7 +104,7 @@ public final class GenerateHttpResponse {
 		StatusRequest statusRequest = request.getStatus();
 		String firstLine = generateFirstLine(statusRequest);
 		if (firstLine == null) {
-			firstLine = "\nHTTP/1.1 400 BAD REQUEST";
+			firstLine = "\nHTTP/1.0 200 OK";
 		}
 		String dataLine = "";
 		MetricManager metric = MetricManager.getInstance();
@@ -125,7 +125,7 @@ public final class GenerateHttpResponse {
 			dataLine = metric.generateStatus(new JsonFormatter());
 			break;
 		default:
-			return generateResponseError(statusRequest);
+			return generateResponseError(StatusRequest.BAD_REQUEST);
 		}
 		String headersLine = generateHeadersLine(statusRequest,
 				dataLine.getBytes().length, false);
