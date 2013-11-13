@@ -33,7 +33,8 @@ public class GroupByHour implements GroupMetrics {
 		
 		for (Date d : data) {
 			int h = d.getHours();
-			map_data.put(keys[h], String.valueOf(map_data.get(keys[h] + 1)));
+			map_data.put(keys[h], String.valueOf(Integer.valueOf(map_data
+					.get(keys[h])) + 1));
 		}
 		
 		return map_data;

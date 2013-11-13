@@ -24,7 +24,7 @@ public final class MetricManager {
 	private long bytesWritten = 0;
 	private long bytesChanged = 0;
 	private ConcurrentMap<Integer, List<Date>> to_histogram;
-
+	
 	private MetricManager() {
 		if (instance != null)
 			throw new IllegalStateException();
