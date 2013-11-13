@@ -1,6 +1,7 @@
 package itba.pdc.proxy.model;
 
 import itba.pdc.admin.MetricManager;
+import itba.pdc.admin.filter.TransformationFilter;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
@@ -98,6 +99,7 @@ public class HttpResponse {
 			// TODO: VER QUE HACEMOS
 		}
 		this.body = ByteBuffer.allocate(buffer.limit());
+//		TransformationFilter.getInstace().transform(buffer); //TODO: REMOVE
 		buffer.flip();
 		this.body.put(buffer);
 	}
