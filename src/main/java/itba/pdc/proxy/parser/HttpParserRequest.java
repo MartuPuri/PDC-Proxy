@@ -43,21 +43,18 @@ public class HttpParserRequest implements HttpParser {
 		concatBuffer(buff);
 		switch (state) {
 		case METHOD:
-			parserLogger.debug("Request: Parse the first line");
 			code = parseMethod();
 			if (code.equals(ParserCode.LOOP)
 					|| !code.equals(ParserCode.CONTINUE)) {
 				return code;
 			}
 		case HEADERS:
-			parserLogger.debug("Request: Parse headers");
 			code = parseHeaders();
 			if (code.equals(ParserCode.LOOP)
 					|| !code.equals(ParserCode.CONTINUE)) {
 				return code;
 			}
 		case DATA:
-			parserLogger.debug("Request: Parse body");
 			code = parseData();
 			if (code.equals(ParserCode.LOOP)
 					|| !code.equals(ParserCode.CONTINUE)) {
@@ -72,8 +69,6 @@ public class HttpParserRequest implements HttpParser {
 	}
 
 	private void concatBuffer(ByteBuffer buff) {
-		parserLogger
-		.debug("Request: Concatenate the parser bufffer and the buffer that the socket read");
 		ByteBuffer aux = ByteBuffer.allocate(buffer.position()
 				+ buff.position());
 		buff.flip();
@@ -128,11 +123,7 @@ public class HttpParserRequest implements HttpParser {
 			idx = cmd[1].indexOf('?');
 			if (idx < 0) {
 				uri = cmd[1];
-				parserLogger
-				.error("Request: Parse uri without query string");
 			} else {
-				parserLogger
-				.error("Request: Parse uri with query string");
 				uri = URLDecoder.decode(cmd[1].substring(0, idx), "ISO-8859-1");
 				prms = cmd[1].substring(idx + 1).split("&");
 				params = new HashMap<String, String>();

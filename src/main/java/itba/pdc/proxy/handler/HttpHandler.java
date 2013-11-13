@@ -66,6 +66,7 @@ public class HttpHandler implements TCPProtocol {
 					if (parser.isConnectionClose()) {
 						MetricManager.getInstance().addStatusCode(
 								att.getResponse().getStatusCode());
+						att.getResponse().setBody(att.getParser().getBuffer());
 						sendMessageToClient(att);
 					}
 				}

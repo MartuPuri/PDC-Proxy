@@ -47,21 +47,18 @@ public class HttpParserResponse implements HttpParser {
 		concatBuffer(buff);
 		switch (state) {
 		case METHOD:
-			parserLogger.debug("Response: Parse the first line");
 			code = parseMethod();
 			if (code.equals(ParserCode.LOOP)
 					|| !code.equals(ParserCode.CONTINUE)) {
 				return code;
 			}
 		case HEADERS:
-			parserLogger.debug("Response: Parse headers");
 			code = parseHeaders();
 			if (code.equals(ParserCode.LOOP)
 					|| !code.equals(ParserCode.CONTINUE)) {
 				return code;
 			}
 		case DATA:
-			parserLogger.debug("Response: Parse body");
 			code = parseData();
 			if (code.equals(ParserCode.LOOP)
 					|| !code.equals(ParserCode.CONTINUE)) {
@@ -75,8 +72,6 @@ public class HttpParserResponse implements HttpParser {
 	}
 
 	private void concatBuffer(ByteBuffer buff) {
-		parserLogger
-				.debug("Response: Concatenate the parser bufffer and the buffer that the socket read");
 		ByteBuffer aux = ByteBuffer.allocate(buffer.position()
 				+ buff.position());
 		buff.flip();
@@ -151,13 +146,11 @@ public class HttpParserResponse implements HttpParser {
 
 	private ParserCode parseData() {
 		if (method.equals("HEAD")) {
-			parserLogger.info("Response: The client ask for head method in the request");
 			state = ParserState.END;
 			return ParserCode.VALID;
 		}
 		String chunked = response.getHeader("transfer-encoding");
 		if (chunked != null) {
-			parserLogger.info("Response: The response has chunked body");
 			return manageChunked();
 		} else if (response.bodyEnable()) {
 			Integer bytes = Integer.parseInt(response
@@ -169,7 +162,6 @@ public class HttpParserResponse implements HttpParser {
 			this.state = ParserState.END;
 			return ParserCode.VALID;
 		} else {
-			parserLogger.info("Response: Read until the connection is closed");
 			connectionClose = true;
 			return ParserCode.LOOP;
 		}
