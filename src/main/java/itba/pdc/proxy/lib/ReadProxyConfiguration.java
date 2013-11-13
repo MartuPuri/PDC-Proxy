@@ -42,6 +42,14 @@ public class ReadProxyConfiguration {
 		return this.getString("chained-ip");
 	}
 	
+	public String getAdminUsername() {
+		return this.getString("username");
+	}
+	
+	public String getAdminPassword() {
+		return this.getString("password");
+	}
+	
 	public Integer getServerPort() {
 		return this.getInteger("server-port");
 	}
