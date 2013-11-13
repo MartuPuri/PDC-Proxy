@@ -35,8 +35,6 @@ public class ConnectionManager {
 	private int max_conns;
 	private Map<String, Set<SocketChannel>> persistent_connections;
 
-	// TODO: CONEXIONES PERSISTENTES VAN ACA LA PUTA MADRE!!!
-
 	private ConnectionManager() throws FileNotFoundException, IOException {
 		if (instance != null) {
 			connectionLogger
@@ -47,6 +45,7 @@ public class ConnectionManager {
 		chained_ip = pconf.getChainedIp();
 		chained_port = pconf.getChainedPort();
 		persistent_connections = new HashMap<String, Set<SocketChannel>>();
+		max_conns = 3;
 	}
 
 	public static synchronized ConnectionManager getInstance()
@@ -157,23 +156,24 @@ public class ConnectionManager {
 		}
 
 		StringBuilder builder = new StringBuilder();
-		connectionLogger.info(builder.append("Open channel: ")
-				.append(opened_channels.size()).toString());
+//		connectionLogger.info(	builder.append("Open channel: ")
+//				.append(opened_channels.size()).toString());
 		if (opened_channels.size() == 0) {
 			channel = SocketChannel.open(new InetSocketAddress(host, port));
 			connectionLogger.info("Open new channel");
 		} else {
 			Iterator<SocketChannel> it = opened_channels.iterator();
 			boolean found = false;
+			connectionLogger
+			.info(builder.append("There are ").append(opened_channels.size()).append(" opened").toString());
 			while (it.hasNext() && !found) {
 				channel = it.next();
 				if (channel.isOpen() && channel.isConnected()) {
 					connectionLogger
-							.info("There is at least one available channel");
+							.info("There is one available channel");
 					found = true;
-				} else {
-					it.remove();
 				}
+				it.remove();
 			}
 		}
 		return (channel != null) ? channel : SocketChannel
