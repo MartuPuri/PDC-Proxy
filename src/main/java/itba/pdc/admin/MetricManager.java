@@ -70,7 +70,7 @@ public final class MetricManager {
 		return format.format(to_format);
 	}
 
-	public String getBytes(Formatter format) {
+	public String generateBytes(Formatter format) {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("Bytes read", String.valueOf(bytesRead));
 		data.put("Bytes written", String.valueOf(bytesWritten));
@@ -87,6 +87,12 @@ public final class MetricManager {
 		} else {
 			data.put(FilterStatus.TRANSFORMER.toString(), "Disabled");
 		}
+		return format.format(data);
+	}
+	
+	public String generateAccesses(Formatter format) {
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("Accesses", String.valueOf(accesses));
 		return format.format(data);
 	}
 }

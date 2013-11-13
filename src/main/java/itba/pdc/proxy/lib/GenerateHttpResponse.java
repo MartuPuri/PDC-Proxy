@@ -115,10 +115,10 @@ public final class GenerateHttpResponse {
 					new JsonFormatter(), new GroupByHour());
 			break;
 		case BYTES:
-			dataLine = metric.getBytes(new JsonFormatter());
+			dataLine = metric.generateBytes(new JsonFormatter());
 			break;
 		case ACCESSES:
-			// TODO: getAccesses
+			dataLine = metric.generateAccesses(new JsonFormatter());
 			break;
 		case STATUS:
 		case FILTER:
