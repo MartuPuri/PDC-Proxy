@@ -19,7 +19,7 @@ public class HttpResponse {
 	private Integer code;
 	private Integer chunkSize = null;
 	private ByteBuffer chunkBuffer = ByteBuffer.allocate(0);
-	private ByteBuffer body;
+	private ByteBuffer body = ByteBuffer.allocate(0);
 	private Map<String, String> headers;
 
 	private static Map<Integer, String> createHttpReplies() {

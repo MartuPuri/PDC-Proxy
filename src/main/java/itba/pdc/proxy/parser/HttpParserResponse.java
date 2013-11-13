@@ -18,6 +18,7 @@ public class HttpParserResponse implements HttpParser {
 	private ParserState state;
 	private ByteBuffer buffer;
 	private boolean connectionClose = false;
+	private String method;
 
 	public HttpParserResponse(HttpResponse response) {
 		this.response = response;
@@ -145,6 +146,10 @@ public class HttpParserResponse implements HttpParser {
 	}
 
 	private ParserCode parseData() {
+		if (method.equals("HEAD")) {
+			state = ParserState.END;
+			return ParserCode.VALID;
+		}
 		String chunked = response.getHeader("transfer-encoding");
 		if (chunked != null) {
 			// TODO: Manage chunked
@@ -238,5 +243,9 @@ public class HttpParserResponse implements HttpParser {
 
 	public ByteBuffer getBuffer() {
 		return this.buffer;
+	}
+
+	public void setMethod(String method) {
+		this.method = method;
 	}
 }

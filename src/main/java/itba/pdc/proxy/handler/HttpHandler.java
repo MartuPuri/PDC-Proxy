@@ -56,6 +56,7 @@ public class HttpHandler implements TCPProtocol {
 
 		ByteBuffer buf = att.getBuff();
 		final long bytesRead = channel.read(buf);
+		System.out.println("Bytes read: " + bytesRead);
 		if (bytesRead == -1) {
 			if (att.getProcessID().equals(ProcessType.SERVER)) {
 				HttpParserResponse parser = (HttpParserResponse) att
@@ -182,7 +183,10 @@ public class HttpHandler implements TCPProtocol {
 
 	private void handleServer(SelectionKey key) {
 		AttachmentProxy att = (AttachmentProxy) key.attachment();
-		ReadingState responseFinished = ManageParser.parse(att.getParser(),
+		AttachmentProxy otherAtt = (AttachmentProxy) att.getOppositeKey().attachment();
+		HttpParserResponse parser = (HttpParserResponse) att.getParser();
+		parser.setMethod(otherAtt.getRequest().getMethod());
+		ReadingState responseFinished = ManageParser.parse(parser,
 				att.getBuff());
 //		debugLog.debug("Body: " + new String(att.getParser().getBuffer().array()));
 		switch (responseFinished) {
