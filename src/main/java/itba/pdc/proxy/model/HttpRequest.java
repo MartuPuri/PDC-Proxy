@@ -41,7 +41,7 @@ public class HttpRequest extends HttpRequestAbstract implements HttpMessage {
 		// headers.add("If-Range");
 		// headers.add("Max-Forwards");
 		// headers.add("If-Unmodified-Since");
-		// headers.add("Origin");
+		 headers.add("origin");
 		headers.add("pragma");
 		// headers.add("Proxy-Authorization");
 		// headers.add("Range");

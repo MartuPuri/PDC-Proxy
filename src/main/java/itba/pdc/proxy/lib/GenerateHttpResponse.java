@@ -196,15 +196,17 @@ public final class GenerateHttpResponse {
 		switch (status) {
 		// TODO: Add specific headers
 		case BAD_REQUEST:
-			return readFile("bad_request.html");
+			return readFile("responseHtml/bad_request.html");
 		case CONFLICT:
-			return readFile("coflict.html");
+			return readFile("responseHtml/coflict.html");
 		case LENGTH_REQUIRED:
-			return readFile("lenght_required.html");
+			return readFile("responseHtml/lenght_required.html");
 		case METHOD_NOT_ALLOWED:
-			return readFile("method_not_allowed.html");
+			return readFile("responseHtml/method_not_allowed.html");
 		case VERSION_NOT_SUPPORTED:
-			return readFile("unsupported_version.html");
+			return readFile("responseHtml/unsupported_version.html");
+		case MISSING_HOST:
+			return readFile("responseHtml/missing_host.html");
 		}
 		return "";
 	}
@@ -225,6 +227,8 @@ public final class GenerateHttpResponse {
 		case METHOD_NOT_ALLOWED:
 			break;
 		case VERSION_NOT_SUPPORTED:
+			break;
+		case MISSING_HOST:
 			break;
 //		default:
 //			throw new IllegalAccessError("Response not implemented for this error");

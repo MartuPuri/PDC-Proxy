@@ -83,7 +83,7 @@ public class HttpParserRequest implements HttpParser {
 			return ParserCode.INVALID;
 		}
 
-		if (cmd[2].indexOf("HTTP/") == 0 && cmd[2].indexOf('.') > 5) {
+		if (cmd[2].toUpperCase().indexOf("HTTP/") == 0 && cmd[2].indexOf('.') > 5) {
 			temp = cmd[2].substring(5).split("\\.");
 			try {
 				version[0] = Integer.parseInt(temp[0]);
@@ -95,6 +95,7 @@ public class HttpParserRequest implements HttpParser {
 				return ParserCode.INVALID;
 			}
 		} else {
+			request.setStatusRequest(StatusRequest.BAD_REQUEST);
 			return ParserCode.INVALID;
 		}
 
@@ -157,6 +158,10 @@ public class HttpParserRequest implements HttpParser {
 			}
 		}
 
+		if (request.getHost() == null) {
+			request.setStatusRequest(StatusRequest.MISSING_HOST);
+			return ParserCode.INVALID;
+		}
 		if (!request.bodyEnable()) {
 			state = ParserState.END;
 			return ParserCode.VALID;
@@ -167,9 +172,10 @@ public class HttpParserRequest implements HttpParser {
 	}
 
 	private ParserCode parseData() {
-		if (!request.bodyEnable()) {
-			return ParserCode.INVALID;
-		}
+//		if (!request.bodyEnable()) {
+//			request.setStatusRequest(StatusRequest.LENGTH_REQUIRED);
+//			return ParserCode.INVALID;
+//		}
 		Integer bytes = Integer.parseInt(request.getHeader("content-length"));
 		if (!readBuffer(bytes)) {
 			return ParserCode.LOOP;

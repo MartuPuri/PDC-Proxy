@@ -86,7 +86,9 @@ public class EHttpHandler implements TCPProtocol {
 		EHttpRequest request = att.getRequest();
 		switch (requestFinished) {
 		case FINISHED:
-			
+			if (request.getHeader("authorization") == null) {
+				
+			}
 			ByteBuffer responseBuffer;
 			try {
 				responseBuffer = ManageByteBuffer.encode(GenerateHttpResponse.generateAdminResponse(request));

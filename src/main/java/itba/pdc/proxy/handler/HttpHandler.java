@@ -5,6 +5,7 @@ import itba.pdc.proxy.ConnectionManager;
 import itba.pdc.proxy.data.AttachmentProxy;
 import itba.pdc.proxy.data.ProcessType;
 import itba.pdc.proxy.data.ProxyType;
+import itba.pdc.proxy.lib.GenerateHttpResponse;
 import itba.pdc.proxy.lib.ManageParser;
 import itba.pdc.proxy.lib.ReadingState;
 import itba.pdc.proxy.model.HttpRequest;
@@ -175,7 +176,20 @@ public class HttpHandler implements TCPProtocol {
 			key.interestOps(SelectionKey.OP_READ);
 			break;
 		case ERROR:
-			// HttpResponse.generateResponse(att.getStatusRequest());
+			try {
+				String responseMessage = GenerateHttpResponse.generateResponseError(att.getRequest()
+						.getStatus());
+				System.out.println("Response: " + responseMessage);
+				att = new AttachmentProxy(
+						att.getProcessID(), att.getProxyType(), this.bufferSize);
+				key.attach(att);
+				ByteBuffer buffResponse = ByteBuffer.allocate(responseMessage.getBytes().length);
+				buffResponse.put(responseMessage.getBytes());
+				att.setBuff(buffResponse);
+				key.interestOps(SelectionKey.OP_WRITE);
+			} catch (IOException e) {
+				// TODO:
+			}
 			break;
 		}
 		// att.getBuff().compact();
@@ -183,12 +197,14 @@ public class HttpHandler implements TCPProtocol {
 
 	private void handleServer(SelectionKey key) {
 		AttachmentProxy att = (AttachmentProxy) key.attachment();
-		AttachmentProxy otherAtt = (AttachmentProxy) att.getOppositeKey().attachment();
+		AttachmentProxy otherAtt = (AttachmentProxy) att.getOppositeKey()
+				.attachment();
 		HttpParserResponse parser = (HttpParserResponse) att.getParser();
 		parser.setMethod(otherAtt.getRequest().getMethod());
 		ReadingState responseFinished = ManageParser.parse(parser,
 				att.getBuff());
-//		debugLog.debug("Body: " + new String(att.getParser().getBuffer().array()));
+		// debugLog.debug("Body: " + new
+		// String(att.getParser().getBuffer().array()));
 		switch (responseFinished) {
 		case FINISHED:
 			if (att.getOppositeKey().isValid()) {

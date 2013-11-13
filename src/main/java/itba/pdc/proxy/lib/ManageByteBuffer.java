@@ -80,8 +80,7 @@ public final class ManageByteBuffer {
 				}
 				b = buffer.get();
 				if (b != lf) {
-					throw new RuntimeErrorException(null); // TODO: Change this
-															// exception
+					return null;
 				}
 				array[i] = b;
 			}
