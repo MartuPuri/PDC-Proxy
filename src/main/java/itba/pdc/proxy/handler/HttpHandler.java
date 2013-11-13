@@ -67,7 +67,7 @@ public class HttpHandler implements TCPProtocol {
 					}
 				}
 				StringBuilder builder = new StringBuilder();
-				accessLogger.info(builder.append("Close conneciton with ")
+				accessLogger.info(builder.append("Close connection with ")
 						.append(channel.getRemoteAddress()).toString());
 				key.cancel();
 				channel.close();
