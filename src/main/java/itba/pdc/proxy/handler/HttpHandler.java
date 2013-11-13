@@ -1,7 +1,6 @@
 package itba.pdc.proxy.handler;
 
 import itba.pdc.admin.MetricManager;
-import itba.pdc.proxy.ConnectionManager;
 import itba.pdc.proxy.data.AttachmentProxy;
 import itba.pdc.proxy.data.ProcessType;
 import itba.pdc.proxy.data.ProxyType;
@@ -10,6 +9,7 @@ import itba.pdc.proxy.lib.ManageParser;
 import itba.pdc.proxy.lib.ReadingState;
 import itba.pdc.proxy.model.HttpRequest;
 import itba.pdc.proxy.model.HttpResponse;
+import itba.pdc.proxy.model.StatusRequest;
 import itba.pdc.proxy.parser.HttpParserResponse;
 
 import java.io.IOException;
@@ -149,7 +149,13 @@ public class HttpHandler implements TCPProtocol {
 				accessLogger
 						.error("Trying to connect to an invalid host or invalid port: "
 								+ request.getHost() + ", " + request.getPort());
-				e.printStackTrace();
+//				e.printStackTrace();
+				try {
+					request.setStatus(StatusRequest.INVALID_HOST_PORT);
+					sendError(key);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+				}
 				return;
 			}
 			try {
@@ -157,7 +163,13 @@ public class HttpHandler implements TCPProtocol {
 						SelectionKey.OP_WRITE);
 			} catch (ClosedChannelException e) {
 				debugLog.error("Trying to register a key in a closed channel");
-				e.printStackTrace();
+//				e.printStackTrace();
+				try {
+					request.setStatus(StatusRequest.CLOSED_CHANNEL);
+					sendError(key);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+				}
 				return;
 			}
 			AttachmentProxy serverAtt = new AttachmentProxy(ProcessType.SERVER,
@@ -177,22 +189,27 @@ public class HttpHandler implements TCPProtocol {
 			break;
 		case ERROR:
 			try {
-				String responseMessage = GenerateHttpResponse.generateResponseError(att.getRequest()
-						.getStatus());
-				System.out.println("Response: " + responseMessage);
-				att = new AttachmentProxy(
-						att.getProcessID(), att.getProxyType(), this.bufferSize);
-				key.attach(att);
-				ByteBuffer buffResponse = ByteBuffer.allocate(responseMessage.getBytes().length);
-				buffResponse.put(responseMessage.getBytes());
-				att.setBuff(buffResponse);
-				key.interestOps(SelectionKey.OP_WRITE);
+				sendError(key);
 			} catch (IOException e) {
 				// TODO:
 			}
 			break;
 		}
 		// att.getBuff().compact();
+	}
+	
+	private void sendError(SelectionKey key) throws IOException {
+		AttachmentProxy att = (AttachmentProxy) key.attachment();
+		String responseMessage = GenerateHttpResponse.generateResponseError(att.getRequest()
+				.getStatus());
+		System.out.println("Response: " + responseMessage);
+		att = new AttachmentProxy(
+				att.getProcessID(), att.getProxyType(), this.bufferSize);
+		key.attach(att);
+		ByteBuffer buffResponse = ByteBuffer.allocate(responseMessage.getBytes().length);
+		buffResponse.put(responseMessage.getBytes());
+		att.setBuff(buffResponse);
+		key.interestOps(SelectionKey.OP_WRITE);
 	}
 
 	private void handleServer(SelectionKey key) {

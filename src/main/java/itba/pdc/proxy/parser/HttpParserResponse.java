@@ -14,13 +14,13 @@ import java.util.Map.Entry;
 import javax.management.RuntimeErrorException;
 
 public class HttpParserResponse implements HttpParser {
-	private HttpResponse response;
+	private final HttpResponse response;
 	private ParserState state;
 	private ByteBuffer buffer;
 	private boolean connectionClose = false;
 	private String method;
 
-	public HttpParserResponse(HttpResponse response) {
+	public HttpParserResponse(final HttpResponse response) {
 		this.response = response;
 		this.state = ParserState.METHOD;
 		this.buffer = ByteBuffer.allocate(0);
@@ -30,16 +30,15 @@ public class HttpParserResponse implements HttpParser {
 	 * 
 	 * @author mpurita
 	 * 
-	 * @param Receive
-	 *            the buffer that the socket read
+	 * @param Receive the buffer that the socket read
 	 * 
 	 * @return A code that indicate if the parser is valid or invalid when the
 	 *         request is finished or continue in the other case
 	 * 
 	 */
-	public ParserCode parseMessage(ByteBuffer _buff) throws IOException {
+	public ParserCode parseMessage(ByteBuffer buff) throws IOException {
 		ParserCode code;
-		concatBuffer(_buff);
+		concatBuffer(buff);
 		switch (state) {
 		case METHOD:
 			code = parseMethod();
@@ -66,15 +65,13 @@ public class HttpParserResponse implements HttpParser {
 		}
 	}
 
-	private void concatBuffer(ByteBuffer _buff) {
-		// System.out.println("buff: " + new String(buffer.array()));
-		// System.out.println("buff2: " + new String(_buff.array()));
-		ByteBuffer aux = ByteBuffer.allocate(buffer.position()
-				+ _buff.position());
-		_buff.flip();
+	private void concatBuffer(ByteBuffer buff) {
+		final ByteBuffer aux = ByteBuffer.allocate(buffer.position()
+				+ buff.position());
+		buff.flip();
 		buffer.flip();
 		aux.put(buffer);
-		aux.put(_buff);
+		aux.put(buff);
 		buffer = aux;
 	}
 

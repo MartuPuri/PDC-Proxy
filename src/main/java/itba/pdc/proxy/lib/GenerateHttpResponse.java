@@ -127,7 +127,8 @@ public final class GenerateHttpResponse {
 
 	private static List<String> createVersions() {
 		supportedVersions = new ArrayList<String>();
-		supportedVersions.add("HTTP/1.1");
+		// TODO: Add 1.0
+		supportedVersions.add("HTTP/1.0");
 		Collections.sort(supportedVersions, new Comparator<String>() {
 
 			public int compare(String o1, String o2) {
@@ -136,46 +137,57 @@ public final class GenerateHttpResponse {
 		});
 		return supportedVersions;
 	}
+
 	private static void generateDefaultHeaders(Map<String, String> headers) {
-		headers = new HashMap<String, String>();
 		headers.put("Date",
 				new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 		headers.put("Connection", "close");
 		headers.put("Cache-Control", "no-cache");
 	}
-	
-	public static String generateAdminResponse(EHttpRequest request) throws IOException {
+
+	public static String generateAdminResponse(EHttpRequest request)
+			throws IOException {
 		StatusRequest statusRequest = request.getStatus();
 		String firstLine = generateFirstLine(statusRequest);
 		String dataLine = "";
 		MetricManager metric = MetricManager.getInstance();
 		switch (statusRequest) {
 		case HISTOGRAM:
-			dataLine = metric.generateHistogram(Integer.parseInt(request.getHeader("histogram")), new JsonFormatter(), new GroupByHour());
+			dataLine = metric.generateHistogram(
+					Integer.parseInt(request.getHeader("histogram")),
+					new JsonFormatter(), new GroupByHour());
 			break;
 		case BYTES:
 			dataLine = metric.getBytes();
 			break;
 		case ACCESSES:
-			//TODO: getAccesses
+			// TODO: getAccesses
 			break;
 		case STATUS:
-			//TODO: getStatus
+			// TODO: getStatus
 			break;
 		default:
 			return generateResponseError(statusRequest);
 		}
-		String headersLine = generateHeadersLine(statusRequest, dataLine.getBytes().length);
+		String headersLine = generateHeadersLine(statusRequest,
+				dataLine.getBytes().length);
 
 		return firstLine + "\n" + headersLine + "\n" + dataLine;
 	}
 
-	public static String generateResponseError(StatusRequest status) throws IOException {
+	public static String generateResponseError(StatusRequest status)
+			throws IOException {
 		String firstLine = generateFirstLine(status);
+		if (firstLine == null) {
+			firstLine = "HTTP/1.0 400 Bad Request";
+		}
 		String dataLine = generateDataFromFile(status);
-		String headersLine = generateHeadersLine(status, dataLine.getBytes().length);
+		String headersLine = generateHeadersLine(status,
+				dataLine.getBytes().length);
 
-		return firstLine + "\n" + headersLine + "\n" + dataLine;
+		StringBuilder builder = new StringBuilder();
+		return builder.append(firstLine).append("\n").append(headersLine)
+				.append("\n").append(dataLine).toString();
 	}
 
 	private static String generateFirstLine(StatusRequest status) {
@@ -188,13 +200,14 @@ public final class GenerateHttpResponse {
 		if (statusCode == null) {
 			return null;
 		}
-		return firstLine + " " + status.getId() + " " + statusCode;
+		StringBuilder builder = new StringBuilder();
+		return builder.append(firstLine).append(" ").append(status.getId())
+				.append(" ").append(statusCode).toString();
 	}
 
 	private static String generateDataFromFile(StatusRequest status)
 			throws IOException {
 		switch (status) {
-		// TODO: Add specific headers
 		case BAD_REQUEST:
 			return readFile("responseHtml/bad_request.html");
 		case CONFLICT:
@@ -207,6 +220,10 @@ public final class GenerateHttpResponse {
 			return readFile("responseHtml/unsupported_version.html");
 		case MISSING_HOST:
 			return readFile("responseHtml/missing_host.html");
+		case INVALID_HOST_PORT:
+			return readFile("responseHtml/invalid_host_port.html");
+		case CLOSED_CHANNEL:
+			return readFile("responseHtml/closed_channel.html");
 		}
 		return "";
 	}
@@ -230,8 +247,13 @@ public final class GenerateHttpResponse {
 			break;
 		case MISSING_HOST:
 			break;
-//		default:
-//			throw new IllegalAccessError("Response not implemented for this error");
+		case INVALID_HOST_PORT:
+			break;
+		case CLOSED_CHANNEL:
+			break;
+		// default:
+		// throw new
+		// IllegalAccessError("Response not implemented for this error");
 		}
 		String headersLine = "";
 		for (Entry<String, String> mapElement : headers.entrySet()) {

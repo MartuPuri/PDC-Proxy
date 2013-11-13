@@ -28,7 +28,8 @@ import ch.qos.logback.classic.Logger;
 
 public class ConnectionManager {
 	private static ConnectionManager instance = null;
-	private Logger infoLogger = (Logger) LoggerFactory.getLogger("info.log");
+	private Logger connectionLogger = (Logger) LoggerFactory
+			.getLogger("connection.log");
 	private String chained_ip;
 	private Integer chained_port;
 	private int max_conns;
@@ -38,7 +39,7 @@ public class ConnectionManager {
 
 	private ConnectionManager() throws FileNotFoundException, IOException {
 		if (instance != null) {
-			infoLogger
+			connectionLogger
 					.error("Instance of ReadProxyConfiguration already created");
 			throw new IllegalArgumentException("Istance already created");
 		}
@@ -67,16 +68,22 @@ public class ConnectionManager {
 		if (port == null) {
 			Integer defaultPort = constantsConfiguration.getServerDefaultPort();
 			if (defaultPort == null) {
+				connectionLogger
+						.error("Default port of server proxy is not defined");
 				throw new InvalidDefaultPortException();
 			}
 			port = defaultPort;
 		}
 		if (host == null) {
-			infoLogger.info("The proxy will listen at my ip at port " + port);
+			StringBuilder builder = new StringBuilder();
+			connectionLogger.info(builder
+					.append("The proxy will listen at my ip at port ")
+					.append(port).toString());
 			listnChannel.socket().bind(new InetSocketAddress(port));
 		} else {
-			infoLogger.info("The proxy will listen at " + host + " at port "
-					+ port);
+			StringBuilder builder = new StringBuilder();
+			connectionLogger.info(builder.append("The proxy will listen at ")
+					.append(host).append(" at port ").append(port).toString());
 			listnChannel.socket().bind(new InetSocketAddress(host, port));
 		}
 		listnChannel.configureBlocking(false);
@@ -99,24 +106,28 @@ public class ConnectionManager {
 		if (port == null) {
 			Integer defaultPort = constantsConfiguration.getAdmingDefaultPort();
 			if (defaultPort == null) {
+				connectionLogger
+						.error("Default port of admin proxy is not defined");
 				throw new InvalidDefaultPortException();
 			}
 			port = defaultPort;
 		}
-		infoLogger
-				.info("The proxy will lister at my ip for admin clients at port "
-						+ port);
+		StringBuilder builder = new StringBuilder();
+		connectionLogger
+				.info(builder
+						.append("The proxy will lister at my ip for admin clients at port ")
+						.append(port).toString());
 		listnChannel.socket().bind(new InetSocketAddress(port));
 		listnChannel.configureBlocking(false);
 		Integer bufferSize = constantsConfiguration.getBufferSize();
 		if (bufferSize == null) {
+			connectionLogger.error("Buffer size is not define");
 			throw new InvalidBufferSizeException();
 		}
 		listnChannel.register(selector, SelectionKey.OP_ACCEPT,
 				new AttachmentAdmin(ProxyType.ADMIN, bufferSize));
 	}
 
-	@Deprecated
 	public SocketChannel getChannel(String host, Integer port)
 			throws IOException {
 		if (chained_ip == null || chained_port == null) {
@@ -125,7 +136,6 @@ public class ConnectionManager {
 		return persistentConnection(chained_ip, chained_port);
 	}
 
-	@Deprecated
 	public void close(String host, SocketChannel channel) throws IOException {
 		Set<SocketChannel> channels = persistent_connections.get(host);
 		if (channels.size() == max_conns)
@@ -135,28 +145,29 @@ public class ConnectionManager {
 		persistent_connections.put(host, channels);
 	}
 
-	@Deprecated
 	private SocketChannel persistentConnection(String host, Integer port)
 			throws IOException {
 		Set<SocketChannel> opened_channels;
 		SocketChannel channel = null;
-		if ((opened_channels =  this.persistent_connections.get(host)) == null) {
+		if ((opened_channels = this.persistent_connections.get(host)) == null) {
 			opened_channels = new HashSet<SocketChannel>();
 			this.persistent_connections.put(host, opened_channels);
 		}
-		System.out.println("hay abiertos:" + opened_channels.size());
+
+		StringBuilder builder = new StringBuilder();
+		connectionLogger.info(builder.append("Open channel: ")
+				.append(opened_channels.size()).toString());
 		if (opened_channels.size() == 0) {
-			{
-				channel = SocketChannel.open(new InetSocketAddress(host, port));
-				System.out.println("abro uno nuevo");
-			}
+			channel = SocketChannel.open(new InetSocketAddress(host, port));
+			connectionLogger.info("Open new channel");
 		} else {
 			Iterator<SocketChannel> it = opened_channels.iterator();
 			boolean found = false;
 			while (it.hasNext() && !found) {
 				channel = it.next();
 				if (channel.isOpen() && channel.isConnected()) {
-					System.out.println("hay uno libre");
+					connectionLogger
+							.info("There is at least one available channel");
 					found = true;
 				} else {
 					it.remove();

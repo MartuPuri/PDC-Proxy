@@ -14,20 +14,27 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Parse with a state machine the full request. This parser use ByteBuffer
+ * instead of String
+ * 
+ * @author mpurita
+ * 
+ */
 public class HttpParserRequest implements HttpParser {
 	private HttpMessage request;
 	private ParserState state;
 	private ByteBuffer buffer;
 
-	public HttpParserRequest(HttpMessage _request) {
-		this.request = _request;
+	public HttpParserRequest(final HttpMessage request) {
+		this.request = request;
 		this.state = ParserState.METHOD;
 		this.buffer = ByteBuffer.allocate(0);
 	}
 
-	public ParserCode parseMessage(ByteBuffer _buff) throws IOException {
+	public final ParserCode parseMessage(ByteBuffer buff) throws IOException {
 		ParserCode code;
-		concatBuffer(_buff);
+		concatBuffer(buff);
 		switch (state) {
 		case METHOD:
 			code = parseMethod();
@@ -83,7 +90,8 @@ public class HttpParserRequest implements HttpParser {
 			return ParserCode.INVALID;
 		}
 
-		if (cmd[2].toUpperCase().indexOf("HTTP/") == 0 && cmd[2].indexOf('.') > 5) {
+		if (cmd[2].toUpperCase().indexOf("HTTP/") == 0
+				&& cmd[2].indexOf('.') > 5) {
 			temp = cmd[2].substring(5).split("\\.");
 			try {
 				version[0] = Integer.parseInt(temp[0]);
@@ -172,10 +180,10 @@ public class HttpParserRequest implements HttpParser {
 	}
 
 	private ParserCode parseData() {
-//		if (!request.bodyEnable()) {
-//			request.setStatusRequest(StatusRequest.LENGTH_REQUIRED);
-//			return ParserCode.INVALID;
-//		}
+		// if (!request.bodyEnable()) {
+		// request.setStatusRequest(StatusRequest.LENGTH_REQUIRED);
+		// return ParserCode.INVALID;
+		// }
 		Integer bytes = Integer.parseInt(request.getHeader("content-length"));
 		if (!readBuffer(bytes)) {
 			return ParserCode.LOOP;
