@@ -1,14 +1,13 @@
 package itba.pdc.proxy.handler;
 
-import itba.pdc.admin.MetricManager;
 import itba.pdc.admin.filter.ManageFilter;
 import itba.pdc.proxy.data.AttachmentAdmin;
-import itba.pdc.proxy.data.AttachmentProxy;
 import itba.pdc.proxy.lib.GenerateHttpResponse;
 import itba.pdc.proxy.lib.ManageByteBuffer;
 import itba.pdc.proxy.lib.ManageParser;
 import itba.pdc.proxy.lib.ReadingState;
 import itba.pdc.proxy.model.EHttpRequest;
+import itba.pdc.proxy.model.StatusRequest;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -89,6 +88,23 @@ public class EHttpHandler implements TCPProtocol {
 		EHttpRequest request = att.getRequest();
 		switch (requestFinished) {
 		case FINISHED:
+			if (!request.validUser()) {
+				request.setStatus(StatusRequest.UNAUTHORIZED);
+				try {
+					String responseMessage = GenerateHttpResponse
+							.generateResponseError(att.getRequest().getStatus());
+					att = new AttachmentAdmin(att.getProxyType(),
+							this.bufferSize);
+					key.attach(att);
+					ByteBuffer buffResponse = ByteBuffer
+							.allocate(responseMessage.getBytes().length);
+					buffResponse.put(responseMessage.getBytes());
+					att.setBuff(buffResponse);
+					key.interestOps(SelectionKey.OP_WRITE);
+				} catch (IOException e) {
+				}
+				break;
+			}
 			ManageFilter.getInstace().addOrRemoveFilter(
 					request.getFilterStatus());
 			if (request.getHeader("authorization") == null) {

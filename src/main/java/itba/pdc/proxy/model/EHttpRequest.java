@@ -1,11 +1,16 @@
 package itba.pdc.proxy.model;
 
 import itba.pdc.admin.filter.FilterStatus;
+import itba.pdc.proxy.lib.ReadProxyConfiguration;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import org.apache.commons.codec.binary.Base64;
 
 public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 
@@ -42,7 +47,8 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 			super.setStatus(StatusRequest.STATUS);
 		} else if (uri.equals("/accesses")) {
 			super.setStatus(StatusRequest.ACCESSES);
-		} else if (uri.equals("/transformer") && super.getMethod().equals("POST")) {
+		} else if (uri.equals("/transformer")
+				&& super.getMethod().equals("POST")) {
 			super.setStatus(StatusRequest.FILTER);
 			filterStatus = FilterStatus.TRANSFORMER;
 		}
@@ -57,13 +63,13 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 				if (p.getKey().equals("code")) {
 					addHeader("histogram", p.getValue());
 				}
-			} 
-//			else if (status.equals(StatusRequest.FILTER)) {
-//				if (p.getKey().equals("transformer")) {
-//					addHeader("filter", p.getValue());
-//					filterStatus = FilterStatus.TRANSFORMER;
-//				}
-//			}
+			}
+			// else if (status.equals(StatusRequest.FILTER)) {
+			// if (p.getKey().equals("transformer")) {
+			// addHeader("filter", p.getValue());
+			// filterStatus = FilterStatus.TRANSFORMER;
+			// }
+			// }
 		}
 	}
 
@@ -76,11 +82,11 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 				if (idx > 0) {
 					port = Integer.parseInt(value.substring(idx + 1, length));
 					value = value.substring(0, idx);
-//					super.addHeader(header, value.substring(0, idx));
-				} 
-//				else {
-//					super.addHeader(header, value);
-//				}
+					// super.addHeader(header, value.substring(0, idx));
+				}
+				// else {
+				// super.addHeader(header, value);
+				// }
 			}
 			super.addHeader(header, value);
 		}
@@ -102,8 +108,37 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 	public Integer getPort() {
 		return port;
 	}
-	
+
 	public FilterStatus getFilterStatus() {
 		return filterStatus;
+	}
+
+	public boolean validUser() {
+		String user = getHeader("authorization");
+		if (user == null) {
+			return false;
+		}
+		String[] params = user.split(" ");
+		if (params.length != 2 || !params[0].toLowerCase().equals("basic")) {
+			return false;
+		}
+		byte[] decoded = Base64.decodeBase64(params[1]);
+		String[] authentication = new String(decoded).split(":");
+		if (authentication.length != 2) {
+			return false;
+		}
+		try {
+			ReadProxyConfiguration prop = ReadProxyConfiguration.getInstance();
+			if (!prop.getAdminUsername().equals(authentication[0].trim())
+					|| !prop.getAdminPassword()
+							.equals(authentication[1].trim())) {
+				return false;
+			}
+			return true;
+		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+		}
+
+		return false;
 	}
 }

@@ -180,6 +180,8 @@ public final class GenerateHttpResponse {
 			return readFile("responseHtml/invalid_host_port.html");
 		case CLOSED_CHANNEL:
 			return readFile("responseHtml/closed_channel.html");
+		case UNAUTHORIZED:
+			return readFile("responseHtml/unauthorized.html");
 		default:
 			break;
 		}
