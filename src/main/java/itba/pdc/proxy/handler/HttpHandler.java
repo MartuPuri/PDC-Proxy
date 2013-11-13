@@ -1,6 +1,7 @@
 package itba.pdc.proxy.handler;
 
 import itba.pdc.admin.MetricManager;
+import itba.pdc.proxy.ConnectionManager;
 import itba.pdc.proxy.data.AttachmentProxy;
 import itba.pdc.proxy.data.ProcessType;
 import itba.pdc.proxy.data.ProxyType;
@@ -12,8 +13,8 @@ import itba.pdc.proxy.model.HttpResponse;
 import itba.pdc.proxy.model.StatusRequest;
 import itba.pdc.proxy.parser.HttpParserResponse;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
@@ -131,11 +132,11 @@ public class HttpHandler implements TCPProtocol {
 			SocketChannel oppositeChannel = null;
 			SelectionKey oppositeKey = null;
 			try {
-				// TODO: conexiones persistente
-//				oppositeChannel = ConnectionManager.getInstance().getChannel(
-//						request.getHost(), request.getPort());
-				 oppositeChannel = SocketChannel.open(new InetSocketAddress(
-				 request.getHost(), request.getPort()));
+				// TODO: Persisteng connection
+			 oppositeChannel = ConnectionManager.getInstance().getChannel(
+				 request.getHost(), request.getPort());
+//				oppositeChannel = SocketChannel.open(new InetSocketAddress(
+//						request.getHost(), request.getPort()));
 				oppositeChannel.configureBlocking(false);
 			} catch (Exception e) {
 				accessLogger
@@ -198,7 +199,7 @@ public class HttpHandler implements TCPProtocol {
 		key.interestOps(SelectionKey.OP_WRITE);
 	}
 
-	private void handleServer(SelectionKey key) {
+	private void handleServer(SelectionKey key) throws FileNotFoundException, IOException {
 		AttachmentProxy att = (AttachmentProxy) key.attachment();
 		AttachmentProxy otherAtt = (AttachmentProxy) att.getOppositeKey()
 				.attachment();
@@ -208,6 +209,7 @@ public class HttpHandler implements TCPProtocol {
 				att.getBuff());
 		switch (responseFinished) {
 		case FINISHED:
+			ConnectionManager.getInstance().close(otherAtt.getRequest().getHost(), (SocketChannel) key.channel());
 			sendMessageToClient(att);
 			break;
 		case UNFINISHED:
