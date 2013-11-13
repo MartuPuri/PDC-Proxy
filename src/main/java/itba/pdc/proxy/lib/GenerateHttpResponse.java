@@ -104,7 +104,7 @@ public final class GenerateHttpResponse {
 		StatusRequest statusRequest = request.getStatus();
 		String firstLine = generateFirstLine(statusRequest);
 		if (firstLine == null) {
-			firstLine = "\nHTTP/1.1 200 OK";
+			firstLine = "\nHTTP/1.1 400 BAD REQUEST";
 		}
 		String dataLine = "";
 		MetricManager metric = MetricManager.getInstance();
