@@ -163,7 +163,7 @@ public class HttpParserResponse implements HttpParser {
 				if (!readBuffer(currentLength, bytes)) {
 					return ParserCode.LOOP;
 				}
-//				response.readFromFile();
+				response.readFromFile();
 			} else {
 				if (!readBuffer(bytes)) {
 					return ParserCode.LOOP;

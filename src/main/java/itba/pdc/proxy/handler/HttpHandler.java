@@ -110,20 +110,6 @@ public class HttpHandler implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
-<<<<<<< HEAD
-=======
-//		if (att.getProcessID().equals(ProcessType.CLIENT)) {
-//			AttachmentProxy oppositeAtt = (AttachmentProxy) att
-//					.getOppositeKey().attachment();
-////			if (oppositeAtt.getResponse().isReadableFromFile()) {
-////				ManageByteBuffer.readFromFile(channel, oppositeAtt
-////						.getResponse().toString());
-////				channel.close();
-////				key.cancel();
-////				return;
-////			}
-//		}
->>>>>>> 6c3011fb50c91ced2f601d5f4d299eb7d8ba923a
 		buf.flip();
 		do {
 			if (channel.isOpen() && channel.isConnected()) {
