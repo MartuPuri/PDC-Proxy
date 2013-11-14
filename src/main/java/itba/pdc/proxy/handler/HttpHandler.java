@@ -72,10 +72,13 @@ public class HttpHandler implements TCPProtocol {
 						att.getResponse().setBody(att.getParser().getBuffer());
 						sendMessageToClient(att);
 					}
+				}else{
+					ConnectionManager con = ConnectionManager.getInstance();
+					//we don't care about persistence, we just close it.
+					con.close(channel);
+					con.close(att.getOppositeChannel());
 				}
 				StringBuilder builder = new StringBuilder();
-				accessLogger.info(builder.append("Close connection with ")
-						.append(channel.getRemoteAddress()).toString());
 				key.cancel();
 				channel.close();
 			} else if (bytesRead > 0) {
