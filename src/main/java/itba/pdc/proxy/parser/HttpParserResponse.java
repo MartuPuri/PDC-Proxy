@@ -146,7 +146,7 @@ public class HttpParserResponse implements HttpParser {
 	}
 
 	private ParserCode parseData() {
-		if (method.equals("HEAD")) {
+		if (method.equals("HEAD") || response.getStatusCode().equals(204)) {
 			state = ParserState.END;
 			return ParserCode.VALID;
 		}
@@ -160,11 +160,10 @@ public class HttpParserResponse implements HttpParser {
 				currentLength += buffer.limit();
 				ManageByteBuffer.writeToFile(buffer, response.toString());
 				buffer = ByteBuffer.allocate(0);
-				System.out.println("Length: " + bytes + "  Current: " + currentLength);
 				if (!readBuffer(currentLength, bytes)) {
 					return ParserCode.LOOP;
 				}
-				response.readFromFile();
+//				response.readFromFile();
 			} else {
 				if (!readBuffer(bytes)) {
 					return ParserCode.LOOP;

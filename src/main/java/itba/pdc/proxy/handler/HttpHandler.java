@@ -76,9 +76,9 @@ public class HttpHandler implements TCPProtocol {
 					ConnectionManager con = ConnectionManager.getInstance();
 					// we don't care about persistence, we just close it.
 					con.close(channel);
+					//we dont't care about the persistance, we just close it.
 					con.close(att.getOppositeChannel());
 				}
-				StringBuilder builder = new StringBuilder();
 				key.cancel();
 				channel.close();
 			} else if (bytesRead > 0) {
@@ -110,6 +110,20 @@ public class HttpHandler implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
+<<<<<<< HEAD
+=======
+//		if (att.getProcessID().equals(ProcessType.CLIENT)) {
+//			AttachmentProxy oppositeAtt = (AttachmentProxy) att
+//					.getOppositeKey().attachment();
+////			if (oppositeAtt.getResponse().isReadableFromFile()) {
+////				ManageByteBuffer.readFromFile(channel, oppositeAtt
+////						.getResponse().toString());
+////				channel.close();
+////				key.cancel();
+////				return;
+////			}
+//		}
+>>>>>>> 6c3011fb50c91ced2f601d5f4d299eb7d8ba923a
 		buf.flip();
 		do {
 			if (channel.isOpen() && channel.isConnected()) {
@@ -200,6 +214,7 @@ public class HttpHandler implements TCPProtocol {
 			try {
 				sendError(key);
 			} catch (IOException e) {
+				e.printStackTrace();
 			}
 			break;
 		}
