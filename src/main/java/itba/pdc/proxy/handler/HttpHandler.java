@@ -6,6 +6,7 @@ import itba.pdc.proxy.data.AttachmentProxy;
 import itba.pdc.proxy.data.ProcessType;
 import itba.pdc.proxy.data.ProxyType;
 import itba.pdc.proxy.lib.GenerateHttpResponse;
+import itba.pdc.proxy.lib.ManageByteBuffer;
 import itba.pdc.proxy.lib.ManageParser;
 import itba.pdc.proxy.lib.ReadingState;
 import itba.pdc.proxy.model.HttpRequest;
@@ -106,6 +107,17 @@ public class HttpHandler implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
+		if (att.getProcessID().equals(ProcessType.CLIENT)) {
+			AttachmentProxy oppositeAtt = (AttachmentProxy) att
+					.getOppositeKey().attachment();
+			if (oppositeAtt.getResponse().isReadableFromFile()) {
+				ManageByteBuffer.readFromFile(channel, oppositeAtt
+						.getResponse().toString());
+				channel.close();
+				key.cancel();
+				return;
+			}
+		}
 		buf.flip();
 		do {
 			if (channel.isOpen() && channel.isConnected()) {
@@ -115,14 +127,12 @@ public class HttpHandler implements TCPProtocol {
 				break;
 			}
 		} while (buf.hasRemaining());
-		if (!buf.hasRemaining()) { // Buffer completely written?
-			// Nothing left, so no longer interested in writes
-			if (att.getProcessID().equals(ProcessType.CLIENT)) {
-				channel.close();
-				key.cancel();
-			} else {
-				key.interestOps(SelectionKey.OP_READ);
-			}
+		// Nothing left, so no longer interested in writes
+		if (att.getProcessID().equals(ProcessType.CLIENT)) {
+			channel.close();
+			key.cancel();
+		} else {
+			key.interestOps(SelectionKey.OP_READ);
 		}
 		buf.compact(); // Make room for more data to be read in
 	}
@@ -137,8 +147,8 @@ public class HttpHandler implements TCPProtocol {
 			SocketChannel oppositeChannel = null;
 			SelectionKey oppositeKey = null;
 			try {
-				 oppositeChannel = ConnectionManager.getInstance().getChannel(
-				 request.getHost(), request.getPort());
+				oppositeChannel = ConnectionManager.getInstance().getChannel(
+						request.getHost(), request.getPort());
 				oppositeChannel.configureBlocking(false);
 			} catch (Exception e) {
 				accessLogger
@@ -215,9 +225,9 @@ public class HttpHandler implements TCPProtocol {
 		case FINISHED:
 			MetricManager.getInstance().addStatusCode(
 					att.getResponse().getStatusCode());
-			 ConnectionManager.getInstance().close(
-			 otherAtt.getRequest().getHost(),
-			 (SocketChannel) key.channel());
+			ConnectionManager.getInstance().close(
+					otherAtt.getRequest().getHost(),
+					(SocketChannel) key.channel());
 			sendMessageToClient(att);
 			break;
 		case UNFINISHED:
@@ -234,7 +244,7 @@ public class HttpHandler implements TCPProtocol {
 			AttachmentProxy oppositeAtt = (AttachmentProxy) (AttachmentProxy) att
 					.getOppositeKey().attachment();
 			HttpResponse response = att.getResponse();
-//			response.setBody(att.getParser().getBuffer());
+			// response.setBody(att.getParser().getBuffer());
 			oppositeAtt.setBuff(response.getStream());
 			metricManager.addStatusCode(response.getStatusCode());
 			att.getOppositeKey().interestOps(SelectionKey.OP_WRITE);

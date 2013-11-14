@@ -156,13 +156,20 @@ public class HttpParserResponse implements HttpParser {
 		} else if (response.bodyEnable()) {
 			Integer bytes = Integer.parseInt(response
 					.getHeader("content-length"));
-			currentLength += buffer.limit();
-			ManageByteBuffer.writeInFile(buffer, response.toString());
-			buffer = ByteBuffer.allocate(0);	
-			if (!readBuffer(currentLength, bytes)) {
-				return ParserCode.LOOP;
+			if (bytes >= 10000000) {
+				currentLength += buffer.limit();
+				ManageByteBuffer.writeToFile(buffer, response.toString());
+				buffer = ByteBuffer.allocate(0);	
+				if (!readBuffer(currentLength, bytes)) {
+					return ParserCode.LOOP;
+				}
+				response.readFromFile();
+			} else {
+				if (!readBuffer(bytes)) {
+					return ParserCode.LOOP;
+				}
+				response.setBody(this.buffer);
 			}
-			response.setBody(this.buffer);
 			this.state = ParserState.END;
 			return ParserCode.VALID;
 		} else {

@@ -19,6 +19,7 @@ public class HttpResponse {
 	private int[] version;
 	private int content_length = 0;
 	private int currentChunkedSize = 0;
+	private boolean readFromFile = false;
 	private String messageCode;
 	private Integer code;
 	private Integer chunkSize = null;
@@ -200,5 +201,13 @@ public class HttpResponse {
 
 	public void removeHeader(String key) {
 		headers.remove(key);
+	}
+
+	public void readFromFile() {
+		readFromFile = true;
+	}
+	
+	public boolean isReadableFromFile() {
+		return readFromFile;
 	}
 }

@@ -1,10 +1,14 @@
 package itba.pdc.proxy.lib;
 
+import itba.pdc.admin.MetricManager;
+
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
@@ -100,7 +104,7 @@ public final class ManageByteBuffer {
 		}
 	}
 
-	public static void writeInFile(ByteBuffer buffer, String filename) {
+	public static void writeToFile(ByteBuffer buffer, String filename) {
 		try {
 			FileOutputStream fo = new FileOutputStream(filename, true);
 			FileChannel wChannel = fo.getChannel();
@@ -112,6 +116,27 @@ public final class ManageByteBuffer {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	public static void readFromFile(SocketChannel channel, String filename) {
+		try {
+			FileInputStream fi = new FileInputStream(filename);
+			FileChannel wChannel = fi.getChannel();
+
+			ByteBuffer buffer = ByteBuffer.allocate(ReadConstantsConfiguration.getInstance().getBufferSize());
+			while (fi.read(buffer.array()) != -1) {
+				buffer.flip();
+				do {
+					if (channel.isOpen() && channel.isConnected()) {
+						int bytesWritten = channel.write(buffer);
+						MetricManager.getInstance().addBytesWritten(bytesWritten);
+					} else {
+						break;
+					}
+				} while (buffer.hasRemaining());
+			}
+		} catch (IOException e) {
 		}
 	}
 }
