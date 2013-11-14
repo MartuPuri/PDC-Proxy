@@ -136,6 +136,10 @@ public class ConnectionManager {
 		}
 		return persistentConnection(host, port);
 	}
+	
+	public void close(SocketChannel channel) throws IOException{
+		channel.close();
+	}
 
 	public void close(String host, SocketChannel channel) throws IOException {
 		String to_use_host;
