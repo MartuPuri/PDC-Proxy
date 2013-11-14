@@ -210,6 +210,8 @@ public final class GenerateHttpResponse {
 		case ACCESSES:
 			headers.put("Content-Type", "application/vnd.ehttp-accesses");
 			break;
+		case METHOD_NOT_ALLOWED:
+			headers.put("Allow", "GET, POST, HEAD");
 
 		default:
 			break;

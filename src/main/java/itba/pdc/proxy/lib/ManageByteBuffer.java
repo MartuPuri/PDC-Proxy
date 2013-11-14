@@ -3,6 +3,7 @@ package itba.pdc.proxy.lib;
 import itba.pdc.admin.MetricManager;
 import itba.pdc.admin.filter.ManageFilter;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -145,6 +146,8 @@ public final class ManageByteBuffer {
 			System.out.println("FINISH");
 			wChannel.close();
 			fi.close();
+			File file = new File(filename);
+			file.delete();
 		} catch (IOException e) {
 		}
 	}
