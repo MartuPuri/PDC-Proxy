@@ -135,6 +135,7 @@ public final class GenerateHttpResponse {
 			throws IOException {
 		String firstLine = generateFirstLine(status);
 		if (firstLine == null) {
+			System.out.println("a");
 			firstLine = "\nHTTP/1.1 400 Bad Request";
 		}
 		String dataLine = generateDataFromFile(status);
@@ -169,7 +170,7 @@ public final class GenerateHttpResponse {
 		case CONFLICT:
 			return readFile("responseHtml/coflict.html");
 		case LENGTH_REQUIRED:
-			return readFile("responseHtml/lenght_required.html");
+			return readFile("responseHtml/length_required.html");
 		case METHOD_NOT_ALLOWED:
 			return readFile("responseHtml/method_not_allowed.html");
 		case VERSION_NOT_SUPPORTED:

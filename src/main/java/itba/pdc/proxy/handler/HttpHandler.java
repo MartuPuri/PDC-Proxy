@@ -110,17 +110,17 @@ public class HttpHandler implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
-		if (att.getProcessID().equals(ProcessType.CLIENT)) {
-			AttachmentProxy oppositeAtt = (AttachmentProxy) att
-					.getOppositeKey().attachment();
-//			if (oppositeAtt.getResponse().isReadableFromFile()) {
-//				ManageByteBuffer.readFromFile(channel, oppositeAtt
-//						.getResponse().toString());
-//				channel.close();
-//				key.cancel();
-//				return;
-//			}
-		}
+//		if (att.getProcessID().equals(ProcessType.CLIENT)) {
+//			AttachmentProxy oppositeAtt = (AttachmentProxy) att
+//					.getOppositeKey().attachment();
+////			if (oppositeAtt.getResponse().isReadableFromFile()) {
+////				ManageByteBuffer.readFromFile(channel, oppositeAtt
+////						.getResponse().toString());
+////				channel.close();
+////				key.cancel();
+////				return;
+////			}
+//		}
 		buf.flip();
 		do {
 			if (channel.isOpen() && channel.isConnected()) {
@@ -196,6 +196,7 @@ public class HttpHandler implements TCPProtocol {
 			try {
 				sendError(key);
 			} catch (IOException e) {
+				e.printStackTrace();
 			}
 			break;
 		}
