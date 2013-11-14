@@ -76,8 +76,8 @@ public class HttpHandler implements TCPProtocol {
 					ConnectionManager con = ConnectionManager.getInstance();
 					//we don't care about persistence, we just close it.
 					con.close(channel);
-					//we care about the persistance, so we give the specific host to de managar
-					con.close(att.getRequest().getHost(), att.getOppositeChannel());
+					//we dont't care about the persistance, we just close it.
+					con.close(att.getOppositeChannel());
 				}
 				key.cancel();
 				channel.close();
@@ -113,13 +113,13 @@ public class HttpHandler implements TCPProtocol {
 		if (att.getProcessID().equals(ProcessType.CLIENT)) {
 			AttachmentProxy oppositeAtt = (AttachmentProxy) att
 					.getOppositeKey().attachment();
-			if (oppositeAtt.getResponse().isReadableFromFile()) {
-				ManageByteBuffer.readFromFile(channel, oppositeAtt
-						.getResponse().toString());
-				channel.close();
-				key.cancel();
-				return;
-			}
+//			if (oppositeAtt.getResponse().isReadableFromFile()) {
+//				ManageByteBuffer.readFromFile(channel, oppositeAtt
+//						.getResponse().toString());
+//				channel.close();
+//				key.cancel();
+//				return;
+//			}
 		}
 		buf.flip();
 		do {
