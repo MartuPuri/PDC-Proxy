@@ -1,6 +1,7 @@
 package itba.pdc.proxy.lib;
 
 import itba.pdc.admin.MetricManager;
+import itba.pdc.admin.filter.ManageFilter;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -125,17 +126,25 @@ public final class ManageByteBuffer {
 			FileChannel wChannel = fi.getChannel();
 
 			ByteBuffer buffer = ByteBuffer.allocate(ReadConstantsConfiguration.getInstance().getBufferSize());
-			while (fi.read(buffer.array()) != -1) {
+			while (wChannel.read(buffer) != -1) {
+				ManageFilter.getInstace().doFilters(buffer);
 				buffer.flip();
 				do {
 					if (channel.isOpen() && channel.isConnected()) {
 						int bytesWritten = channel.write(buffer);
 						MetricManager.getInstance().addBytesWritten(bytesWritten);
 					} else {
-						break;
+						wChannel.close();
+						fi.close();
+						return;
 					}
 				} while (buffer.hasRemaining());
+				buffer.clear();
+				System.out.println("CONTINUE");
 			}
+			System.out.println("FINISH");
+			wChannel.close();
+			fi.close();
 		} catch (IOException e) {
 		}
 	}

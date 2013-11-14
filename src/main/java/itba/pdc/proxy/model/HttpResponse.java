@@ -144,7 +144,9 @@ public class HttpResponse {
 			ManageFilter.getInstace().doFilters(body);
 		}
 		body.flip();
-		buff.put(body);
+		if (!readFromFile) {
+			buff.put(body);
+		}
 		return buff;
 	}
 
@@ -206,7 +208,7 @@ public class HttpResponse {
 	public void readFromFile() {
 		readFromFile = true;
 	}
-	
+
 	public boolean isReadableFromFile() {
 		return readFromFile;
 	}

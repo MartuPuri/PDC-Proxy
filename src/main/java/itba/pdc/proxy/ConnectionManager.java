@@ -138,7 +138,9 @@ public class ConnectionManager {
 	}
 	
 	public void close(SocketChannel channel) throws IOException{
-		channel.close();
+		if (channel != null) {
+			channel.close();
+		}
 	}
 
 	public void close(String host, SocketChannel channel) throws IOException {

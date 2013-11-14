@@ -159,7 +159,8 @@ public class HttpParserResponse implements HttpParser {
 			if (bytes >= 10000000) {
 				currentLength += buffer.limit();
 				ManageByteBuffer.writeToFile(buffer, response.toString());
-				buffer = ByteBuffer.allocate(0);	
+				buffer = ByteBuffer.allocate(0);
+				System.out.println("Length: " + bytes + "  Current: " + currentLength);
 				if (!readBuffer(currentLength, bytes)) {
 					return ParserCode.LOOP;
 				}
@@ -225,7 +226,7 @@ public class HttpParserResponse implements HttpParser {
 	}
 
 	private boolean readBuffer(Integer length, Integer contentLength) {
-		if (length == contentLength) {
+		if (length.equals(contentLength)) {
 			return true;
 		}
 		return false;

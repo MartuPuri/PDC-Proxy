@@ -72,9 +72,9 @@ public class HttpHandler implements TCPProtocol {
 						att.getResponse().setBody(att.getParser().getBuffer());
 						sendMessageToClient(att);
 					}
-				}else{
+				} else {
 					ConnectionManager con = ConnectionManager.getInstance();
-					//we don't care about persistence, we just close it.
+					// we don't care about persistence, we just close it.
 					con.close(channel);
 					con.close(att.getOppositeChannel());
 				}
@@ -110,17 +110,6 @@ public class HttpHandler implements TCPProtocol {
 		SocketChannel channel = (SocketChannel) key.channel();
 
 		ByteBuffer buf = att.getBuff();
-		if (att.getProcessID().equals(ProcessType.CLIENT)) {
-			AttachmentProxy oppositeAtt = (AttachmentProxy) att
-					.getOppositeKey().attachment();
-			if (oppositeAtt.getResponse().isReadableFromFile()) {
-				ManageByteBuffer.readFromFile(channel, oppositeAtt
-						.getResponse().toString());
-				channel.close();
-				key.cancel();
-				return;
-			}
-		}
 		buf.flip();
 		do {
 			if (channel.isOpen() && channel.isConnected()) {
@@ -130,6 +119,21 @@ public class HttpHandler implements TCPProtocol {
 				break;
 			}
 		} while (buf.hasRemaining());
+		if (att.getProcessID().equals(ProcessType.CLIENT)) {
+
+			SelectionKey oppositeKey = att.getOppositeKey();
+			if (oppositeKey != null) {
+				AttachmentProxy oppositeAtt = (AttachmentProxy) oppositeKey
+						.attachment();
+				if (oppositeAtt.getResponse().isReadableFromFile()) {
+					ManageByteBuffer.readFromFile(channel, oppositeAtt
+							.getResponse().toString());
+					channel.close();
+					key.cancel();
+					return;
+				}
+			}
+		}
 		// Nothing left, so no longer interested in writes
 		if (att.getProcessID().equals(ProcessType.CLIENT)) {
 			channel.close();
