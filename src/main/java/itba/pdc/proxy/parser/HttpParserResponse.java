@@ -22,6 +22,7 @@ public class HttpParserResponse implements HttpParser {
 	private ByteBuffer buffer;
 	private boolean connectionClose = false;
 	private String method;
+	private int currentLength = 0;
 
 	public HttpParserResponse(HttpResponse response) {
 		this.response = response;
@@ -155,7 +156,10 @@ public class HttpParserResponse implements HttpParser {
 		} else if (response.bodyEnable()) {
 			Integer bytes = Integer.parseInt(response
 					.getHeader("content-length"));
-			if (!readBuffer(bytes)) {
+			currentLength += buffer.limit();
+			ManageByteBuffer.writeInFile(buffer, response.toString());
+			buffer = ByteBuffer.allocate(0);	
+			if (!readBuffer(currentLength, bytes)) {
 				return ParserCode.LOOP;
 			}
 			response.setBody(this.buffer);
@@ -213,6 +217,13 @@ public class HttpParserResponse implements HttpParser {
 		return ParserCode.LOOP;
 	}
 
+	private boolean readBuffer(Integer length, Integer contentLength) {
+		if (length == contentLength) {
+			return true;
+		}
+		return false;
+	}
+	
 	private boolean readBuffer(Integer contentLength) {
 		if (this.buffer.limit() == contentLength) {
 			return true;

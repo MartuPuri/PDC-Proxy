@@ -1,7 +1,10 @@
 package itba.pdc.proxy.lib;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
@@ -18,7 +21,8 @@ public final class ManageByteBuffer {
 			.getCR();
 	private static Integer lf = ReadConstantsConfiguration.getInstance()
 			.getLF();
-	private static Logger parserLogger = (Logger) LoggerFactory.getLogger("parser.log");
+	private static Logger parserLogger = (Logger) LoggerFactory
+			.getLogger("parser.log");
 
 	private ManageByteBuffer() {
 		parserLogger.error("The class ManageByteBuffer cannot be instantiated");
@@ -29,7 +33,8 @@ public final class ManageByteBuffer {
 		try {
 			return encoder.encode(CharBuffer.wrap(message));
 		} catch (Exception e) {
-			parserLogger.error("Problem encoding a string message into bytebuffer");
+			parserLogger
+					.error("Problem encoding a string message into bytebuffer");
 		}
 		return null;
 	}
@@ -41,7 +46,8 @@ public final class ManageByteBuffer {
 			data = decoder.decode(buffer).toString();
 			buffer.position(old_position);
 		} catch (Exception e) {
-			parserLogger.error("Problem decoding a bytebuffer into string message");
+			parserLogger
+					.error("Problem decoding a bytebuffer into string message");
 			return "";
 		}
 		return data;
@@ -91,6 +97,21 @@ public final class ManageByteBuffer {
 			int position = buffer.position();
 			buffer.limit(position);
 			return new String(array).trim();
+		}
+	}
+
+	public static void writeInFile(ByteBuffer buffer, String filename) {
+		try {
+			FileOutputStream fo = new FileOutputStream(filename, true);
+			FileChannel wChannel = fo.getChannel();
+
+			buffer.flip();
+			wChannel.write(buffer);
+			wChannel.close();
+			fo.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

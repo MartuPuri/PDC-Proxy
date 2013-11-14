@@ -1,8 +1,6 @@
 package itba.pdc.proxy.model;
 
-import itba.pdc.admin.MetricManager;
 import itba.pdc.admin.filter.ManageFilter;
-import itba.pdc.admin.filter.TransformationFilter;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
