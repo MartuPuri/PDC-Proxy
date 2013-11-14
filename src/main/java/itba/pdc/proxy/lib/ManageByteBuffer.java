@@ -141,9 +141,7 @@ public final class ManageByteBuffer {
 					}
 				} while (buffer.hasRemaining());
 				buffer.clear();
-				System.out.println("CONTINUE");
 			}
-			System.out.println("FINISH");
 			wChannel.close();
 			fi.close();
 			File file = new File(filename);
