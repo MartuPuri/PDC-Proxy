@@ -76,9 +76,9 @@ public class HttpHandler implements TCPProtocol {
 					ConnectionManager con = ConnectionManager.getInstance();
 					//we don't care about persistence, we just close it.
 					con.close(channel);
-					con.close(att.getOppositeChannel());
+					//we care about the persistance, so we give the specific host to de managar
+					con.close(att.getRequest().getHost(), att.getOppositeChannel());
 				}
-				StringBuilder builder = new StringBuilder();
 				key.cancel();
 				channel.close();
 			} else if (bytesRead > 0) {

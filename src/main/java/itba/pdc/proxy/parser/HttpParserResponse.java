@@ -146,7 +146,7 @@ public class HttpParserResponse implements HttpParser {
 	}
 
 	private ParserCode parseData() {
-		if (method.equals("HEAD")) {
+		if (method.equals("HEAD") || response.getStatusCode().equals(204)) {
 			state = ParserState.END;
 			return ParserCode.VALID;
 		}
