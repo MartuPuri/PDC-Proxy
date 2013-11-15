@@ -31,6 +31,7 @@ public class EHttpRequest extends HttpRequestAbstract implements HttpMessage {
 		headers.add("date");
 		headers.add("host");
 		headers.add("histogram");
+		headers.add("content-length");
 		return headers;
 	}
 
