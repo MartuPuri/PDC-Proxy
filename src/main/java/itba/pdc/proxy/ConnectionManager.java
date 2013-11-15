@@ -35,7 +35,7 @@ public class ConnectionManager {
 	private int max_conns = 2;
 	private Map<String, Set<SocketChannel>> persistent_connections;
 
-	private ConnectionManager() throws FileNotFoundException, IOException {
+	private ConnectionManager() {
 		if (instance != null) {
 			connectionLogger
 					.error("Instance of ReadProxyConfiguration already created");
